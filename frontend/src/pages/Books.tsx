@@ -92,7 +92,7 @@ const Books = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Books</h1>
+        <h1 className="text-2xl font-bold text-foreground">Books</h1>
         <p className="text-muted-foreground">
           Browse our collection of recommended books and share your reviews with the community.
         </p>
@@ -110,7 +110,7 @@ const Books = () => {
             </div>
             <CardContent className="flex-1 p-4 flex flex-col">
               <div className="flex-1">
-                <h3 className="font-bold text-lg mb-1 line-clamp-2">{book.title}</h3>
+                <h3 className="font-bold text-lg mb-1 line-clamp-2 text-foreground">{book.title}</h3>
                 <p className="text-sm text-muted-foreground mb-3">by {book.author}</p>
                 <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{book.description}</p>
               </div>
@@ -126,11 +126,11 @@ const Books = () => {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px]">
                   <DialogHeader>
-                    <DialogTitle className="text-2xl">Review "{book.title}"</DialogTitle>
+                    <DialogTitle className="text-2xl text-foreground">Review "{book.title}"</DialogTitle>
                   </DialogHeader>
                   <div className="grid gap-6 py-4">
                     <div className="space-y-4">
-                      <Label className="text-base">Rating</Label>
+                      <Label className="text-base text-foreground">Rating</Label>
                       <p className="text-sm text-muted-foreground">
                         How would you rate this book? Select the number of stars that best represents your experience.
                       </p>
@@ -157,7 +157,7 @@ const Books = () => {
                       </div>
                     </div>
                     <div className="grid w-full gap-2">
-                      <Label htmlFor="review" className="text-base">Review</Label>
+                      <Label htmlFor="review" className="text-base text-foreground">Review</Label>
                       <p className="text-sm text-muted-foreground">
                         Share your detailed thoughts about this book. What did you like or dislike? How did it impact you?
                       </p>

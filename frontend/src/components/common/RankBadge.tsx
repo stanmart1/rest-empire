@@ -10,11 +10,11 @@ interface RankBadgeProps {
 const RankBadge = ({ rank, size = 'md', showLabel = true }: RankBadgeProps) => {
   const rankConfig: Record<string, { color: string; bgColor: string; icon: any }> = {
     'Pearl': { color: 'text-gray-700', bgColor: 'bg-gray-100', icon: Gem },
-    'Sapphire': { color: 'text-blue-700', bgColor: 'bg-blue-100', icon: Gem },
+    'Sapphire': { color: 'text-primary', bgColor: 'bg-primary/10', icon: Gem },
     'Ruby': { color: 'text-red-700', bgColor: 'bg-red-100', icon: Gem },
     'Emerald': { color: 'text-emerald-700', bgColor: 'bg-emerald-100', icon: Gem },
-    'Diamond': { color: 'text-cyan-700', bgColor: 'bg-cyan-100', icon: Crown },
-    'Blue Diamond': { color: 'text-blue-700', bgColor: 'bg-blue-100', icon: Crown },
+    'Diamond': { color: 'text-primary', bgColor: 'bg-primary/10', icon: Crown },
+    'Blue Diamond': { color: 'text-primary', bgColor: 'bg-primary/10', icon: Crown },
     'Green Diamond': { color: 'text-green-700', bgColor: 'bg-green-100', icon: Crown },
     'Purple Diamond': { color: 'text-purple-700', bgColor: 'bg-purple-100', icon: Crown },
     'Red Diamond': { color: 'text-red-700', bgColor: 'bg-red-100', icon: Crown },
