@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, Calendar, User, Tag } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar, User, Tag, ArrowRight } from "lucide-react";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import { useEffect } from "react";
 
 // Dummy blog data
 const blogPosts = [
@@ -9,7 +12,6 @@ const blogPosts = [
     id: 1,
     title: "How to Build a Successful Network Marketing Business",
     excerpt: "Learn the fundamental strategies that top distributors use to build their network marketing empires.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     date: "2023-06-15",
     author: "John Smith",
     tags: ["Network Marketing", "Business Tips", "Success"],
@@ -19,7 +21,6 @@ const blogPosts = [
     id: 2,
     title: "Understanding the 14-Tier Rank System",
     excerpt: "A comprehensive guide to maximizing your earnings through our unique ranking system.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     date: "2023-06-10",
     author: "Sarah Johnson",
     tags: ["Rank System", "Earnings", "Growth"],
@@ -29,45 +30,19 @@ const blogPosts = [
     id: 3,
     title: "Top 5 Mistakes New Distributors Make",
     excerpt: "Avoid these common pitfalls that prevent new distributors from achieving success.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     date: "2023-06-05",
     author: "Michael Brown",
     tags: ["Beginners", "Mistakes", "Tips"],
     readTime: "6 min read"
-  },
-  {
-    id: 4,
-    title: "Maximizing Your Team Building Potential",
-    excerpt: "Proven techniques to attract, retain, and grow your network marketing team.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    date: "2023-05-28",
-    author: "Emily Davis",
-    tags: ["Team Building", "Leadership", "Recruitment"],
-    readTime: "8 min read"
-  },
-  {
-    id: 5,
-    title: "The Power of Multiple Income Streams",
-    excerpt: "Discover how to leverage different bonus structures for maximum earnings.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    date: "2023-05-20",
-    author: "Robert Wilson",
-    tags: ["Income", "Bonuses", "Strategy"],
-    readTime: "6 min read"
-  },
-  {
-    id: 6,
-    title: "Staying Motivated in Network Marketing",
-    excerpt: "Practical advice for maintaining momentum and achieving long-term success.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    date: "2023-05-15",
-    author: "Jennifer Lee",
-    tags: ["Motivation", "Mindset", "Success"],
-    readTime: "5 min read"
   }
 ];
 
 const Blog = () => {
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -85,7 +60,7 @@ const Blog = () => {
               Blog
             </h1>
             <p className="text-xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto">
-              Insights, tips, and strategies to help you build your network marketing empire.
+              Stay updated with the latest tips, strategies, and success stories from our network marketing community.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -95,8 +70,8 @@ const Blog = () => {
                 </Link>
               </Button>
               <Button asChild size="lg" className="text-lg px-8 py-6 bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                <Link to="/contact">
-                  Contact Us
+                <Link to="/faq">
+                  View FAQ
                 </Link>
               </Button>
             </div>
@@ -128,75 +103,43 @@ const Blog = () => {
         </div>
       </div>
 
-      {/* Blog Content */}
+      {/* Blog Posts */}
       <div className="container mx-auto px-4 py-16 relative z-10 bg-background">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogPosts.map((post) => (
-              <div key={post.id} className="bg-card rounded-xl border overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="p-6">
-                  <div className="flex items-center text-sm text-muted-foreground mb-3">
+              <Card key={post.id} className="flex flex-col">
+                <CardHeader>
+                  <CardTitle className="text-xl">{post.title}</CardTitle>
+                  <CardDescription className="text-foreground">{post.excerpt}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <div className="flex items-center text-sm text-foreground mb-2">
+                    <User className="w-4 h-4 mr-1" />
+                    <span>{post.author}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-foreground">
                     <Calendar className="w-4 h-4 mr-1" />
-                    <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                    <span className="mx-2">•</span>
-                    <span>{post.readTime}</span>
+                    <span>{new Date(post.date).toLocaleDateString()}</span>
                   </div>
-                  
-                  <h3 className="text-xl font-bold text-foreground mb-3 line-clamp-2">
-                    <Link to={`/blog/${post.id}`} className="hover:text-primary transition-colors">
-                      {post.title}
-                    </Link>
-                  </h3>
-                  
-                  <p className="text-muted-foreground mb-4 line-clamp-3">
-                    {post.excerpt}
-                  </p>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <User className="w-4 h-4 mr-1" />
-                      <span>{post.author}</span>
-                    </div>
-                    
-                    <Button asChild variant="outline" size="sm">
-                      <Link to={`/blog/${post.id}`}>
-                        Read More
-                      </Link>
-                    </Button>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-2 mt-4">
+                </CardContent>
+                <CardFooter className="flex flex-col">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     {post.tags.map((tag, index) => (
-                      <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
                         <Tag className="w-3 h-3 mr-1" />
                         {tag}
                       </span>
                     ))}
                   </div>
-                </div>
-              </div>
+                  <Button asChild className="w-full">
+                    <Link to={`/blog/${post.id}`}>
+                      Read More <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
             ))}
-          </div>
-          
-          {/* Pagination */}
-          <div className="flex justify-center mt-12">
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" disabled>
-                Previous
-              </Button>
-              <Button variant="outline" size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                1
-              </Button>
-              <Button variant="outline" size="sm">
-                2
-              </Button>
-              <Button variant="outline" size="sm">
-                3
-              </Button>
-              <Button variant="outline" size="sm">
-                Next
-              </Button>
-            </div>
           </div>
         </div>
       </div>
@@ -204,17 +147,19 @@ const Blog = () => {
       {/* CTA Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-8 md:p-12 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-6">Stay Updated with Our Latest Posts</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-6">Stay Informed</h2>
           <p className="text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
-            Join our community to receive notifications about new blog posts and updates.
+            Subscribe to our newsletter for the latest blog posts and industry insights delivered to your inbox.
           </p>
           <Button asChild size="lg" className="text-lg px-8 py-6 bg-white text-primary hover:bg-white/90">
             <Link to="/register">
-              Create Your Account <ArrowRight className="ml-2 h-5 w-5" />
+              Subscribe Now
             </Link>
           </Button>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };

@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Calendar, User, Tag, Share2 } from "lucide-react";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import { useEffect } from "react";
 
 // Dummy blog data
 const blogPosts = [
@@ -88,6 +90,11 @@ const BlogPost = () => {
   const { id } = useParams();
   const postId = parseInt(id || "1");
   const post = blogPosts.find(p => p.id === postId) || blogPosts[0];
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Function to handle sharing
   const handleShare = () => {
@@ -196,10 +203,10 @@ const BlogPost = () => {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-foreground mb-1">{post.author}</h3>
-                <p className="text-muted-foreground mb-3">
+                <p className="text-foreground mb-3">
                   About the author
                 </p>
-                <p className="text-muted-foreground">
+                <p className="text-foreground">
                   Experienced network marketing professional with over 10 years in the industry. 
                   Passionate about helping others achieve financial freedom through innovative business models.
                 </p>
@@ -223,6 +230,8 @@ const BlogPost = () => {
           </Button>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };

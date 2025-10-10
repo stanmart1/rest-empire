@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronRight, Users, Gift, CreditCard, Shield, Globe, ArrowRight, BarChart3, Zap, Lock } from "lucide-react";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useEffect } from "react";
 
 const FAQ = () => {
   const faqs = [
@@ -85,6 +87,11 @@ const FAQ = () => {
       ]
     }
   ];
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -166,7 +173,7 @@ const FAQ = () => {
                       <AccordionItem key={qIndex} value={`item-${index}-${qIndex}`}>
                         <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
                         <AccordionContent>
-                          <p className="text-muted-foreground">{faq.answer}</p>
+                          <p className="text-foreground">{faq.answer}</p>
                         </AccordionContent>
                       </AccordionItem>
                     ))}
@@ -192,6 +199,8 @@ const FAQ = () => {
           </Button>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };

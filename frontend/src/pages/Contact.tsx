@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Phone, Mail, MapPin, Clock, ArrowRight, Users, Gift, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/layout/Header";
-import { useState } from "react";
+import Footer from "@/components/layout/Footer";
+import { useState, useEffect } from "react";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,11 @@ const Contact = () => {
     subject: "",
     message: ""
   });
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -96,7 +102,7 @@ const Contact = () => {
               <Card className="h-full">
                 <CardHeader>
                   <CardTitle className="text-2xl">Get in Touch</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-foreground">
                     Reach out to us through any of the following channels and we'll respond within 24 hours.
                   </CardDescription>
                 </CardHeader>
@@ -107,8 +113,8 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-foreground">Phone</h3>
-                      <p className="text-muted-foreground">+1 (555) 123-4567</p>
-                      <p className="text-muted-foreground text-sm">Mon-Fri, 9:00 AM - 6:00 PM EST</p>
+                      <p className="text-foreground">+1 (555) 123-4567</p>
+                      <p className="text-foreground text-sm">Mon-Fri, 9:00 AM - 6:00 PM EST</p>
                     </div>
                   </div>
 
@@ -118,8 +124,8 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-foreground">Email</h3>
-                      <p className="text-muted-foreground">support@restempire.com</p>
-                      <p className="text-muted-foreground">partnerships@restempire.com</p>
+                      <p className="text-foreground">support@restempire.com</p>
+                      <p className="text-foreground">partnerships@restempire.com</p>
                     </div>
                   </div>
 
@@ -129,8 +135,8 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-foreground">Office</h3>
-                      <p className="text-muted-foreground">123 Business Avenue, Suite 100</p>
-                      <p className="text-muted-foreground">San Francisco, CA 94107</p>
+                      <p className="text-foreground">123 Business Avenue, Suite 100</p>
+                      <p className="text-foreground">San Francisco, CA 94107</p>
                     </div>
                   </div>
 
@@ -140,9 +146,9 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-foreground">Business Hours</h3>
-                      <p className="text-muted-foreground">Monday - Friday: 9:00 AM - 6:00 PM EST</p>
-                      <p className="text-muted-foreground">Saturday: 10:00 AM - 4:00 PM EST</p>
-                      <p className="text-muted-foreground">Sunday: Closed</p>
+                      <p className="text-foreground">Monday - Friday: 9:00 AM - 6:00 PM EST</p>
+                      <p className="text-foreground">Saturday: 10:00 AM - 4:00 PM EST</p>
+                      <p className="text-foreground">Sunday: Closed</p>
                     </div>
                   </div>
                 </CardContent>
@@ -153,7 +159,7 @@ const Contact = () => {
               <Card className="h-full">
                 <CardHeader>
                   <CardTitle className="text-2xl">Send us a Message</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-foreground">
                     Fill out the form below and we'll get back to you as soon as possible.
                   </CardDescription>
                 </CardHeader>
@@ -237,6 +243,8 @@ const Contact = () => {
           </Button>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };
