@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Main backgrounds - clean light theme */
+    --background: 240 20% 98%;
+    --foreground: 222.2 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47% 11%;
+
+    /* Primary: Blue theme matching reference */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-dark: 217 91% 50%;
+    --primary-light: 217 91% 70%;
+
+    /* Secondary: lighter gray */
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 222.2 47% 11%;
+
+    /* Muted: subtle grays */
+    --muted: 240 5% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    /* Accent: keep for special highlights */
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Status colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+
+    /* Rank colors */
+    --rank-amber: 38 92% 50%;
+    --rank-jade: 142 76% 36%;
+    --rank-pearl: 0 0% 85%;
+    --rank-sapphire: 217 91% 60%;
+    --rank-ruby: 0 84% 60%;
+    --rank-emerald: 142 76% 36%;
+    --rank-diamond: 191 97% 77%;
+    --rank-blue-diamond: 217 91% 60%;
+    --rank-green-diamond: 142 76% 36%;
+    --rank-purple-diamond: 262 83% 58%;
+    --rank-red-diamond: 0 84% 60%;
+    --rank-black-diamond: 0 0% 0%;
+    --rank-ultima-diamond: 45 93% 47%;
+    --rank-double-ultima: 45 93% 47%;
+
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
+    --gradient-dark: linear-gradient(135deg, hsl(217 33% 17%), hsl(217 33% 27%));
+
+    /* Sidebar - blue tint theme */
+    --sidebar-background: 217 91% 97%;
+    --sidebar-foreground: 222.2 47% 11%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 91% 92%;
+    --sidebar-accent-foreground: 222.2 47% 11%;
+    --sidebar-border: 217 50% 85%;
+    --sidebar-ring: 217 91% 60%;
+    --sidebar-muted: 215 16% 47%;
+
+    /* Shadows - softer for light theme */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 2px 4px 0 rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 4px 8px 0 rgb(0 0 0 / 0.06);
+    --shadow-glow: 0 0 20px hsl(217 91% 60% / 0.15);
+
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 217 33% 17%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 217 33% 17%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 245 58% 51%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217 33% 27%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 27%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 262 83% 58%;
+    --accent-foreground: 0 0% 100%;
+
+    --border: 217 33% 27%;
+    --input: 217 33% 27%;
+    --ring: 245 58% 51%;
+    
+    --sidebar-background: 217 33% 17%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 245 58% 51%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 33% 27%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 217 33% 27%;
+    --sidebar-ring: 245 58% 51%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

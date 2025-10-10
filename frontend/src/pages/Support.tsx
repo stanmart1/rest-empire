@@ -1,0 +1,123 @@
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+
+const Support = () => {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate form submission
+    setTimeout(() => {
+      toast({
+        title: "Message sent",
+        description: "Your inquiry has been submitted to our support team.",
+      });
+      setIsSubmitting(false);
+      (e.target as HTMLFormElement).reset();
+    }, 1000);
+  };
+
+  const faqCategories = [
+    {
+      title: "Change passport/address/phone",
+      content: "To update your personal information including passport, address, or phone number, please contact your sponsor or team leader directly. They will guide you through the verification process required for security purposes."
+    },
+    {
+      title: "Change your e-mail address",
+      content: "Email changes require verification for security. Please submit a request through your account settings or contact support with your current email and the new email address you'd like to use. Verification links will be sent to both addresses."
+    },
+    {
+      title: "Question about bonuses",
+      content: "Bonus calculations are based on your rank, team performance, and active status. Direct bonuses are paid at 40% for Level 1, with decreasing percentages for subsequent levels. Rank bonuses are one-time payments awarded when achieving new ranks. For specific bonus questions, please refer to your bonus dashboard or contact your sponsor."
+    },
+    {
+      title: "Questions about verification",
+      content: "Account verification typically takes 24-48 hours after submitting required documents. Ensure all documents are clear, valid, and match your account information. You'll receive an email notification once verification is complete. Active verification is required to receive bonuses and payouts."
+    },
+    {
+      title: "Account recovery, safety",
+      content: "If you've lost access to your account, use the password recovery option on the login page. For additional security concerns, contact support immediately. We recommend enabling two-factor authentication and keeping your contact information up to date for account security."
+    }
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold mb-2">Support</h1>
+        <p className="text-muted-foreground">Submit an inquiry to our support team</p>
+      </div>
+
+      {/* FAQ Section */}
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-muted-foreground mb-6">
+            If you have any issues with the Rest Empire platform, we recommend seeking advice from your sponsor or team leader. Our community members learn fast and can help each other.
+          </p>
+
+          <Accordion type="single" collapsible className="w-full">
+            {faqCategories.map((item, index) => (
+              <AccordionItem key={index} value={`item-${index}`}>
+                <AccordionTrigger className="text-left hover:no-underline">
+                  {item.title}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {item.content}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      {/* Contact Form */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Still need help?</CardTitle>
+          <CardDescription>
+            Send us a message and our support team will get back to you
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="subject">Subject</Label>
+              <Input
+                id="subject"
+                placeholder="Brief description of your issue"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="message">Message</Label>
+              <Textarea
+                id="message"
+                placeholder="Please provide details about your inquiry..."
+                rows={6}
+                required
+              />
+            </div>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Sending...' : 'Submit Inquiry'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default Support;

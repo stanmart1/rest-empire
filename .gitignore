@@ -1,0 +1,8 @@
+# Frontend files
+frontend/node_moddules
+frontend/.env
+frontend/dist
+
+# Backend files
+backend/.env
+backend/venv
