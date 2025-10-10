@@ -28,7 +28,7 @@ const Dashboard = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2 flex-1">
               <span className="text-sm text-muted-foreground">Referral link</span>
-              <span className="text-sm font-medium break-all">{referralLink}</span>
+              <span className="text-sm font-medium break-all text-foreground">{referralLink}</span>
             </div>
             <div className="flex gap-2">
               <Button size="icon" variant="ghost" onClick={copyReferralLink}>
@@ -53,7 +53,7 @@ const Dashboard = () => {
 
       {/* My available balance */}
       <div>
-        <h2 className="text-xl font-semibold mb-4">My available balance</h2>
+        <h2 className="text-xl font-semibold mb-4 text-foreground">My available balance</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardContent className="p-6">
@@ -61,9 +61,9 @@ const Dashboard = () => {
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <Euro className="w-5 h-5 text-primary" />
                 </div>
-                <span className="font-medium">EUR</span>
+                <span className="font-medium text-foreground">EUR</span>
               </div>
-              <p className="text-3xl font-bold mb-4">0</p>
+              <p className="text-3xl font-bold mb-4 text-foreground">0</p>
               <Button 
                 className="w-full" 
                 variant="outline"
@@ -82,12 +82,12 @@ const Dashboard = () => {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                  <Gem className="w-5 h-5 text-blue-500" />
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Gem className="w-5 h-5 text-primary" />
                 </div>
-                <span className="font-medium">DBSP</span>
+                <span className="font-medium text-foreground">DBSP</span>
               </div>
-              <p className="text-3xl font-bold mb-4">0</p>
+              <p className="text-3xl font-bold mb-4 text-foreground">0</p>
               <Button 
                 className="w-full" 
                 variant="outline"
@@ -107,7 +107,7 @@ const Dashboard = () => {
 
       {/* My Status & Rank */}
       <div>
-        <h2 className="text-xl font-semibold mb-4">My Status & Rank</h2>
+        <h2 className="text-xl font-semibold mb-4 text-foreground">My Status & Rank</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* My Status */}
           <Card>
@@ -119,7 +119,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Turnover</p>
-                  <p className="text-2xl font-bold">0 EUR</p>
+                  <p className="text-2xl font-bold text-foreground">0 EUR</p>
                 </div>
               </div>
             </CardContent>
@@ -136,21 +136,21 @@ const Dashboard = () => {
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">0 / 25 000 EUR</p>
-                    <p className="text-lg font-semibold">0%</p>
+                    <p className="text-lg font-semibold text-foreground">0%</p>
                   </div>
                 </div>
                 
-                <div className="bg-green-50 p-4 rounded-lg">
+                <div className="bg-primary/5 p-4 rounded-lg">
                   <p className="text-sm text-muted-foreground mb-1">Rank bonus</p>
-                  <p className="text-2xl font-bold text-success">0 EUR</p>
+                  <p className="text-2xl font-bold text-primary">0 EUR</p>
                 </div>
 
                 <div className="space-y-2">
                   <Progress value={0} className="h-2" />
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="bg-success text-white">0%</Badge>
-                    <Badge variant="secondary" className="bg-blue-500 text-white">0%</Badge>
-                    <Badge variant="secondary" className="bg-orange-500 text-white">0%</Badge>
+                    <Badge variant="secondary" className="bg-primary text-primary-foreground">0%</Badge>
+                    <Badge variant="secondary" className="bg-secondary text-secondary-foreground">0%</Badge>
+                    <Badge variant="secondary" className="bg-muted text-foreground">0%</Badge>
                   </div>
                   <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                     <span>■ 50%</span>
@@ -171,24 +171,24 @@ const Dashboard = () => {
         {/* My Team */}
         <Card>
           <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4">My Team</h3>
+            <h3 className="text-lg font-semibold mb-4 text-foreground">My Team</h3>
             <div className="flex items-center gap-3 mb-6">
               <Avatar className="w-12 h-12">
                 <AvatarFallback>PA</AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium">Peter Adelodun</p>
+                <p className="font-medium text-foreground">Peter Adelodun</p>
                 <p className="text-sm text-muted-foreground">Not verified</p>
               </div>
             </div>
             <div className="space-y-4">
-              <div className="flex justify-between items-center py-3 border-b">
+              <div className="flex justify-between items-center py-3 border-b border-border">
                 <span className="text-muted-foreground">First Line</span>
-                <span className="text-2xl font-bold">0</span>
+                <span className="text-2xl font-bold text-foreground">0</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">All Team</span>
-                <span className="text-2xl font-bold">0</span>
+                <span className="text-2xl font-bold text-foreground">0</span>
               </div>
             </div>
           </CardContent>
@@ -197,7 +197,7 @@ const Dashboard = () => {
         {/* Infinity Bonus */}
         <Card>
           <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Infinity Bonus</h3>
+            <h3 className="text-lg font-semibold mb-4 text-foreground">Infinity Bonus</h3>
             <div className="flex flex-col items-center justify-center py-8">
               <div className="relative w-40 h-40 mb-4 sm:w-48 sm:h-48">
                 <svg className="w-full h-full transform -rotate-90">
@@ -231,7 +231,7 @@ const Dashboard = () => {
               </div>
               <div className="text-center">
                 <p className="text-sm text-muted-foreground mb-1">Your bonus</p>
-                <p className="text-3xl font-bold">0</p>
+                <p className="text-3xl font-bold text-foreground">0</p>
               </div>
             </div>
           </CardContent>

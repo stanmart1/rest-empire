@@ -29,9 +29,9 @@ const Topbar = () => {
       <div className="flex items-center gap-4 sm:gap-6">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-white font-bold text-sm">RE</span>
+            <span className="text-primary-foreground font-bold text-sm">RE</span>
           </div>
-          <span className="font-bold text-lg hidden sm:block">
+          <span className="font-bold text-lg hidden sm:block text-foreground">
             <span className="text-primary">REST</span>
             <span className="font-normal"> EMPIRE</span>
           </span>
@@ -75,7 +75,7 @@ const Topbar = () => {
                   {user?.name ? getInitials(user.name) : 'U'}
                 </AvatarFallback>
               </Avatar>
-              <span className="font-medium text-sm hidden sm:block">{user?.name || 'User'}</span>
+              <span className="font-medium text-sm hidden sm:block text-foreground">{user?.name || 'User'}</span>
               <ChevronDown className="w-4 h-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>

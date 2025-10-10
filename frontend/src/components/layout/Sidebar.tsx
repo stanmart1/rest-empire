@@ -94,13 +94,13 @@ const Sidebar = () => {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm truncate">{user?.name || 'User'}</p>
+              <p className="font-medium text-sm truncate text-sidebar-foreground">{user?.name || 'User'}</p>
               <p className="text-xs text-sidebar-muted">Not verified</p>
             </div>
           </div>
           <div className="text-center py-2 bg-muted rounded-lg">
             <p className="text-xs text-sidebar-muted mb-1">Inactive</p>
-            <p className="text-sm font-medium">since {new Date().toLocaleDateString('en-GB')}</p>
+            <p className="text-sm font-medium text-sidebar-foreground">since {new Date().toLocaleDateString('en-GB')}</p>
           </div>
         </div>
 
@@ -211,13 +211,13 @@ const Sidebar = () => {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm truncate">{user?.name || 'User'}</p>
+              <p className="font-medium text-sm truncate text-sidebar-foreground">{user?.name || 'User'}</p>
               <p className="text-xs text-sidebar-muted">Not verified</p>
             </div>
           </div>
           <div className="text-center py-2 bg-muted rounded-lg">
             <p className="text-xs text-sidebar-muted mb-1">Inactive</p>
-            <p className="text-sm font-medium">since {new Date().toLocaleDateString('en-GB')}</p>
+            <p className="text-sm font-medium text-sidebar-foreground">since {new Date().toLocaleDateString('en-GB')}</p>
           </div>
         </div>
 
