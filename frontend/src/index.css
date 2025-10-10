@@ -18,27 +18,27 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
 
-    /* Primary: Leaf Green #33563A */
-    --primary: 180 20% 25%; /* Leaf Green */
+    /* Primary: Vibrant Green #00A651 */
+    --primary: 153 100% 32%; /* Vibrant Green */
     --primary-foreground: 0 0% 100%;
-    --primary-dark: 180 20% 20%; /* Darker shade for hover */
-    --primary-light: 180 20% 30%; /* Lighter shade */
+    --primary-dark: 153 100% 25%; /* Darker shade for hover */
+    --primary-light: 153 100% 40%; /* Lighter shade */
 
     /* Secondary: Muted Olive Green #45654C */
-    --secondary: 180 15% 30%; /* Muted Olive Green */
+    --secondary: 135 20% 33%; /* Muted Olive Green */
     --secondary-foreground: 0 0% 100%;
-    --secondary-dark: 180 15% 25%; /* Darker shade for hover */
+    --secondary-dark: 135 20% 28%; /* Darker shade for hover */
 
-    /* Accent: Deep Forest Green #13331A */
-    --accent: 180 30% 15%; /* Deep Forest Green */
+    /* Accent: Vibrant Green #00A651 */
+    --accent: 153 100% 32%; /* Vibrant Green */
     --accent-foreground: 0 0% 100%;
 
     /* Muted: Soft Sage #406148 */
-    --muted: 180 15% 35%; /* Soft Sage */
+    --muted: 135 20% 31%; /* Soft Sage */
     --muted-foreground: 0 0% 0%;
 
     /* Status colors */
-    --success: 180 20% 25%; /* Leaf Green */
+    --success: 153 100% 32%; /* Vibrant Green */
     --success-foreground: 0 0% 100%;
     
     --warning: 38 92% 50%;
@@ -47,52 +47,52 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --info: 180 20% 25%; /* Leaf Green */
+    --info: 153 100% 32%; /* Vibrant Green */
     --info-foreground: 0 0% 100%;
 
     /* Rank colors */
     --rank-amber: 38 92% 50%;
-    --rank-jade: 142 76% 36%;
+    --rank-jade: 153 100% 32%; /* Vibrant Green */
     --rank-pearl: 0 0% 85%;
-    --rank-sapphire: 180 20% 25%; /* Leaf Green */
+    --rank-sapphire: 153 100% 32%; /* Vibrant Green */
     --rank-ruby: 0 84% 60%;
-    --rank-emerald: 142 76% 36%;
-    --rank-diamond: 180 20% 25%; /* Leaf Green */
-    --rank-blue-diamond: 180 20% 25%; /* Leaf Green */
-    --rank-green-diamond: 142 76% 36%;
+    --rank-emerald: 153 100% 32%; /* Vibrant Green */
+    --rank-diamond: 153 100% 32%; /* Vibrant Green */
+    --rank-blue-diamond: 153 100% 32%; /* Vibrant Green */
+    --rank-green-diamond: 153 100% 32%; /* Vibrant Green */
     --rank-purple-diamond: 262 83% 58%;
     --rank-red-diamond: 0 84% 60%;
     --rank-black-diamond: 0 0% 0%;
     --rank-ultima-diamond: 45 93% 47%;
     --rank-double-ultima: 45 93% 47%;
 
-    --border: 180 15% 85%; /* Light border */
-    --input: 180 15% 85%;
-    --ring: 180 20% 25%; /* Leaf Green */
+    --border: 135 20% 85%; /* Light border */
+    --input: 135 20% 85%;
+    --ring: 153 100% 32%; /* Vibrant Green */
 
     --radius: 0.75rem;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(180 20% 25%), hsl(180 20% 30%));
-    --gradient-success: linear-gradient(135deg, hsl(180 20% 25%), hsl(180 20% 30%));
-    --gradient-dark: linear-gradient(135deg, hsl(180 30% 15%), hsl(180 20% 20%));
+    --gradient-primary: linear-gradient(135deg, hsl(153 100% 32%), hsl(153 100% 40%));
+    --gradient-success: linear-gradient(135deg, hsl(153 100% 32%), hsl(153 100% 40%));
+    --gradient-dark: linear-gradient(135deg, hsl(153 100% 25%), hsl(153 100% 32%));
 
-    /* Sidebar - forest green theme */
-    --sidebar-background: 180 20% 97%; /* Very light green */
+    /* Sidebar - vibrant green theme */
+    --sidebar-background: 153 100% 97%; /* Very light green */
     --sidebar-foreground: 0 0% 0%;
-    --sidebar-primary: 180 20% 25%; /* Leaf Green */
+    --sidebar-primary: 153 100% 32%; /* Vibrant Green */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 180 20% 92%; /* Light green accent */
+    --sidebar-accent: 153 100% 92%; /* Light green accent */
     --sidebar-accent-foreground: 0 0% 0%;
-    --sidebar-border: 180 15% 85%;
-    --sidebar-ring: 180 20% 25%; /* Leaf Green */
-    --sidebar-muted: 180 15% 40%;
+    --sidebar-border: 153 20% 85%;
+    --sidebar-ring: 153 100% 32%; /* Vibrant Green */
+    --sidebar-muted: 153 20% 40%;
 
     /* Shadows - softer for light theme */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 2px 4px 0 rgb(0 0 0 / 0.05);
     --shadow-lg: 0 4px 8px 0 rgb(0 0 0 / 0.06);
-    --shadow-glow: 0 0 20px hsl(180 20% 25% / 0.15);
+    --shadow-glow: 0 0 20px hsl(153 100% 32% / 0.15);
 
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -100,42 +100,42 @@ All colors MUST be HSL.
 
   .dark {
     /* Dark mode colors - keeping the same green palette but adjusting for dark backgrounds */
-    --background: 180 20% 10%; /* Dark green background */
+    --background: 153 100% 8%; /* Dark green background */
     --foreground: 0 0% 100%; /* White text */
 
-    --card: 180 20% 12%;
+    --card: 153 100% 10%;
     --card-foreground: 0 0% 100%;
 
-    --popover: 180 20% 12%;
+    --popover: 153 100% 10%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 180 20% 35%; /* Lighter Leaf Green for dark mode */
+    --primary: 153 100% 35%; /* Lighter Vibrant Green for dark mode */
     --primary-foreground: 0 0% 100%;
-    --primary-dark: 180 20% 30%;
-    --primary-light: 180 20% 40%;
+    --primary-dark: 153 100% 30%;
+    --primary-light: 153 100% 40%;
 
-    --secondary: 180 15% 40%; /* Lighter Muted Olive Green */
+    --secondary: 153 20% 35%; /* Lighter Muted Olive Green */
     --secondary-foreground: 0 0% 100%;
-    --secondary-dark: 180 15% 35%;
+    --secondary-dark: 153 20% 30%;
 
-    --accent: 180 30% 25%; /* Lighter Deep Forest Green */
+    --accent: 153 100% 35%; /* Lighter Vibrant Green */
     --accent-foreground: 0 0% 100%;
 
-    --muted: 180 15% 30%;
+    --muted: 153 20% 30%;
     --muted-foreground: 0 0% 100%;
 
-    --border: 180 15% 25%;
-    --input: 180 15% 25%;
-    --ring: 180 20% 35%;
+    --border: 153 20% 25%;
+    --input: 153 20% 25%;
+    --ring: 153 100% 35%;
     
-    --sidebar-background: 180 20% 15%;
+    --sidebar-background: 153 100% 12%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 180 20% 35%;
+    --sidebar-primary: 153 100% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 180 20% 25%;
+    --sidebar-accent: 153 100% 30%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 180 15% 25%;
-    --sidebar-ring: 180 20% 35%;
+    --sidebar-border: 153 20% 25%;
+    --sidebar-ring: 153 100% 35%;
   }
 }
 
