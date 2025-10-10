@@ -17,7 +17,7 @@ const About = () => {
         
         <div className="container mx-auto px-4 py-28 md:py-36 lg:py-44 relative z-10">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-primary-foreground leading-tight">
               About Us
             </h1>
             <p className="text-xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto">
@@ -30,7 +30,7 @@ const About = () => {
                   Create Account <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild size="lg" className="text-lg px-8 py-6 bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary">
+              <Button asChild size="lg" className="text-lg px-8 py-6 bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
                 <Link to="/contact">
                   Contact Us
                 </Link>
