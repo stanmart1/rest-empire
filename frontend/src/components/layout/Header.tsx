@@ -26,6 +26,7 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-foreground hover:text-primary font-medium">Home</Link>
             <Link to="/about" className="text-foreground hover:text-primary font-medium">About</Link>
+            <Link to="/blog" className="text-foreground hover:text-primary font-medium">Blog</Link>
             <Link to="/contact" className="text-foreground hover:text-primary font-medium">Contact</Link>
             <Link to="/faq" className="text-foreground hover:text-primary font-medium">FAQ</Link>
           </nav>
@@ -62,6 +63,7 @@ const Header = () => {
             <div className="flex flex-col space-y-4">
               <Link to="/" className="text-foreground hover:text-primary font-medium" onClick={() => setMobileMenuOpen(false)}>Home</Link>
               <Link to="/about" className="text-foreground hover:text-primary font-medium" onClick={() => setMobileMenuOpen(false)}>About</Link>
+              <Link to="/blog" className="text-foreground hover:text-primary font-medium" onClick={() => setMobileMenuOpen(false)}>Blog</Link>
               <Link to="/contact" className="text-foreground hover:text-primary font-medium" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
               <Link to="/faq" className="text-foreground hover:text-primary font-medium" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
               <div className="flex flex-col space-y-2 pt-4 border-t border-border">

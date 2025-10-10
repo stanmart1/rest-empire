@@ -219,40 +219,7 @@ const Contact = () => {
           </div>
 
           {/* Features Section */}
-          <div className="mt-20">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground">Why Choose Rest Empire</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-card p-8 rounded-xl border shadow-sm hover:shadow-md transition-shadow text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                  <Users className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-2xl font-semibold mb-4 text-foreground">Team Building</h3>
-                <p className="text-muted-foreground">
-                  Easily manage and support your growing team with our intuitive dashboard and powerful analytics tools.
-                </p>
-              </div>
-              
-              <div className="bg-card p-8 rounded-xl border shadow-sm hover:shadow-md transition-shadow text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                  <Gift className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-2xl font-semibold mb-4 text-foreground">Multiple Bonuses</h3>
-                <p className="text-muted-foreground">
-                  Earn through various bonus structures including Rank, Unilevel, and Infinity bonuses for maximum income potential.
-                </p>
-              </div>
-              
-              <div className="bg-card p-8 rounded-xl border shadow-sm hover:shadow-md transition-shadow text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                  <TrendingUp className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-2xl font-semibold mb-4 text-foreground">Real-time Analytics</h3>
-                <p className="text-muted-foreground">
-                  Track your team performance and earnings in real-time with comprehensive reporting and visualization tools.
-                </p>
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
 
