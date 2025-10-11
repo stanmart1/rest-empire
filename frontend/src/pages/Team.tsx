@@ -224,7 +224,7 @@ const Team = () => {
             </div>
             <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
               <Mail className="w-4 h-4 text-primary" />
-              <span className="text-sm">{sponsorInfo.email}</span>
+              <span className="text-sm text-white">kike4gold@gmail.com</span>
               <Button 
                 size="icon" 
                 variant="ghost" 

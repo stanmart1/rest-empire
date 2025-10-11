@@ -159,16 +159,16 @@ const Payouts = () => {
 
             <div className="bg-muted p-4 rounded-lg space-y-2">
               <div className="flex justify-between">
-                <span>Requested Amount:</span>
-                <span className="font-semibold">{formatCurrency(watchAmount || 0, watchCurrency)}</span>
+                <span className="text-white">Requested Amount:</span>
+                <span className="font-semibold text-white">{formatCurrency(watchAmount || 0, watchCurrency)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Processing Fee (5%):</span>
-                <span className="text-destructive">-{formatCurrency(fee, watchCurrency)}</span>
+                <span className="text-white">Processing Fee (5%):</span>
+                <span className="text-white">-{formatCurrency(fee, watchCurrency)}</span>
               </div>
               <div className="flex justify-between text-lg font-bold pt-2 border-t border-border">
-                <span>Net Amount:</span>
-                <span className="text-success">{formatCurrency(netAmount, watchCurrency)}</span>
+                <span className="text-white">Net Amount:</span>
+                <span className="text-white">{formatCurrency(netAmount, watchCurrency)}</span>
               </div>
             </div>
 
