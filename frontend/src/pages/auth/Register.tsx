@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Loader2, Mail, Eye, EyeOff, Lock, Phone, Check } from 'lucide-react';
+import { Loader2, Mail, Eye, EyeOff, Lock, Phone, Check, ArrowLeft } from 'lucide-react';
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -70,6 +70,15 @@ const Register = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-5xl relative py-8">
         <div className="flex flex-col lg:flex-row gap-8 items-center">
+        {/* Back to Home Button */}
+        <div className="absolute top-4 left-4">
+          <Link to="/">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+          </Link>
+        </div>
         {/* Registration Form */}
         <Card className={`w-full lg:w-1/2 transition-all duration-500 ease-in-out ${step === 1 ? 'lg:translate-x-0' : 'lg:translate-x-[calc(100%+2rem)]'}`}>
           <CardHeader className="space-y-1 pb-4">
@@ -308,14 +317,7 @@ const Register = () => {
               </p>
             </CardFooter>
           </form>
-          {/* Back to Home Button */}
-          <div className="px-6 pb-6">
-            <Link to="/">
-              <Button variant="outline" className="w-full">
-                Back to Home
-              </Button>
-            </Link>
-          </div>
+
         </Card>
 
         {/* Info Section */}
