@@ -197,6 +197,46 @@ export const usePromoStats = () => {
   });
 };
 
+// Transactions hooks
+export const useTransactions = (params?: {
+  page?: number;
+  limit?: number;
+  type?: string;
+  status?: string;
+}) => {
+  return useQuery({
+    queryKey: ['transactions', params],
+    queryFn: () => apiService.transactions.getTransactions(params),
+  });
+};
+
+// Payouts hooks
+export const usePayouts = (params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+}) => {
+  return useQuery({
+    queryKey: ['payouts', params],
+    queryFn: () => apiService.payouts.getPayouts(params),
+  });
+};
+
+// Activation hooks
+export const useActivationPackages = () => {
+  return useQuery({
+    queryKey: ['activation-packages'],
+    queryFn: apiService.activation.getPackages,
+  });
+};
+
+export const useActivationStatus = () => {
+  return useQuery({
+    queryKey: ['activation-status'],
+    queryFn: apiService.activation.getStatus,
+  });
+};
+
 // Books hooks
 export const useBooks = () => {
   return useQuery({

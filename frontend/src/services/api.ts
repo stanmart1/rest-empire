@@ -90,7 +90,7 @@ export const bonusAPI = {
     limit?: number;
     type?: string;
   }) => {
-    const response = await api.get('/bonuses', { params });
+    const response = await api.get('/bonuses/', { params });
     return response.data;
   },
 
@@ -108,7 +108,7 @@ export const transactionAPI = {
     type?: string;
     status?: string;
   }) => {
-    const response = await api.get('/transactions', { params });
+    const response = await api.get('/transactions/', { params });
     return response.data;
   }
 };
@@ -240,6 +240,42 @@ export const booksAPI = {
   }
 };
 
+// Activation API
+export const activationAPI = {
+  getPackages: async () => {
+    const response = await api.get('/activation/packages');
+    return response.data;
+  },
+
+  getStatus: async () => {
+    const response = await api.get('/activation/status');
+    return response.data;
+  },
+
+  requestActivation: async (data: { package: string; payment_method: string }) => {
+    const response = await api.post('/activation/request', data);
+    return response.data;
+  }
+};
+
+// Support API
+export const supportAPI = {
+  createTicket: async (data: { subject: string; message: string; category?: string }) => {
+    const response = await api.post('/support/tickets', data);
+    return response.data;
+  },
+
+  getTickets: async () => {
+    const response = await api.get('/support/tickets');
+    return response.data;
+  },
+
+  getTicket: async (id: number) => {
+    const response = await api.get(`/support/tickets/${id}`);
+    return response.data;
+  }
+};
+
 export default {
   auth: authAPI,
   user: userAPI,
@@ -250,5 +286,7 @@ export default {
   ranks: ranksAPI,
   events: eventsAPI,
   promoMaterials: promoMaterialsAPI,
-  books: booksAPI
+  books: booksAPI,
+  activation: activationAPI,
+  support: supportAPI
 };

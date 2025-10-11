@@ -1,52 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Download } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 import StatusBadge from '@/components/common/StatusBadge';
 import { formatCurrency, formatDateTime } from '@/utils/formatters';
-import api from '@/lib/api';
+import { useTransactions } from '@/hooks/useApi';
 import { Transaction } from '@/lib/types';
 
 const Transactions = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [activeTab, setActiveTab] = useState('all');
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const response = await api.get('/transactions');
-        const transactionData = response.data?.data || [];
-        setTransactions(transactionData);
-        setFilteredTransactions(transactionData);
-      } catch (error) {
-        console.error('Failed to fetch transactions:', error);
-        setTransactions([]);
-        setFilteredTransactions([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTransactions();
-  }, []);
-
-  useEffect(() => {
-    if (activeTab === 'all') {
-      setFilteredTransactions(transactions);
-    } else {
-      setFilteredTransactions(transactions.filter(t => t.type === activeTab));
-    }
-  }, [activeTab, transactions]);
+  
+  const { data: transactions, isLoading } = useTransactions({
+    type: activeTab !== 'all' ? activeTab : undefined
+  });
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <Loader2 className="h-12 w-12 animate-spin" />
       </div>
     );
   }
@@ -122,14 +96,14 @@ const Transactions = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredTransactions.map((transaction) => (
+                    {transactions?.map((transaction: Transaction) => (
                       <tr
                         key={transaction.id}
                         className="border-b border-border hover:bg-muted/50 cursor-pointer"
                         onClick={() => setSelectedTransaction(transaction)}
                       >
                         <td className="p-4">
-                          <p className="text-sm">{formatDateTime(transaction.createdAt)}</p>
+                          <p className="text-sm">{formatDateTime(transaction.created_at)}</p>
                         </td>
                         <td className="p-4">
                           <span className="capitalize">{transaction.type}</span>
@@ -152,7 +126,7 @@ const Transactions = () => {
                     ))}
                   </tbody>
                 </table>
-                {filteredTransactions.length === 0 && (
+                {!transactions?.length && (
                   <p className="text-center text-muted-foreground py-8">No transactions found</p>
                 )}
               </div>
@@ -193,7 +167,7 @@ const Transactions = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Date</p>
-                  <p>{formatDateTime(selectedTransaction.createdAt)}</p>
+                  <p>{formatDateTime(selectedTransaction.created_at)}</p>
                 </div>
               </div>
               <div>

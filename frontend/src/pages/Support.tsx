@@ -10,25 +10,42 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useMutation } from '@tanstack/react-query';
+import apiService from '@/services/api';
 
 const Support = () => {
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    subject: '',
+    message: ''
+  });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
+  const submitMutation = useMutation({
+    mutationFn: (data: { subject: string; message: string }) =>
+      apiService.support.createTicket(data),
+    onSuccess: (data) => {
       toast({
-        title: "Message sent",
-        description: "Your inquiry has been submitted to our support team.",
+        title: "Ticket Created",
+        description: `Your support ticket #${data.ticket_id} has been submitted successfully.`,
       });
-      setIsSubmitting(false);
-      (e.target as HTMLFormElement).reset();
-    }, 1000);
+      setFormData({ subject: '', message: '' });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.response?.data?.detail || "Failed to submit support ticket",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (formData.subject.trim() && formData.message.trim()) {
+      submitMutation.mutate(formData);
+    }
   };
 
   const faqCategories = [
@@ -98,6 +115,8 @@ const Support = () => {
               <Input
                 id="subject"
                 placeholder="Brief description of your issue"
+                value={formData.subject}
+                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 required
               />
             </div>
@@ -107,11 +126,20 @@ const Support = () => {
                 id="message"
                 placeholder="Please provide details about your inquiry..."
                 rows={6}
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 required
               />
             </div>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Sending...' : 'Submit Inquiry'}
+            <Button type="submit" disabled={submitMutation.isPending}>
+              {submitMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                'Submit Inquiry'
+              )}
             </Button>
           </form>
         </CardContent>

@@ -1,70 +1,42 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, Coins, Clock } from 'lucide-react';
+import { TrendingUp, Coins, Clock, Loader2 } from 'lucide-react';
 import StatCard from '@/components/common/StatCard';
-import StatusBadge from '@/components/common/StatusBadge';
 import { formatCurrency, formatDate } from '@/utils/formatters';
-import api from '@/lib/api';
+import { useBonuses, useBonusSummary } from '@/hooks/useApi';
 import { Bonus } from '@/lib/types';
 
 const Bonuses = () => {
-  const [bonuses, setBonuses] = useState<Bonus[]>([]);
-  const [filteredBonuses, setFilteredBonuses] = useState<Bonus[]>([]);
   const [activeTab, setActiveTab] = useState('all');
-  const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalEarned: 0,
-    thisMonth: 0,
-    pending: 0,
+  
+  const { data: bonuses, isLoading: bonusesLoading } = useBonuses({
+    type: activeTab !== 'all' ? activeTab : undefined
   });
+  
+  const { data: summary, isLoading: summaryLoading } = useBonusSummary('30d');
 
-  useEffect(() => {
-    const fetchBonuses = async () => {
-      try {
-        const [bonusesRes, statsRes] = await Promise.all([
-          api.get('/bonuses'),
-          api.get('/bonuses/stats'),
-        ]);
-
-        const bonusData = bonusesRes.data?.data || [];
-        setBonuses(bonusData);
-        setFilteredBonuses(bonusData);
-        setStats(statsRes.data || { totalEarned: 0, thisMonth: 0, pending: 0 });
-      } catch (error) {
-        console.error('Failed to fetch bonuses:', error);
-        setBonuses([]);
-        setFilteredBonuses([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchBonuses();
-  }, []);
-
-  useEffect(() => {
-    if (activeTab === 'all') {
-      setFilteredBonuses(bonuses);
-    } else {
-      setFilteredBonuses(bonuses.filter(b => b.type === activeTab));
-    }
-  }, [activeTab, bonuses]);
+  const isLoading = bonusesLoading || summaryLoading;
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <Loader2 className="h-12 w-12 animate-spin" />
       </div>
     );
   }
 
-  const chartData = bonuses.slice(0, 7).map(b => ({
-    date: formatDate(b.createdAt),
+  const chartData = bonuses?.slice(0, 7).map((b: Bonus) => ({
+    date: formatDate(b.created_at),
     amount: b.amount,
-  }));
+  })) || [];
+
+  const stats = {
+    totalEarned: summary?.total_earned || 0,
+    thisMonth: summary?.period_total || 0,
+    pending: summary?.pending_amount || 0,
+  };
 
   return (
     <div className="space-y-6">
@@ -135,16 +107,16 @@ const Bonuses = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredBonuses.map((bonus) => (
+                    {bonuses?.map((bonus: Bonus) => (
                       <tr key={bonus.id} className="border-b border-border hover:bg-muted/50">
                         <td className="p-4">
-                          <p className="text-sm">{formatDate(bonus.createdAt)}</p>
+                          <p className="text-sm">{formatDate(bonus.created_at)}</p>
                         </td>
                         <td className="p-4">
                           <span className="capitalize">{bonus.type}</span>
                         </td>
                         <td className="p-4">
-                          <p className="font-medium">{bonus.sourceUserName}</p>
+                          <p className="font-medium">{bonus.source_user_name}</p>
                         </td>
                         <td className="p-4">
                           {bonus.level ? `Level ${bonus.level}` : '-'}
@@ -167,7 +139,7 @@ const Bonuses = () => {
                     ))}
                   </tbody>
                 </table>
-                {filteredBonuses.length === 0 && (
+                {!bonuses?.length && (
                   <p className="text-center text-muted-foreground py-8">No bonuses found</p>
                 )}
               </div>
