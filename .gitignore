@@ -6,3 +6,4 @@ frontend/dist
 # Backend files
 backend/.env
 backend/venv
+*__pycache__*

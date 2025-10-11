@@ -1,0 +1,46 @@
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Numeric, ForeignKey
+from sqlalchemy.orm import relationship
+from datetime import datetime
+from app.core.database import Base
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    full_name = Column(String)
+    phone_number = Column(String)
+    
+    is_verified = Column(Boolean, default=False)
+    verification_token = Column(String, nullable=True)
+    is_active = Column(Boolean, default=True)
+    is_inactive = Column(Boolean, default=False)
+    
+    sponsor_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    referral_code = Column(String, unique=True, index=True)
+    registration_date = Column(DateTime, default=datetime.utcnow)
+    
+    current_rank = Column(String, default="Amber", index=True)
+    rank_achieved_date = Column(DateTime)
+    highest_rank_achieved = Column(String)
+    
+    balance_eur = Column(Numeric(10, 2), default=0)
+    balance_dbsp = Column(Numeric(10, 2), default=0)
+    total_earnings = Column(Numeric(10, 2), default=0)
+    
+    last_login = Column(DateTime)
+    password_reset_token = Column(String, nullable=True)
+    password_reset_expires = Column(DateTime, nullable=True)
+    
+    last_activity_date = Column(DateTime)
+    activity_status = Column(String, default="active")
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    sponsor = relationship("User", remote_side=[id], backref="downline")
+    transactions = relationship("Transaction", back_populates="user")
+    bonuses = relationship("Bonus", back_populates="user", foreign_keys="Bonus.user_id")
+    payouts = relationship("Payout", back_populates="user")
+    support_tickets = relationship("SupportTicket", back_populates="user")
