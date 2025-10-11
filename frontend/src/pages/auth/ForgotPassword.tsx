@@ -57,7 +57,7 @@ const ForgotPassword = () => {
 
         {emailSent ? (
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-foreground">
               We've sent a password reset link to your email address. Please check your inbox and follow the instructions.
             </p>
             <Link to="/login">
@@ -99,7 +99,7 @@ const ForgotPassword = () => {
                   'Send Reset Link'
                 )}
               </Button>
-              <Link to="/login" className="text-sm text-center text-muted-foreground hover:text-primary">
+              <Link to="/login" className="text-sm text-center text-foreground hover:text-primary">
                 <ArrowLeft className="inline mr-1 h-3 w-3" />
                 Back to Login
               </Link>

@@ -93,6 +93,7 @@ const Register = () => {
                 placeholder="John Doe"
                 {...register('fullName')}
                 disabled={isLoading}
+                className="placeholder:text-foreground/70"
               />
               {errors.fullName && (
                 <p className="text-sm text-destructive">{errors.fullName.message}</p>
@@ -106,7 +107,8 @@ const Register = () => {
                 <Input
                   id="email"
                   type="email"
-                  className="pl-10"
+                  placeholder="your@email.com"
+                  className="pl-10 placeholder:text-foreground/70"
                   {...register('email')}
                   disabled={isLoading}
                 />
@@ -124,7 +126,7 @@ const Register = () => {
                   id="phone"
                   type="tel"
                   placeholder="+1234567890"
-                  className="pl-10"
+                  className="pl-10 placeholder:text-foreground/70"
                   {...register('phone')}
                   disabled={isLoading}
                 />
@@ -141,14 +143,15 @@ const Register = () => {
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  className="pl-10 pr-10"
+                  placeholder="At least 8 characters"
+                  className="pl-10 pr-10 placeholder:text-foreground/70"
                   {...register('password')}
                   disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-3 text-foreground hover:text-foreground"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -165,14 +168,15 @@ const Register = () => {
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  className="pl-10 pr-10"
+                  placeholder="Confirm your password"
+                  className="pl-10 pr-10 placeholder:text-foreground/70"
                   {...register('confirmPassword')}
                   disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-3 text-foreground hover:text-foreground"
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -213,7 +217,7 @@ const Register = () => {
                 />
                 <label
                   htmlFor="terms1"
-                  className="text-sm text-muted-foreground leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm text-foreground leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   I have read, understood, and agreed to the General Terms and Conditions.
                 </label>
@@ -231,7 +235,7 @@ const Register = () => {
                 />
                 <label
                   htmlFor="terms2"
-                  className="text-sm text-muted-foreground leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm text-foreground leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   I have read, understood, and agreed to the Data and Privacy Policy.
                 </label>
@@ -249,7 +253,7 @@ const Register = () => {
                 />
                 <label
                   htmlFor="terms3"
-                  className="text-sm text-muted-foreground leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm text-foreground leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   I confirm that all information I provided is correct and will notify Rest Empire of any changes.
                 </label>
@@ -296,7 +300,7 @@ const Register = () => {
                   </Button>
                 </>
               )}
-              <p className="text-sm text-center text-muted-foreground">
+              <p className="text-sm text-center text-foreground">
                 Already have an account?{' '}
                 <Link to="/login" className="text-primary hover:underline font-medium">
                   Log In
@@ -308,38 +312,40 @@ const Register = () => {
 
         {/* Info Section */}
         <div className={`space-y-6 w-full lg:w-1/2 transition-all duration-500 ease-in-out ${step === 1 ? 'lg:translate-x-0' : 'lg:-translate-x-[calc(100%+2rem)]'}`}>
-          <div className="space-y-4">
-            <h2 className="text-4xl font-bold">Build Your Empire</h2>
-            <p className="text-lg text-muted-foreground">
-              Join Rest Empire and access powerful tools to grow your network marketing business.
-            </p>
-          </div>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Check className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Real-time Analytics</h3>
-                <p className="text-sm text-muted-foreground">Track your team performance and earnings in real-time</p>
-              </div>
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h2 className="text-4xl font-bold">Build Your Empire</h2>
+              <p className="text-lg text-foreground">
+                Join Rest Empire and access powerful tools to grow your network marketing business.
+              </p>
             </div>
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Check className="w-5 h-5 text-primary" />
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Real-time Analytics</h3>
+                  <p className="text-sm text-foreground">Track your team performance and earnings in real-time</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold mb-1">Team Management</h3>
-                <p className="text-sm text-muted-foreground">Easily manage and support your growing team</p>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Team Management</h3>
+                  <p className="text-sm text-foreground">Easily manage and support your growing team</p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Check className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">Multiple Bonus Types</h3>
-                <p className="text-sm text-muted-foreground">Earn through various bonus structures and ranks</p>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Multiple Bonus Types</h3>
+                  <p className="text-sm text-foreground">Earn through various bonus structures and ranks</p>
+                </div>
               </div>
             </div>
           </div>

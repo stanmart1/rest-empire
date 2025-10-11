@@ -53,7 +53,7 @@ const Login = () => {
               </div>
               <div>
                 <CardTitle className="text-2xl font-bold">Rest Empire</CardTitle>
-                <CardDescription className="text-sm">Welcome back</CardDescription>
+                <CardDescription className="text-sm text-foreground">Welcome back</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -67,6 +67,7 @@ const Login = () => {
                   placeholder="your@email.com"
                   {...register('email')}
                   disabled={isLoading}
+                  className="placeholder:text-foreground/70"
                 />
                 {errors.email && (
                   <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -86,7 +87,7 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground hover:text-foreground"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -119,7 +120,7 @@ const Login = () => {
                   'Sign In'
                 )}
               </Button>
-              <p className="text-sm text-center text-muted-foreground">
+              <p className="text-sm text-center text-foreground">
                 Don't have an account?{' '}
                 <Link to="/register" className="text-primary hover:underline font-medium">
                   Sign up
@@ -133,7 +134,7 @@ const Login = () => {
         <div className="space-y-6">
           <div className="space-y-4">
             <h2 className="text-4xl font-bold">Build Your Empire</h2>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-foreground">
               Join Rest Empire and access powerful tools to grow your network marketing business.
             </p>
           </div>
@@ -144,7 +145,7 @@ const Login = () => {
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Real-time Analytics</h3>
-                <p className="text-sm text-muted-foreground">Track your team performance and earnings in real-time</p>
+                <p className="text-sm text-foreground">Track your team performance and earnings in real-time</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -153,7 +154,7 @@ const Login = () => {
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Team Management</h3>
-                <p className="text-sm text-muted-foreground">Easily manage and support your growing team</p>
+                <p className="text-sm text-foreground">Easily manage and support your growing team</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -162,7 +163,7 @@ const Login = () => {
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Multiple Bonus Types</h3>
-                <p className="text-sm text-muted-foreground">Earn through various bonus structures and ranks</p>
+                <p className="text-sm text-foreground">Earn through various bonus structures and ranks</p>
               </div>
             </div>
           </div>
