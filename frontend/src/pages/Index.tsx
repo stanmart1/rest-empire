@@ -12,7 +12,8 @@ const Index = () => {
   }, []);
   
   // Carousel state - continuous infinite scroll
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(1);
+  const [isTransitioning, setIsTransitioning] = useState(true);
   
   const nextSlide = () => {
     setCurrentSlide((prev) => prev + 1);
@@ -30,6 +31,27 @@ const Index = () => {
     
     return () => clearInterval(interval);
   }, []);
+
+  // Handle infinite loop - reset when reaching clones
+  useEffect(() => {
+    if (currentSlide === 4) {
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setCurrentSlide(1);
+      }, 500);
+      setTimeout(() => {
+        setIsTransitioning(true);
+      }, 50);
+    } else if (currentSlide === 0) {
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setCurrentSlide(3);
+      }, 500);
+      setTimeout(() => {
+        setIsTransitioning(true);
+      }, 50);
+    }
+  }, [currentSlide]);
   
   return (
     <div className="min-h-screen bg-background">
@@ -278,16 +300,36 @@ const Index = () => {
         <div className="sm:hidden">
           {/* Carousel Container */}
           <div className="relative overflow-hidden rounded-xl">
-            {/* Slides - Duplicated for infinite loop */}
+            {/* Slides - With clones for infinite loop */}
             <div 
-              className="flex transition-transform duration-500 ease-linear"
+              className={`flex ${isTransitioning ? 'transition-transform duration-500 ease-in-out' : ''}`}
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
-              {/* Repeat slides multiple times for continuous effect */}
-              {[...Array(20)].map((_, repeatIndex) => (
-                <>
+              {/* Clone of last slide (for backward infinite) */}
+              <div className="w-full flex-shrink-0 p-4">
+                <div className="bg-card p-6 rounded-xl border shadow-sm">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                    <TrendingUp className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Real-time Analytics</h3>
+                  <p className="text-foreground mb-4">
+                    Track your team performance and earnings in real-time with comprehensive reporting and visualization tools.
+                  </p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Live dashboard updates</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Custom reporting</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
               {/* Slide 1 */}
-              <div key={`slide-1-${repeatIndex}`} className="w-full flex-shrink-0 p-4">
+              <div className="w-full flex-shrink-0 p-4">
                 <div className="bg-card p-6 rounded-xl border shadow-sm">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <Users className="w-8 h-8 text-primary" />
@@ -310,7 +352,7 @@ const Index = () => {
               </div>
               
               {/* Slide 2 */}
-              <div key={`slide-2-${repeatIndex}`} className="w-full flex-shrink-0 p-4">
+              <div className="w-full flex-shrink-0 p-4">
                 <div className="bg-card p-6 rounded-xl border shadow-sm">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <Gift className="w-8 h-8 text-primary" />
@@ -333,7 +375,7 @@ const Index = () => {
               </div>
               
               {/* Slide 3 */}
-              <div key={`slide-3-${repeatIndex}`} className="w-full flex-shrink-0 p-4">
+              <div className="w-full flex-shrink-0 p-4">
                 <div className="bg-card p-6 rounded-xl border shadow-sm">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <TrendingUp className="w-8 h-8 text-primary" />
@@ -354,8 +396,29 @@ const Index = () => {
                   </ul>
                 </div>
               </div>
-              </>
-              ))}
+
+              {/* Clone of first slide (for forward infinite) */}
+              <div className="w-full flex-shrink-0 p-4">
+                <div className="bg-card p-6 rounded-xl border shadow-sm">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                    <Users className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Team Building</h3>
+                  <p className="text-foreground mb-4">
+                    Easily manage and support your growing team with our intuitive dashboard and powerful analytics tools.
+                  </p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Real-time team visualization</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Performance tracking</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -364,9 +427,9 @@ const Index = () => {
             {[0, 1, 2].map((index) => (
               <button
                 key={index}
-                onClick={() => setCurrentSlide(index)}
+                onClick={() => setCurrentSlide(index + 1)}
                 className={`w-3 h-3 rounded-full ${
-                  currentSlide % 3 === index ? 'bg-primary' : 'bg-gray-300'
+                  ((currentSlide - 1 + 3) % 3) === index ? 'bg-primary' : 'bg-gray-300'
                 }`}
               />
             ))}
@@ -386,80 +449,6 @@ const Index = () => {
             >
               <ArrowRight className="w-5 h-5" />
             </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Testimonials */}
-      <div className="bg-muted/50 py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground">Success Stories</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-card p-6 rounded-xl border">
-              <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-foreground mb-4">
-                "Rest Empire transformed my income. I went from zero to earning over €5,000 monthly in just 8 months!"
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="font-medium text-primary">JD</span>
-                </div>
-                <div>
-                  <p className="font-medium">John D.</p>
-                  <p className="text-sm text-foreground">Diamond Rank</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-card p-6 rounded-xl border">
-              <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-foreground mb-4">
-                "The platform is intuitive and the support team is exceptional. My team has grown to over 200 members."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="font-medium text-primary">MS</span>
-                </div>
-                <div>
-                  <p className="font-medium">Maria S.</p>
-                  <p className="text-sm text-foreground">Blue Diamond Rank</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-card p-6 rounded-xl border">
-              <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-foreground mb-4">
-                "I love the transparency and real-time analytics. I can track my progress and make informed decisions."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="font-medium text-primary">RP</span>
-                </div>
-                <div>
-                  <p className="font-medium">Robert P.</p>
-                  <p className="text-sm text-foreground">Green Diamond Rank</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
