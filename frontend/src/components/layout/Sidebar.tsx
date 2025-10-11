@@ -23,6 +23,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { motion, AnimatePresence } from 'motion/react';
 
 const Sidebar = () => {
   const { user } = useAuth();
@@ -73,18 +74,29 @@ const Sidebar = () => {
       </div>
 
       {/* Mobile sidebar overlay */}
-      {mobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Sidebar */}
-      <aside className={cn(
-        "fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border overflow-y-auto z-50 transition-transform duration-300 ease-in-out md:hidden",
-        mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.aside
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border overflow-y-auto z-50 md:hidden"
+          >
         {/* User Profile Card */}
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center gap-3 mb-3">
@@ -105,10 +117,23 @@ const Sidebar = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="p-3 space-y-1 bg-sidebar">
-          {mainLinks.map((link) => (
-            <NavLink
+        <motion.nav 
+          initial="hidden"
+          animate="visible"
+          variants={{
+            visible: { transition: { staggerChildren: 0.05 } }
+          }}
+          className="p-3 space-y-1 bg-sidebar"
+        >
+          {mainLinks.map((link, index) => (
+            <motion.div
               key={link.to}
+              variants={{
+                hidden: { opacity: 0, x: -20 },
+                visible: { opacity: 1, x: 0 }
+              }}
+            >
+            <NavLink
               to={link.to}
               className={({ isActive }) =>
                 cn(
@@ -122,6 +147,7 @@ const Sidebar = () => {
               <link.icon className="w-4 h-4 flex-shrink-0" />
               <span>{link.label}</span>
             </NavLink>
+            </motion.div>
           ))}
 
           {/* Bonuses Section with Submenu */}
@@ -197,8 +223,10 @@ const Sidebar = () => {
               </NavLink>
             ))}
           </div>
-        </nav>
-      </aside>
+        </motion.nav>
+      </motion.aside>
+      )}
+      </AnimatePresence>
 
       {/* Desktop sidebar - always visible on md and larger screens */}
       <aside className="hidden md:block fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border overflow-y-auto">

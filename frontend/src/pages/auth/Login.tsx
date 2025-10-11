@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Loader2, Eye, EyeOff, Check, ArrowLeft } from 'lucide-react';
+import { motion } from 'motion/react';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -23,6 +24,7 @@ const Login = () => {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -32,8 +34,9 @@ const Login = () => {
     setIsLoading(true);
     try {
       await login(data.email, data.password);
+      setLoginSuccess(true);
       toast.success('Login successful!');
-      navigate('/dashboard');
+      setTimeout(() => navigate('/dashboard'), 500);
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -54,6 +57,11 @@ const Login = () => {
           </Link>
         </div>
         {/* Left side - Login Form */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
         <Card className="w-full">
           <CardHeader className="space-y-1">
             <div className="flex items-center gap-3 mb-6">
@@ -118,9 +126,19 @@ const Login = () => {
               <Button 
                 type="submit" 
                 className="w-full"
-                disabled={isLoading}
+                disabled={isLoading || loginSuccess}
               >
-                {isLoading ? (
+                {loginSuccess ? (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 200 }}
+                    className="flex items-center"
+                  >
+                    <Check className="mr-2 h-4 w-4" />
+                    Success!
+                  </motion.div>
+                ) : isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Signing in...
@@ -138,6 +156,7 @@ const Login = () => {
             </CardFooter>
           </form>
         </Card>
+        </motion.div>
 
         {/* Right side - Info Section */}
         <div className="space-y-6">

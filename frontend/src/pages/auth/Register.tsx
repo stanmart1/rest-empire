@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Loader2, Mail, Eye, EyeOff, Lock, Phone, Check, ArrowLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -93,8 +94,17 @@ const Register = () => {
             </div>
           </CardHeader>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <CardContent className="space-y-4 min-h-[400px]">
-            <div className={`transition-opacity duration-200 ${step === 1 ? 'opacity-100' : 'opacity-0 absolute invisible'}`}>
+            <CardContent className="space-y-4 min-h-[400px] relative overflow-hidden">
+            <AnimatePresence mode="wait">
+            {step === 1 && (
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              className="space-y-4"
+            >
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name <span className="text-destructive">*</span></Label>
               <Input
@@ -194,9 +204,18 @@ const Register = () => {
                 <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
               )}
             </div>
-            </div>
+            </motion.div>
+            )}
 
-            <div className={`transition-opacity duration-200 ${step === 2 ? 'opacity-100' : 'opacity-0 absolute invisible'}`}>
+            {step === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              className="space-y-4"
+            >
             <div className="space-y-2">
               <Label htmlFor="residence">Place of residence <span className="text-destructive">*</span></Label>
               <Select onValueChange={(value) => setValue('residence', value)}>
@@ -271,7 +290,9 @@ const Register = () => {
                 <p className="text-sm text-destructive">{errors.terms3.message}</p>
               )}
             </div>
-            </div>
+            </motion.div>
+            )}
+            </AnimatePresence>
 
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">

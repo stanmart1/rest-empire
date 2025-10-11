@@ -2,10 +2,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import DashboardLayout from "./components/layout/DashboardLayout";
+import { motion, AnimatePresence } from "motion/react";
 
 // Auth Pages
 import Login from "./pages/auth/Login";
@@ -39,6 +40,64 @@ import BlogPost from "./pages/BlogPost";
 
 const queryClient = new QueryClient();
 
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* Public Routes */}
+        <Route path="/" element={<PageWrapper><Index /></PageWrapper>} />
+        <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
+        <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
+        <Route path="/faq" element={<PageWrapper><FAQ /></PageWrapper>} />
+        <Route path="/blog" element={<PageWrapper><Blog /></PageWrapper>} />
+        <Route path="/blog/:id" element={<PageWrapper><BlogPost /></PageWrapper>} />
+        <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+        <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
+        <Route path="/forgot-password" element={<PageWrapper><ForgotPassword /></PageWrapper>} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/"
+          element={<DashboardLayout />}
+        >
+          <Route path="dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
+          <Route path="team" element={<PageWrapper><Team /></PageWrapper>} />
+          <Route path="bonuses" element={<PageWrapper><Bonuses /></PageWrapper>} />
+          <Route path="bonuses/rank" element={<PageWrapper><RankBonus /></PageWrapper>} />
+          <Route path="bonuses/unilevel" element={<PageWrapper><UnilevelBonus /></PageWrapper>} />
+          <Route path="bonuses/infinity" element={<PageWrapper><InfinityBonus /></PageWrapper>} />
+          <Route path="transactions" element={<PageWrapper><Transactions /></PageWrapper>} />
+          <Route path="payouts" element={<PageWrapper><Payouts /></PageWrapper>} />
+          <Route path="ranks" element={<PageWrapper><Ranks /></PageWrapper>} />
+          <Route path="profile" element={<PageWrapper><Profile /></PageWrapper>} />
+          <Route path="status" element={<PageWrapper><Status /></PageWrapper>} />
+          <Route path="events" element={<PageWrapper><Events /></PageWrapper>} />
+          <Route path="promo-materials" element={<PageWrapper><PromoMaterials /></PageWrapper>} />
+          <Route path="activation" element={<PageWrapper><Activation /></PageWrapper>} />
+          <Route path="support" element={<PageWrapper><Support /></PageWrapper>} />
+          <Route path="books" element={<PageWrapper><Books /></PageWrapper>} />
+        </Route>
+
+        {/* Catch-all */}
+        <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
+const PageWrapper = ({ children }: { children: React.ReactNode }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.3 }}
+  >
+    {children}
+  </motion.div>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -46,44 +105,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:id" element={<BlogPost />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-
-            {/* Protected Routes */}
-            <Route
-              path="/"
-              element={<DashboardLayout />}
-            >
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="team" element={<Team />} />
-              <Route path="bonuses" element={<Bonuses />} />
-              <Route path="bonuses/rank" element={<RankBonus />} />
-              <Route path="bonuses/unilevel" element={<UnilevelBonus />} />
-              <Route path="bonuses/infinity" element={<InfinityBonus />} />
-              <Route path="transactions" element={<Transactions />} />
-              <Route path="payouts" element={<Payouts />} />
-              <Route path="ranks" element={<Ranks />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="status" element={<Status />} />
-              <Route path="events" element={<Events />} />
-              <Route path="promo-materials" element={<PromoMaterials />} />
-              <Route path="activation" element={<Activation />} />
-              <Route path="support" element={<Support />} />
-              <Route path="books" element={<Books />} />
-            </Route>
-
-            {/* Catch-all */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AnimatedRoutes />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
