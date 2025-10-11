@@ -78,6 +78,7 @@ const ForgotPassword = () => {
                   placeholder="your@email.com"
                   {...register('email')}
                   disabled={isLoading}
+                  className="placeholder:text-foreground/70"
                 />
                 {errors.email && (
                   <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -106,6 +107,14 @@ const ForgotPassword = () => {
             </CardFooter>
           </form>
         )}
+        {/* Back to Home Button */}
+        <div className="px-6 pb-6">
+          <Link to="/">
+            <Button variant="outline" className="w-full">
+              Back to Home
+            </Button>
+          </Link>
+        </div>
       </Card>
     </div>
   );

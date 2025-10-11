@@ -35,7 +35,7 @@ All colors MUST be HSL.
 
     /* Muted: Dark Green #0f321eff */
     --muted: 146 54% 13%; /* Dark Green */
-    --muted-foreground: 0 0% 100%;
+    --muted-foreground: 0 0% 60%; /* Changed from 0 0% 100% to make it visible */
 
     /* Status colors */
     --success: 152 63% 11%; /* Dark Green */
@@ -122,7 +122,7 @@ All colors MUST be HSL.
     --accent-foreground: 0 0% 100%;
 
     --muted: 152 20% 30%;
-    --muted-foreground: 0 0% 100%;
+    --muted-foreground: 0 0% 80%; /* Changed from 0 0% 100% to make it visible */
 
     --border: 152 20% 25%;
     --input: 152 20% 25%;
