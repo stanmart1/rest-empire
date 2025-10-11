@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '@/contexts/AuthContext';
+import { RegisterFormData } from '@/types/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,8 +30,6 @@ const registerSchema = z.object({
   path: ["confirmPassword"],
 });
 
-type RegisterFormData = z.infer<typeof registerSchema>;
-
 const Register = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -40,8 +39,15 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [step, setStep] = useState(1);
 
+  const referralCode = searchParams.get('ref');
+
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      terms1: false,
+      terms2: false,
+      terms3: false,
+    },
   });
 
   const terms1Value = watch('terms1');
@@ -54,14 +60,14 @@ const Register = () => {
       await registerUser({
         email: data.email,
         password: data.password,
-        name: data.fullName,
-        phone: data.phone,
-        referralCode: '',
+        full_name: data.fullName,
+        phone_number: data.phone,
+        referral_code: referralCode || undefined,
       });
       toast.success('Registration successful! Please check your email to verify your account.');
       navigate('/login');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
+      toast.error(error.response?.data?.detail || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

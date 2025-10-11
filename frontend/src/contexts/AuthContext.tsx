@@ -1,24 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '@/lib/types';
-import api from '@/lib/api';
-
-interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: RegisterData) => Promise<void>;
-  logout: () => void;
-  refreshUser: () => Promise<void>;
-}
-
-interface RegisterData {
-  email: string;
-  password: string;
-  name: string;
-  phone: string;
-  referralCode: string;
-}
+import { AuthContextType, AuthUser, RegisterRequest } from '@/types/auth';
+import authAPI from '@/services/authApi';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -31,7 +13,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshUser = async () => {
@@ -42,14 +24,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      const response = await api.get('/users/me');
-      setUser(response.data);
-      localStorage.setItem('user', JSON.stringify(response.data));
+      const userData = await authAPI.getCurrentUser();
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
     } catch (error) {
       console.error('Failed to refresh user:', error);
       setUser(null);
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
+      localStorage.removeItem('refresh_token');
     }
   };
 
@@ -74,21 +57,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await api.post('/auth/login', { email, password });
-    const { token, user: userData } = response.data;
-
-    localStorage.setItem('auth_token', token);
+    const response = await authAPI.login({ email, password });
+    
+    localStorage.setItem('auth_token', response.access_token);
+    if (response.refresh_token) {
+      localStorage.setItem('refresh_token', response.refresh_token);
+    }
+    
+    // Fetch user data after successful login
+    const userData = await authAPI.getCurrentUser();
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
   };
 
-  const register = async (data: RegisterData) => {
-    const response = await api.post('/auth/register', data);
-    return response.data;
+  const register = async (data: RegisterRequest) => {
+    const response = await authAPI.register(data);
+    return response;
+  };
+
+  const forgotPassword = async (email: string) => {
+    await authAPI.forgotPassword({ email });
+  };
+
+  const resetPassword = async (token: string, password: string) => {
+    await authAPI.resetPassword({ token, new_password: password });
   };
 
   const logout = () => {
+    // Call backend logout if available
+    try {
+      authAPI.logout().catch(() => {}); // Don't block logout on API failure
+    } catch (error) {
+      console.warn('Backend logout failed:', error);
+    }
+
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
     setUser(null);
     window.location.href = '/login';
@@ -106,6 +110,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register,
         logout,
         refreshUser,
+        forgotPassword,
+        resetPassword,
       }}
     >
       {children}

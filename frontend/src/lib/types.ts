@@ -1,30 +1,35 @@
 export interface User {
   id: string;
   email: string;
-  name: string;
-  phone: string;
-  rank: string;
+  full_name: string;
+  phone_number: string;
+  current_rank: string;
   rankLevel: number;
   isAdmin: boolean;
-  isVerified: boolean;
-  referralCode: string;
-  sponsorId?: string;
-  createdAt: string;
-  updatedAt: string;
+  is_verified: boolean;
+  referral_code: string;
+  sponsor_id?: string;
+  registration_date: string;
+  balance_eur: number;
+  balance_dbsp: number;
+  total_earnings: number;
+}
+
+export interface DashboardStats {
+  balance_eur: number;
+  balance_dbsp: number;
+  total_earnings: number;
+  current_rank: string;
+  team_size: number;
+  first_line_count: number;
+  pending_payouts: number;
+  recent_earnings_30d: number;
 }
 
 export interface Balance {
   eur: number;
   dbsp: number;
   usdt: number;
-}
-
-export interface DashboardStats {
-  totalEarnings: number;
-  monthlyEarnings: number;
-  teamSize: number;
-  pendingPayouts: number;
-  balance: Balance;
 }
 
 export interface RankProgress {
@@ -48,8 +53,8 @@ export interface Transaction {
   status: 'pending' | 'completed' | 'failed' | 'processing' | 'cancelled';
   paymentMethod?: string;
   description: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Bonus {
@@ -57,11 +62,11 @@ export interface Bonus {
   type: 'unilevel' | 'rank' | 'infinity';
   amount: number;
   currency: 'EUR' | 'DBSP';
-  sourceUserId: string;
-  sourceUserName: string;
+  source_user_id: string;
+  source_user_name: string;
   level?: number;
   status: 'pending' | 'paid';
-  createdAt: string;
+  created_at: string;
 }
 
 export interface TeamMember {
@@ -82,13 +87,13 @@ export interface Payout {
   amount: number;
   currency: 'EUR' | 'USDT' | 'DBSP';
   method: 'bank' | 'crypto';
-  accountDetails: string;
+  account_details: string;
   status: 'pending' | 'approved' | 'processing' | 'completed' | 'rejected';
   fee: number;
-  netAmount: number;
-  rejectionReason?: string;
-  createdAt: string;
-  updatedAt: string;
+  net_amount: number;
+  rejection_reason?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Rank {
@@ -127,18 +132,18 @@ export interface SupportTicket {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
   messages: TicketMessage[];
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface TicketMessage {
   id: string;
-  userId: string;
-  userName: string;
-  isAdmin: boolean;
+  user_id: string;
+  user_name: string;
+  is_admin: boolean;
   message: string;
   attachments?: string[];
-  createdAt: string;
+  created_at: string;
 }
 
 export interface PaginationParams {

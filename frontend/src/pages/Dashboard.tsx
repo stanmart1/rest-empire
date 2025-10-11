@@ -7,10 +7,18 @@ import { Copy, QrCode, Euro, Gem, CircleDot, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import RankBadge from '@/components/common/RankBadge';
+import { useDashboardStats, useTeamStats } from '@/hooks/useApi';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Dashboard = () => {
   const { toast } = useToast();
-  const referralLink = "https://restempire.com/partner/znrp59sa";
+  const { user } = useAuth();
+  const { data: dashboardStats, isLoading: statsLoading } = useDashboardStats();
+  const { data: teamStats, isLoading: teamLoading } = useTeamStats();
+
+  const referralLink = user?.referral_code 
+    ? `https://restempire.com/register?ref=${user.referral_code}`
+    : "https://restempire.com/register";
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -19,6 +27,23 @@ const Dashboard = () => {
       description: "Referral link copied to clipboard",
     });
   };
+
+  if (statsLoading || teamLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="animate-pulse">
+              <CardContent className="p-6">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -51,192 +76,145 @@ const Dashboard = () => {
         </CardContent>
       </Card>
 
-      {/* My available balance */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4 text-foreground">My available balance</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Euro className="w-5 h-5 text-primary" />
-                </div>
-                <span className="font-medium text-foreground">EUR</span>
-              </div>
-              <p className="text-3xl font-bold mb-4 text-foreground">0</p>
-              <Button 
-                className="w-full" 
-                variant="outline"
-                onClick={() => {
-                  toast({
-                    title: "Payout Request",
-                    description: "Insufficient balance for payout",
-                  });
-                }}
-              >
-                Payout
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Gem className="w-5 h-5 text-primary" />
-                </div>
-                <span className="font-medium text-foreground">DBSP</span>
-              </div>
-              <p className="text-3xl font-bold mb-4 text-foreground">0</p>
-              <Button 
-                className="w-full" 
-                variant="outline"
-                onClick={() => {
-                  toast({
-                    title: "Payout Request",
-                    description: "Insufficient balance for payout",
-                  });
-                }}
-              >
-                Payout
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* My Status & Rank */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4 text-foreground">My Status & Rank</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* My Status */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">My Status</p>
-                  <RankBadge rank="Pearl" showLabel size="md" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Turnover</p>
-                  <p className="text-2xl font-bold text-foreground">0 EUR</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* My Next Rank Bonus */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-2">My Next Rank Bonus</p>
-                    <RankBadge rank="Sapphire" showLabel size="md" />
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">0 / 25 000 EUR</p>
-                    <p className="text-lg font-semibold text-foreground">0%</p>
-                  </div>
-                </div>
-                
-                <div className="bg-primary/5 p-4 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Rank bonus</p>
-                  <p className="text-2xl font-bold text-primary">0 EUR</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Progress value={0} className="h-2" />
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="bg-primary text-primary-foreground">0%</Badge>
-                    <Badge variant="secondary" className="bg-secondary text-secondary-foreground">0%</Badge>
-                    <Badge variant="secondary" className="bg-muted text-foreground">0%</Badge>
-                  </div>
-                  <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                    <span>■ 50%</span>
-                    <span>■ 30%</span>
-                    <span>■ All Team</span>
-                  </div>
-                </div>
-
-                <Button className="w-full">Leg Rules</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* My Team & Infinity Bonus */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* My Team */}
+      {/* Balance Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4 text-foreground">My Team</h3>
-            <div className="flex items-center gap-3 mb-6">
-              <Avatar className="w-12 h-12">
-                <AvatarFallback>PA</AvatarFallback>
-              </Avatar>
+            <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-foreground">Peter Adelodun</p>
-                <p className="text-sm text-muted-foreground">Not verified</p>
+                <p className="text-sm text-muted-foreground">Available Balance</p>
+                <p className="text-2xl font-bold">
+                  €{dashboardStats?.balance_eur?.toFixed(2) || '0.00'}
+                </p>
               </div>
-            </div>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center py-3 border-b border-border">
-                <span className="text-muted-foreground">First Line</span>
-                <span className="text-2xl font-bold text-foreground">0</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">All Team</span>
-                <span className="text-2xl font-bold text-foreground">0</span>
+              <div className="flex items-center gap-2">
+                <Euro className="w-5 h-5 text-blue-600" />
+                <Button size="sm" variant="outline">
+                  Payout
+                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Infinity Bonus */}
         <Card>
           <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4 text-foreground">Infinity Bonus</h3>
-            <div className="flex flex-col items-center justify-center py-8">
-              <div className="relative w-40 h-40 mb-4 sm:w-48 sm:h-48">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle
-                    cx="80"
-                    cy="80"
-                    r="70"
-                    stroke="currentColor"
-                    strokeWidth="12"
-                    fill="none"
-                    className="text-muted"
-                  />
-                  <circle
-                    cx="80"
-                    cy="80"
-                    r="70"
-                    stroke="currentColor"
-                    strokeWidth="12"
-                    fill="none"
-                    strokeDasharray={`${0 * 4.4} ${440 - 0 * 4.4}`}
-                    className="text-primary"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-4xl font-bold text-muted-foreground">0%</span>
-                </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">DBSP Balance</p>
+                <p className="text-2xl font-bold">
+                  {dashboardStats?.balance_dbsp?.toFixed(2) || '0.00'}
+                </p>
               </div>
-              <div className="flex items-center gap-2 text-muted-foreground mb-4">
-                <CircleDot className="w-4 h-4" />
-                <span>Diamond</span>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-1">Your bonus</p>
-                <p className="text-3xl font-bold text-foreground">0</p>
+              <div className="flex items-center gap-2">
+                <Gem className="w-5 h-5 text-purple-600" />
+                <Button size="sm" variant="outline">
+                  Payout
+                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Rank Status */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <RankBadge rank={dashboardStats?.current_rank || 'Amber'} />
+              <div>
+                <h3 className="font-semibold">{dashboardStats?.current_rank || 'Amber'}</h3>
+                <p className="text-sm text-muted-foreground">Current Rank</p>
+              </div>
+            </div>
+            <Badge variant="secondary">
+              <CircleDot className="w-3 h-3 mr-1" />
+              Active
+            </Badge>
+          </div>
+
+          {/* Rank Progress */}
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span>Progress to next rank</span>
+              <span>65%</span>
+            </div>
+            <Progress value={65} className="h-2" />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>€{teamStats?.total_turnover?.toFixed(0) || '0'} / €25,000</span>
+              <span>Next: Sapphire</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Team Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Info className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{dashboardStats?.team_size || 0}</p>
+                <p className="text-sm text-muted-foreground">Total Team</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Info className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{dashboardStats?.first_line_count || 0}</p>
+                <p className="text-sm text-muted-foreground">First Line</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Euro className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">
+                  €{dashboardStats?.total_earnings?.toFixed(0) || '0'}
+                </p>
+                <p className="text-sm text-muted-foreground">Total Earnings</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Earnings */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold mb-1">Recent Earnings (30 days)</h3>
+              <p className="text-2xl font-bold text-green-600">
+                €{dashboardStats?.recent_earnings_30d?.toFixed(2) || '0.00'}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">Pending Payouts</p>
+              <p className="text-lg font-semibold">
+                €{dashboardStats?.pending_payouts?.toFixed(2) || '0.00'}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -135,9 +135,9 @@ def get_dashboard_stats(
     ).scalar() or 0
     
     return DashboardStats(
-        balance_eur=float(current_user.balance_eur),
-        balance_dbsp=float(current_user.balance_dbsp),
-        total_earnings=float(current_user.total_earnings),
+        balance_eur=float(current_user.balance_ngn or 0),  # Using NGN as EUR equivalent
+        balance_dbsp=float(current_user.balance_usdt or 0),  # Using USDT as DBSP equivalent
+        total_earnings=float(current_user.total_earnings or 0),
         current_rank=current_user.current_rank,
         team_size=team_size,
         first_line_count=first_line_count,

@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     RESEND_API_KEY: str = ""
     
     # Frontend
-    FRONTEND_URL: str = "http://localhost:5173"
+    FRONTEND_URL: str = "http://localhost:8080"
     
     # Payment Gateways - GTPay
     GTPAY_MERCHANT_ID: str = ""
@@ -55,7 +55,7 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "Rest Empire API"
     DEBUG_MODE: bool = False
-    CORS_ORIGINS: List[str] = ["http://localhost:5173"]
+    CORS_ORIGINS: List[str] = ["http://localhost:8080"]
     API_V1_PREFIX: str = "/api/v1"
     
     class Config:
