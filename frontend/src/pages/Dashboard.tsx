@@ -1,21 +1,17 @@
-import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Copy, QrCode, Euro, Gem, CircleDot, Info } from 'lucide-react';
+import { Copy, QrCode, Euro, Gem, CircleDot, Info, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import RankBadge from '@/components/common/RankBadge';
-import { useDashboardStats, useTeamStats } from '@/hooks/useApi';
+import { useDashboardStats } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
-import { DashboardStats, TeamStats } from '@/types/dashboard';
 
 const Dashboard = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { data: dashboardStats, isLoading: statsLoading } = useDashboardStats();
-  const { data: teamStats, isLoading: teamLoading } = useTeamStats();
 
   const referralLink = user?.referral_code 
     ? `https://restempire.com/register?ref=${user.referral_code}`
@@ -29,22 +25,19 @@ const Dashboard = () => {
     });
   };
 
-  if (statsLoading || teamLoading) {
+  if (statsLoading) {
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-6">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
+
+  const rankProgress = dashboardStats?.rank_progress;
+  const progressPercentage = rankProgress?.percentage || 0;
+  const currentTurnover = rankProgress?.current_turnover || 0;
+  const nextRequirement = rankProgress?.next_requirement;
+  const nextRank = rankProgress?.next_rank;
 
   return (
     <div className="space-y-6">
@@ -129,24 +122,32 @@ const Dashboard = () => {
                 <p className="text-sm text-muted-foreground">Current Rank</p>
               </div>
             </div>
-            <Badge variant="secondary">
+            <Badge variant={dashboardStats?.is_active ? "default" : "secondary"}>
               <CircleDot className="w-3 h-3 mr-1" />
-              Active
+              {dashboardStats?.is_active ? 'Active' : 'Inactive'}
             </Badge>
           </div>
 
           {/* Rank Progress */}
-          <div className="space-y-3">
-            <div className="flex justify-between text-sm">
-              <span>Progress to next rank</span>
-              <span>65%</span>
+          {nextRank && nextRequirement && (
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span>Progress to next rank</span>
+                <span>{progressPercentage.toFixed(0)}%</span>
+              </div>
+              <Progress value={progressPercentage} className="h-2" />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>€{currentTurnover.toFixed(0)} / €{nextRequirement.toFixed(0)}</span>
+                <span>Next: {nextRank}</span>
+              </div>
             </div>
-            <Progress value={65} className="h-2" />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>€{teamStats?.total_turnover?.toFixed(0) || '0'} / €25,000</span>
-              <span>Next: Sapphire</span>
+          )}
+          
+          {!nextRank && (
+            <div className="text-center py-4">
+              <p className="text-sm text-muted-foreground">🎉 Maximum rank achieved!</p>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 

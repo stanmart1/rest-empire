@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { RootRedirect } from "./components/RootRedirect";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -46,8 +47,11 @@ const AnimatedRoutes = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+        {/* Root redirect */}
+        <Route path="/" element={<RootRedirect />} />
+        
         {/* Public Routes */}
-        <Route path="/" element={<PageWrapper><Index /></PageWrapper>} />
+        <Route path="/home" element={<PageWrapper><Index /></PageWrapper>} />
         <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
         <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
         <Route path="/faq" element={<PageWrapper><FAQ /></PageWrapper>} />
@@ -58,27 +62,22 @@ const AnimatedRoutes = () => {
         <Route path="/forgot-password" element={<PageWrapper><ForgotPassword /></PageWrapper>} />
 
         {/* Protected Routes */}
-        <Route
-          path="/"
-          element={<DashboardLayout />}
-        >
-          <Route path="dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
-          <Route path="team" element={<PageWrapper><Team /></PageWrapper>} />
-          <Route path="bonuses" element={<PageWrapper><Bonuses /></PageWrapper>} />
-          <Route path="bonuses/rank" element={<PageWrapper><RankBonus /></PageWrapper>} />
-          <Route path="bonuses/unilevel" element={<PageWrapper><UnilevelBonus /></PageWrapper>} />
-          <Route path="bonuses/infinity" element={<PageWrapper><InfinityBonus /></PageWrapper>} />
-          <Route path="transactions" element={<PageWrapper><Transactions /></PageWrapper>} />
-          <Route path="payouts" element={<PageWrapper><Payouts /></PageWrapper>} />
-          <Route path="ranks" element={<PageWrapper><Ranks /></PageWrapper>} />
-          <Route path="profile" element={<PageWrapper><Profile /></PageWrapper>} />
-          <Route path="status" element={<PageWrapper><Status /></PageWrapper>} />
-          <Route path="events" element={<PageWrapper><Events /></PageWrapper>} />
-          <Route path="promo-materials" element={<PageWrapper><PromoMaterials /></PageWrapper>} />
-          <Route path="activation" element={<PageWrapper><Activation /></PageWrapper>} />
-          <Route path="support" element={<PageWrapper><Support /></PageWrapper>} />
-          <Route path="books" element={<PageWrapper><Books /></PageWrapper>} />
-        </Route>
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout><PageWrapper><Dashboard /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/team" element={<ProtectedRoute><DashboardLayout><PageWrapper><Team /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/bonuses" element={<ProtectedRoute><DashboardLayout><PageWrapper><Bonuses /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/bonuses/rank" element={<ProtectedRoute><DashboardLayout><PageWrapper><RankBonus /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/bonuses/unilevel" element={<ProtectedRoute><DashboardLayout><PageWrapper><UnilevelBonus /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/bonuses/infinity" element={<ProtectedRoute><DashboardLayout><PageWrapper><InfinityBonus /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/transactions" element={<ProtectedRoute><DashboardLayout><PageWrapper><Transactions /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/payouts" element={<ProtectedRoute><DashboardLayout><PageWrapper><Payouts /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/ranks" element={<ProtectedRoute><DashboardLayout><PageWrapper><Ranks /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><DashboardLayout><PageWrapper><Profile /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/status" element={<ProtectedRoute><DashboardLayout><PageWrapper><Status /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/events" element={<ProtectedRoute><DashboardLayout><PageWrapper><Events /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/promo-materials" element={<ProtectedRoute><DashboardLayout><PageWrapper><PromoMaterials /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/activation" element={<ProtectedRoute><DashboardLayout><PageWrapper><Activation /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/support" element={<ProtectedRoute><DashboardLayout><PageWrapper><Support /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/books" element={<ProtectedRoute><DashboardLayout><PageWrapper><Books /></PageWrapper></DashboardLayout></ProtectedRoute>} />
 
         {/* Catch-all */}
         <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
