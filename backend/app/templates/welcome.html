@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6; 
+            color: #000000;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 40px auto; 
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header { 
+            background: linear-gradient(135deg, #0a2c1c 0%, #0f321e 100%);
+            color: white; 
+            padding: 40px 30px; 
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+        }
+        .content { 
+            padding: 40px 30px;
+            background: #ffffff;
+        }
+        .content h2 {
+            color: #0a2c1c;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .content p {
+            color: #333333;
+            margin-bottom: 15px;
+        }
+        .button { 
+            display: inline-block; 
+            padding: 14px 40px; 
+            background: #0a2c1c;
+            color: white !important;
+            text-decoration: none; 
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 25px 0;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: #0d311e;
+        }
+        .feature-box { 
+            background: #f9f9f9;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #0a2c1c;
+        }
+        .feature-box h3 {
+            color: #0a2c1c;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        .feature-box ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #333333;
+        }
+        .feature-box li {
+            margin-bottom: 10px;
+        }
+        .stats {
+            display: table;
+            width: 100%;
+            margin: 30px 0;
+            background: linear-gradient(135deg, #0a2c1c 0%, #0f321e 100%);
+            border-radius: 8px;
+            padding: 25px;
+        }
+        .stat-item {
+            display: table-cell;
+            text-align: center;
+            color: white;
+            padding: 10px;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .footer { 
+            text-align: center; 
+            padding: 30px;
+            background: #f9f9f9;
+            color: #666666;
+            font-size: 13px;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Welcome to Rest Empire!</h1>
+        </div>
+        <div class="content">
+            <h2>Hi {{name}},</h2>
+            <p>Congratulations! Your email has been successfully verified and your account is now active.</p>
+            <p>You're now part of a thriving community of entrepreneurs building sustainable income streams through network marketing.</p>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number">10K+</span>
+                    <span class="stat-label">Active Members</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$2M+</span>
+                    <span class="stat-label">Paid Out</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">16</span>
+                    <span class="stat-label">Rank Levels</span>
+                </div>
+            </div>
+            
+            <div class="feature-box">
+                <h3>✨ What's Next?</h3>
+                <ul>
+                    <li><strong>Share Your Referral Link:</strong> Start building your team and earn commissions</li>
+                    <li><strong>Track Your Progress:</strong> Monitor your earnings, bonuses, and team growth</li>
+                    <li><strong>Advance Through Ranks:</strong> Climb from Amber to Billion Diamond</li>
+                    <li><strong>Earn Multiple Bonuses:</strong> Unilevel, rank bonuses, and infinity bonuses</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="{{dashboard_url}}" class="button">Go to Your Dashboard</a>
+            </div>
+            
+            <p style="margin-top: 30px; padding: 20px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0a2c1c;">
+                <strong>💡 Pro Tip:</strong> The key to success is consistent action. Share your referral link, support your team, and watch your empire grow!
+            </p>
+            
+            <p style="margin-top: 30px; color: #666666; font-size: 14px;">
+                Need help getting started? Our support team is here to assist you every step of the way.
+            </p>
+        </div>
+        <div class="footer">
+            <p><strong>Rest Empire</strong></p>
+            <p>&copy; 2025 Rest Empire. All rights reserved.</p>
+            <p>Building Your Network Marketing Empire</p>
+        </div>
+    </div>
+</body>
+</html>

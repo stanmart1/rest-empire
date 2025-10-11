@@ -27,7 +27,7 @@ class Transaction(Base):
     currency = Column(String, default="EUR")
     status = Column(Enum(TransactionStatus), default=TransactionStatus.pending, index=True)
     description = Column(Text)
-    metadata = Column(JSON)
+    meta_data = Column(JSON)
     
     payment_method = Column(String)
     payment_reference = Column(String)

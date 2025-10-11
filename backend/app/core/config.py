@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str
     DATABASE_POOL_SIZE: int = 30
-    DATABASE_MAX_OVERFLOW: int = 20
+    DATABASE_MAX_OVERFLOW: int = 10
     
     # Security
     SECRET_KEY: str
@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     MAIL_PORT: int = 587
     MAIL_SERVER: str = ""
     MAIL_TLS: bool = True
+    RESEND_API_KEY: str = ""
+    
+    # Frontend
+    FRONTEND_URL: str = "http://localhost:5173"
     
     # Payment Gateways
     STRIPE_SECRET_KEY: str = ""

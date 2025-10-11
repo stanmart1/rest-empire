@@ -42,5 +42,5 @@ class User(Base):
     sponsor = relationship("User", remote_side=[id], backref="downline")
     transactions = relationship("Transaction", back_populates="user")
     bonuses = relationship("Bonus", back_populates="user", foreign_keys="Bonus.user_id")
-    payouts = relationship("Payout", back_populates="user")
-    support_tickets = relationship("SupportTicket", back_populates="user")
+    payouts = relationship("Payout", back_populates="user", foreign_keys="Payout.user_id")
+    support_tickets = relationship("SupportTicket", back_populates="user", foreign_keys="SupportTicket.user_id")

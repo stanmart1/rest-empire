@@ -35,7 +35,7 @@ class SupportTicket(Base):
     closed_at = Column(DateTime)
     
     user = relationship("User", back_populates="support_tickets", foreign_keys=[user_id])
-    assigned_admin = relationship("User", foreign_keys=[assigned_to])
+    assigned_admin = relationship("User", foreign_keys=[assigned_to], overlaps="user")
     responses = relationship("SupportResponse", back_populates="ticket")
 
 class SupportResponse(Base):

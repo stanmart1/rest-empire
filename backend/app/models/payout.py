@@ -35,4 +35,4 @@ class Payout(Base):
     external_response = Column(JSON)
     
     user = relationship("User", back_populates="payouts", foreign_keys=[user_id])
-    approved_by_admin = relationship("User", foreign_keys=[approved_by])
+    approved_by_admin = relationship("User", foreign_keys=[approved_by], overlaps="user")
