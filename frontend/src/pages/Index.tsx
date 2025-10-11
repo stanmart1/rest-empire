@@ -11,22 +11,22 @@ const Index = () => {
     window.scrollTo(0, 0);
   }, []);
   
-  // Carousel state
+  // Carousel state - continuous infinite scroll
   const [currentSlide, setCurrentSlide] = useState(0);
   
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1));
+    setCurrentSlide((prev) => prev + 1);
   };
   
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1));
+    setCurrentSlide((prev) => prev - 1);
   };
   
-  // Auto-advance carousel
+  // Continuous auto-advance - never stops
   useEffect(() => {
     const interval = setInterval(() => {
-      nextSlide();
-    }, 5000);
+      setCurrentSlide((prev) => prev + 1);
+    }, 3000);
     
     return () => clearInterval(interval);
   }, []);
@@ -278,13 +278,16 @@ const Index = () => {
         <div className="sm:hidden">
           {/* Carousel Container */}
           <div className="relative overflow-hidden rounded-xl">
-            {/* Slides */}
+            {/* Slides - Duplicated for infinite loop */}
             <div 
-              className="flex transition-transform duration-300 ease-in-out"
+              className="flex transition-transform duration-500 ease-linear"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
+              {/* Repeat slides multiple times for continuous effect */}
+              {[...Array(20)].map((_, repeatIndex) => (
+                <>
               {/* Slide 1 */}
-              <div className="w-full flex-shrink-0 p-4">
+              <div key={`slide-1-${repeatIndex}`} className="w-full flex-shrink-0 p-4">
                 <div className="bg-card p-6 rounded-xl border shadow-sm">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <Users className="w-8 h-8 text-primary" />
@@ -307,7 +310,7 @@ const Index = () => {
               </div>
               
               {/* Slide 2 */}
-              <div className="w-full flex-shrink-0 p-4">
+              <div key={`slide-2-${repeatIndex}`} className="w-full flex-shrink-0 p-4">
                 <div className="bg-card p-6 rounded-xl border shadow-sm">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <Gift className="w-8 h-8 text-primary" />
@@ -330,7 +333,7 @@ const Index = () => {
               </div>
               
               {/* Slide 3 */}
-              <div className="w-full flex-shrink-0 p-4">
+              <div key={`slide-3-${repeatIndex}`} className="w-full flex-shrink-0 p-4">
                 <div className="bg-card p-6 rounded-xl border shadow-sm">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <TrendingUp className="w-8 h-8 text-primary" />
@@ -351,6 +354,8 @@ const Index = () => {
                   </ul>
                 </div>
               </div>
+              </>
+              ))}
             </div>
           </div>
           
@@ -361,7 +366,7 @@ const Index = () => {
                 key={index}
                 onClick={() => setCurrentSlide(index)}
                 className={`w-3 h-3 rounded-full ${
-                  currentSlide === index ? 'bg-primary' : 'bg-gray-300'
+                  currentSlide % 3 === index ? 'bg-primary' : 'bg-gray-300'
                 }`}
               />
             ))}
