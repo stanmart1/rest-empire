@@ -1,117 +1,227 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, Presentation } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Download, FileText, Presentation, Video, Image, File, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { usePromoMaterials, usePromoStats } from '@/hooks/useApi';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import apiService from '@/services/api';
+import { PromoMaterial } from '@/types/promo';
 
 const PromoMaterials = () => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [languageFilter, setLanguageFilter] = useState('all');
 
-  const handleDownload = (material: string) => {
-    toast({
-      title: "Download Started",
-      description: `Downloading ${material}...`,
-    });
-    // TODO: Implement actual download functionality
+  const { data: materials, isLoading: materialsLoading } = usePromoMaterials({
+    material_type: typeFilter !== 'all' ? typeFilter : undefined,
+    language: languageFilter !== 'all' ? languageFilter : undefined,
+  });
+
+  const { data: stats, isLoading: statsLoading } = usePromoStats();
+
+  const downloadMutation = useMutation({
+    mutationFn: (materialId: number) => apiService.promoMaterials.downloadMaterial(materialId),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['promo-materials'] });
+      queryClient.invalidateQueries({ queryKey: ['promo-stats'] });
+      
+      // Open download URL
+      if (data.download_url) {
+        window.open(data.download_url, '_blank');
+      }
+      
+      toast({
+        title: "Download Started",
+        description: "Your download has been initiated",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Download Failed",
+        description: error.response?.data?.detail || "Failed to download material",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const getTypeIcon = (type: string) => {
+    const icons = {
+      presentation: Presentation,
+      calculator: FileText,
+      document: File,
+      video: Video,
+      image: Image,
+      brochure: FileText,
+    };
+    const IconComponent = icons[type as keyof typeof icons] || File;
+    return <IconComponent className="w-16 h-16" />;
   };
+
+  const getTypeColor = (type: string) => {
+    const colors = {
+      presentation: 'from-blue-500 to-blue-600',
+      calculator: 'from-green-500 to-green-600',
+      document: 'from-gray-500 to-gray-600',
+      video: 'from-red-500 to-red-600',
+      image: 'from-purple-500 to-purple-600',
+      brochure: 'from-orange-500 to-orange-600',
+    };
+    return colors[type as keyof typeof colors] || 'from-gray-500 to-gray-600';
+  };
+
+  const formatFileSize = (bytes?: number) => {
+    if (!bytes) return '';
+    const mb = bytes / (1024 * 1024);
+    return `${mb.toFixed(1)} MB`;
+  };
+
+  const renderMaterialCard = (material: PromoMaterial) => (
+    <Card key={material.id} className="hover:shadow-md transition-shadow">
+      <CardContent className="p-6">
+        <div className={`aspect-video bg-gradient-to-br ${getTypeColor(material.material_type)} rounded-lg mb-4 flex items-center justify-center text-white`}>
+          {getTypeIcon(material.material_type)}
+        </div>
+        
+        <div className="space-y-2 mb-4">
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary">
+              {material.material_type}
+            </Badge>
+            {material.file_size && (
+              <Badge variant="outline">
+                {formatFileSize(material.file_size)}
+              </Badge>
+            )}
+          </div>
+          
+          <h3 className="font-semibold">{material.title}</h3>
+          
+          {material.description && (
+            <p className="text-sm text-muted-foreground">{material.description}</p>
+          )}
+          
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>{material.download_count} downloads</span>
+            <span>{material.language.toUpperCase()}</span>
+          </div>
+        </div>
+        
+        <Button 
+          variant="outline" 
+          className="w-full"
+          onClick={() => downloadMutation.mutate(material.id)}
+          disabled={downloadMutation.isPending}
+        >
+          {downloadMutation.isPending ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Download className="w-4 h-4 mr-2" />
+          )}
+          Download
+        </Button>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Promotional Materials</h1>
-        <p className="text-muted-foreground">Download promotional content and marketing materials</p>
+        <h1 className="text-2xl font-bold mb-2">Promotional Materials</h1>
+        <p className="text-muted-foreground">
+          Download promotional content and marketing materials to grow your business
+        </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Promo pages</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            You can use any of the presented pages for your work. All users registered on it will immediately fall into your first line and will be able to contact you!
-          </p>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="bg-blue-50 border-blue-200">
-            <CardContent className="p-6">
-              <div className="aspect-video bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg mb-4 flex items-center justify-center text-white">
-                <FileText className="w-16 h-16" />
-              </div>
-              <h3 className="font-semibold mb-2">Rest Empire Calculator</h3>
-              <p className="text-sm text-muted-foreground mb-4">Interactive profit calculator</p>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => handleDownload('Rest Empire Calculator')}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-orange-50 border-orange-200">
-            <CardContent className="p-6">
-              <div className="aspect-video bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg mb-4 flex items-center justify-center text-white">
-                <FileText className="w-16 h-16" />
-              </div>
-              <h3 className="font-semibold mb-2">BOOSTER SPLIT 2.0 Calculator</h3>
-              <p className="text-sm text-muted-foreground mb-4">Advanced profit calculator</p>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => handleDownload('BOOSTER SPLIT 2.0 Calculator')}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
-            </CardContent>
-          </Card>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Presentation</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Download our presentation. It's available in many languages.
-          </p>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Stats */}
+      {!statsLoading && stats && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
-            <CardContent className="p-6">
-              <div className="aspect-video bg-gradient-to-br from-blue-900 to-blue-700 rounded-lg mb-4 flex items-center justify-center text-white">
-                <Presentation className="w-16 h-16" />
+            <CardContent className="p-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold">{stats.total_materials}</p>
+                <p className="text-sm text-muted-foreground">Total Materials</p>
               </div>
-              <h3 className="font-semibold mb-2">Presentation</h3>
-              <p className="text-sm text-muted-foreground mb-4">Download our presentation. It's available in many languages.</p>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => handleDownload('Presentation')}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
             </CardContent>
           </Card>
-
+          
           <Card>
-            <CardContent className="p-6">
-              <div className="aspect-video bg-gradient-to-br from-blue-900 to-blue-700 rounded-lg mb-4 flex items-center justify-center text-white">
-                <Presentation className="w-16 h-16" />
+            <CardContent className="p-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold">{stats.total_downloads}</p>
+                <p className="text-sm text-muted-foreground">Total Downloads</p>
               </div>
-              <h3 className="font-semibold mb-2">Text Description</h3>
-              <p className="text-sm text-muted-foreground mb-4">Look through the text option of the presentation! It will make slides clear!</p>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => handleDownload('Text Description')}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
             </CardContent>
           </Card>
-        </CardContent>
-      </Card>
+          
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold">{Object.keys(stats.materials_by_type).length}</p>
+                <p className="text-sm text-muted-foreground">Material Types</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="flex gap-4">
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Material Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="presentation">Presentations</SelectItem>
+            <SelectItem value="calculator">Calculators</SelectItem>
+            <SelectItem value="document">Documents</SelectItem>
+            <SelectItem value="brochure">Brochures</SelectItem>
+            <SelectItem value="video">Videos</SelectItem>
+            <SelectItem value="image">Images</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={languageFilter} onValueChange={setLanguageFilter}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Language" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Languages</SelectItem>
+            <SelectItem value="en">English</SelectItem>
+            <SelectItem value="es">Spanish</SelectItem>
+            <SelectItem value="fr">French</SelectItem>
+            <SelectItem value="de">German</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Materials Grid */}
+      {materialsLoading ? (
+        <div className="flex justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {materials?.map((material: PromoMaterial) => renderMaterialCard(material))}
+          {!materials?.length && (
+            <div className="col-span-full">
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-16">
+                  <FileText className="w-16 h-16 text-muted-foreground mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">No Materials Found</h3>
+                  <p className="text-muted-foreground text-center max-w-md">
+                    No promotional materials match your current filters. Try adjusting your search criteria.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

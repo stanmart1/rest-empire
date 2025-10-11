@@ -51,9 +51,13 @@ export const userAPI = {
 
 // Team API
 export const teamAPI = {
-  getTeamMembers: async (depth?: number): Promise<TeamMember[]> => {
-    const params = depth ? { depth } : {};
-    const response = await api.get('/team/members', { params });
+  getTeamTree: async (params?: { depth?: number; skip?: number; limit?: number }) => {
+    const response = await api.get('/team/tree', { params });
+    return response.data;
+  },
+
+  getFirstLine: async () => {
+    const response = await api.get('/team/first-line');
     return response.data;
   },
 
@@ -64,6 +68,17 @@ export const teamAPI = {
 
   getLegBreakdown: async () => {
     const response = await api.get('/team/legs');
+    return response.data;
+  },
+
+  searchMembers: async (params?: {
+    search?: string;
+    rank?: string;
+    status?: string;
+    skip?: number;
+    limit?: number;
+  }) => {
+    const response = await api.get('/team/search', { params });
     return response.data;
   }
 };
@@ -120,11 +135,120 @@ export const payoutAPI = {
   }
 };
 
+// Ranks API
+export const ranksAPI = {
+  getRanks: async () => {
+    const response = await api.get('/ranks');
+    return response.data;
+  },
+
+  getRankProgress: async () => {
+    const response = await api.get('/ranks/progress');
+    return response.data;
+  },
+
+  getRankHistory: async () => {
+    const response = await api.get('/ranks/history');
+    return response.data;
+  },
+
+  recalculateRank: async () => {
+    const response = await api.post('/ranks/recalculate');
+    return response.data;
+  }
+};
+
+// Events API
+export const eventsAPI = {
+  getEvents: async (params?: {
+    event_type?: string;
+    status?: string;
+    upcoming_only?: boolean;
+    skip?: number;
+    limit?: number;
+  }) => {
+    const response = await api.get('/events/', { params });
+    return response.data;
+  },
+
+  getMyEvents: async (upcoming_only?: boolean) => {
+    const response = await api.get('/events/my-events', { 
+      params: { upcoming_only } 
+    });
+    return response.data;
+  },
+
+  getEventStats: async () => {
+    const response = await api.get('/events/stats');
+    return response.data;
+  },
+
+  getEvent: async (id: number) => {
+    const response = await api.get(`/events/${id}`);
+    return response.data;
+  },
+
+  registerForEvent: async (id: number) => {
+    const response = await api.post(`/events/${id}/register`);
+    return response.data;
+  },
+
+  unregisterFromEvent: async (id: number) => {
+    const response = await api.delete(`/events/${id}/register`);
+    return response.data;
+  }
+};
+
+// Promo Materials API
+export const promoMaterialsAPI = {
+  getMaterials: async (params?: {
+    material_type?: string;
+    language?: string;
+    skip?: number;
+    limit?: number;
+  }) => {
+    const response = await api.get('/promo-materials/', { params });
+    return response.data;
+  },
+
+  getStats: async () => {
+    const response = await api.get('/promo-materials/stats');
+    return response.data;
+  },
+
+  downloadMaterial: async (id: number) => {
+    const response = await api.post(`/promo-materials/${id}/download`);
+    return response.data;
+  }
+};
+
+// Books API
+export const booksAPI = {
+  getBooks: async () => {
+    const response = await api.get('/books/');
+    return response.data;
+  },
+
+  createReview: async (bookId: number, reviewData: { rating: number; comment?: string }) => {
+    const response = await api.post(`/books/${bookId}/reviews`, reviewData);
+    return response.data;
+  },
+
+  getBookReviews: async (bookId: number) => {
+    const response = await api.get(`/books/${bookId}/reviews`);
+    return response.data;
+  }
+};
+
 export default {
   auth: authAPI,
   user: userAPI,
   team: teamAPI,
   bonuses: bonusAPI,
   transactions: transactionAPI,
-  payouts: payoutAPI
+  payouts: payoutAPI,
+  ranks: ranksAPI,
+  events: eventsAPI,
+  promoMaterials: promoMaterialsAPI,
+  books: booksAPI
 };

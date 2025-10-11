@@ -13,10 +13,17 @@ export const useDashboardStats = () => {
 };
 
 // Team hooks
-export const useTeamMembers = (depth?: number) => {
+export const useTeamTree = (params?: { depth?: number; skip?: number; limit?: number }) => {
   return useQuery({
-    queryKey: ['team-members', depth],
-    queryFn: () => apiService.team.getTeamMembers(depth),
+    queryKey: ['team-tree', params],
+    queryFn: () => apiService.team.getTeamTree(params),
+  });
+};
+
+export const useFirstLine = () => {
+  return useQuery({
+    queryKey: ['first-line'],
+    queryFn: apiService.team.getFirstLine,
   });
 };
 
@@ -25,6 +32,27 @@ export const useTeamStats = () => {
     queryKey: ['team-stats'],
     queryFn: apiService.team.getTeamStats,
     refetchInterval: 60000, // Refresh every minute
+  });
+};
+
+export const useLegBreakdown = () => {
+  return useQuery({
+    queryKey: ['leg-breakdown'],
+    queryFn: apiService.team.getLegBreakdown,
+  });
+};
+
+export const useSearchMembers = (params?: {
+  search?: string;
+  rank?: string;
+  status?: string;
+  skip?: number;
+  limit?: number;
+}) => {
+  return useQuery({
+    queryKey: ['search-members', params],
+    queryFn: () => apiService.team.searchMembers(params),
+    enabled: !!(params?.search || params?.rank || params?.status),
   });
 };
 
@@ -90,6 +118,90 @@ export const useRegister = () => {
         variant: "destructive",
       });
     },
+  });
+};
+
+// Ranks hooks
+export const useRanks = () => {
+  return useQuery({
+    queryKey: ['ranks'],
+    queryFn: apiService.ranks.getRanks,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+export const useRankProgress = () => {
+  return useQuery({
+    queryKey: ['rank-progress'],
+    queryFn: apiService.ranks.getRankProgress,
+    refetchInterval: 60000, // Refresh every minute
+  });
+};
+
+export const useRankHistory = () => {
+  return useQuery({
+    queryKey: ['rank-history'],
+    queryFn: apiService.ranks.getRankHistory,
+  });
+};
+
+// Events hooks
+export const useEvents = (params?: {
+  event_type?: string;
+  status?: string;
+  upcoming_only?: boolean;
+}) => {
+  return useQuery({
+    queryKey: ['events', params],
+    queryFn: () => apiService.events.getEvents(params),
+  });
+};
+
+export const useMyEvents = (upcoming_only?: boolean) => {
+  return useQuery({
+    queryKey: ['my-events', upcoming_only],
+    queryFn: () => apiService.events.getMyEvents(upcoming_only),
+  });
+};
+
+export const useEventStats = () => {
+  return useQuery({
+    queryKey: ['event-stats'],
+    queryFn: apiService.events.getEventStats,
+  });
+};
+
+export const useEvent = (id: number) => {
+  return useQuery({
+    queryKey: ['event', id],
+    queryFn: () => apiService.events.getEvent(id),
+    enabled: !!id,
+  });
+};
+
+// Promo Materials hooks
+export const usePromoMaterials = (params?: {
+  material_type?: string;
+  language?: string;
+}) => {
+  return useQuery({
+    queryKey: ['promo-materials', params],
+    queryFn: () => apiService.promoMaterials.getMaterials(params),
+  });
+};
+
+export const usePromoStats = () => {
+  return useQuery({
+    queryKey: ['promo-stats'],
+    queryFn: apiService.promoMaterials.getStats,
+  });
+};
+
+// Books hooks
+export const useBooks = () => {
+  return useQuery({
+    queryKey: ['books'],
+    queryFn: apiService.books.getBooks,
   });
 };
 

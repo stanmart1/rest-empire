@@ -1,91 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Copy, QrCode, Mail, ChevronDown, ChevronRight, Search } from 'lucide-react';
+import { Copy, QrCode, ChevronDown, ChevronRight, Search, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import api from '@/lib/api';
 import RankBadge from '@/components/common/RankBadge';
 import StatusBadge from '@/components/common/StatusBadge';
-
-interface TeamMember {
-  id: string;
-  name: string;
-  email: string;
-  rank: string;
-  status: string;
-  registeredAt: string;
-  turnover: number;
-  teamSize: number;
-  children?: TeamMember[];
-}
-
-interface SponsorInfo {
-  name: string;
-  email: string;
-  status: string;
-}
-
-interface TeamStats {
-  firstLine: number;
-  allTeam: number;
-}
+import { useTeamTree, useFirstLine, useTeamStats, useLegBreakdown, useSearchMembers } from '@/hooks/useApi';
+import { useAuth } from '@/contexts/AuthContext';
+import { TeamMemberInfo } from '@/types/team';
 
 const Team = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [teamList, setTeamList] = useState<TeamMember[]>([]);
-  const [teamTree, setTeamTree] = useState<TeamMember[]>([]);
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
-  const [isLoading, setIsLoading] = useState(true);
+  const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
   const [sortBy, setSortBy] = useState('newest');
   const [rankFilter, setRankFilter] = useState('all');
   
-  const referralLink = "https://restempire.com/partner/znrp59sa";
+  const { data: teamTree, isLoading: treeLoading } = useTeamTree({ depth: 5 });
+  const { data: firstLine, isLoading: firstLineLoading } = useFirstLine();
+  const { data: teamStats, isLoading: statsLoading } = useTeamStats();
+  const { data: legBreakdown, isLoading: legLoading } = useLegBreakdown();
+  const { data: searchResults, isLoading: searchLoading } = useSearchMembers({
+    search: searchQuery || undefined,
+    rank: rankFilter !== 'all' ? rankFilter : undefined,
+  });
   
-  const sponsorInfo: SponsorInfo = {
-    name: "Kikelomo Ayodele",
-    email: "kike4gold@gmail.com",
-    status: "Sponsor"
-  };
-
-  const teamStats: TeamStats = {
-    firstLine: 0,
-    allTeam: 0
-  };
-
-  useEffect(() => {
-    const fetchTeamData = async () => {
-      setIsLoading(true);
-      try {
-        const [listRes, treeRes] = await Promise.all([
-          api.get('/team/list'),
-          api.get('/team/tree')
-        ]);
-        const listData = Array.isArray(listRes.data)
-          ? listRes.data
-          : Array.isArray((listRes as any).data?.data)
-            ? (listRes as any).data.data
-            : [];
-        const treeData = Array.isArray(treeRes.data)
-          ? treeRes.data
-          : Array.isArray((treeRes as any).data?.data)
-            ? (treeRes as any).data.data
-            : [];
-        setTeamList(listData);
-        setTeamTree(treeData);
-      } catch (error) {
-        console.error('Failed to fetch team data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTeamData();
-  }, []);
+  const referralLink = user?.referral_code 
+    ? `https://restempire.com/register?ref=${user.referral_code}`
+    : "https://restempire.com/register";
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -95,7 +42,7 @@ const Team = () => {
     });
   };
 
-  const toggleNode = (nodeId: string) => {
+  const toggleNode = (nodeId: number) => {
     const newExpanded = new Set(expandedNodes);
     if (newExpanded.has(nodeId)) {
       newExpanded.delete(nodeId);
@@ -105,284 +52,280 @@ const Team = () => {
     setExpandedNodes(newExpanded);
   };
 
-  const renderTreeNode = (member: TeamMember, level: number = 0) => {
-    const hasChildren = member.children && member.children.length > 0;
-    const isExpanded = expandedNodes.has(member.id);
-
-    return (
-      <div key={member.id} className="mb-2">
-        <div
-          className={`flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors`}
-          style={{ marginLeft: `${level * 24}px` }}
+  const renderTeamMember = (member: TeamMemberInfo, depth = 0) => (
+    <div key={member.id} className={`border-l-2 border-gray-200 ${depth > 0 ? 'ml-6' : ''}`}>
+      <div className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg">
+        <button
+          onClick={() => toggleNode(member.id)}
+          className="p-1 hover:bg-gray-200 rounded"
         >
-          {hasChildren ? (
-            <button
-              onClick={() => toggleNode(member.id)}
-              className="flex-shrink-0"
-            >
-              {isExpanded ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronRight className="w-4 h-4" />
-              )}
-            </button>
+          {expandedNodes.has(member.id) ? (
+            <ChevronDown className="w-4 h-4" />
           ) : (
-            <div className="w-4" />
+            <ChevronRight className="w-4 h-4" />
           )}
-          
-          <Avatar className="w-8 h-8">
-            <AvatarFallback>
-              {member.name.split(' ').map(n => n[0]).join('')}
-            </AvatarFallback>
-          </Avatar>
-          
-          <div className="flex-1 min-w-0">
-            <p className="font-medium truncate">{member.name}</p>
-            <p className="text-xs text-muted-foreground truncate">{member.email}</p>
+        </button>
+        
+        <Avatar className="w-10 h-10">
+          <AvatarFallback>
+            {member.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
+          </AvatarFallback>
+        </Avatar>
+        
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-medium">{member.full_name || 'Unknown'}</span>
+            <RankBadge rank={member.current_rank} size="sm" />
+            <StatusBadge status={member.is_active ? 'active' : 'inactive'} />
           </div>
-          
-          <RankBadge rank={member.rank} size="sm" />
-          <span className={`text-xs px-2 py-1 rounded-full ${
-            member.status === 'active' ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'
-          }`}>
-            {member.status}
-          </span>
-          <p className="text-sm font-medium">{member.turnover.toLocaleString()} EUR</p>
+          <div className="text-sm text-muted-foreground">
+            {member.email} • Team: {member.team_size} • €{member.personal_turnover.toFixed(0)}
+          </div>
         </div>
-
-        {hasChildren && isExpanded && (
-          <div>
-            {member.children!.map(child => renderTreeNode(child, level + 1))}
+        
+        <div className="text-right text-sm">
+          <div className="text-muted-foreground">
+            {new Date(member.registration_date).toLocaleDateString()}
           </div>
-        )}
+        </div>
       </div>
-    );
-  };
-
-  const filteredTeamList = (Array.isArray(teamList) ? teamList : []).filter(member =>
-    member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    member.email.toLowerCase().includes(searchQuery.toLowerCase())
+    </div>
   );
 
-  if (isLoading) {
+  const renderListMember = (member: TeamMemberInfo) => (
+    <div key={member.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg border-b">
+      <Avatar className="w-10 h-10">
+        <AvatarFallback>
+          {member.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
+        </AvatarFallback>
+      </Avatar>
+      
+      <div className="flex-1">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="font-medium">{member.full_name || 'Unknown'}</span>
+          <RankBadge rank={member.current_rank} size="sm" />
+          <StatusBadge status={member.is_active ? 'active' : 'inactive'} />
+        </div>
+        <div className="text-sm text-muted-foreground">
+          {member.email} • Team: {member.team_size} • €{member.personal_turnover.toFixed(0)}
+        </div>
+      </div>
+      
+      <div className="text-right text-sm text-muted-foreground">
+        {new Date(member.registration_date).toLocaleDateString()}
+      </div>
+    </div>
+  );
+
+  if (statsLoading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Referral Link Section */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 flex-1">
-              <span className="text-sm text-muted-foreground">Referral link</span>
-              <span className="text-sm font-medium">{referralLink}</span>
-            </div>
-            <div className="flex gap-2">
-              <Button size="icon" variant="ghost" onClick={copyReferralLink}>
-                <Copy className="w-4 h-4" />
-              </Button>
-              <Button 
-                size="icon" 
-                variant="ghost"
-                onClick={() => {
-                  toast({
-                    title: "QR Code",
-                    description: "QR code feature coming soon",
-                  });
-                }}
-              >
-                <QrCode className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <div>
+        <h1 className="text-2xl font-bold mb-2">My Team</h1>
+        <p className="text-muted-foreground">
+          Manage and view your team structure, performance, and growth.
+        </p>
+      </div>
 
-      {/* Sponsor and Team Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* My Sponsor */}
+      {/* Team Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">My sponsor</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-3 mb-4">
-              <Avatar className="w-12 h-12">
-                <AvatarFallback>
-                  {sponsorInfo.name.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">{sponsorInfo.name}</p>
-                <p className="text-xs text-muted-foreground">{sponsorInfo.status}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-              <Mail className="w-4 h-4 text-primary" />
-              <span className="text-sm text-white">kike4gold@gmail.com</span>
-              <Button 
-                size="icon" 
-                variant="ghost" 
-                className="ml-auto h-6 w-6"
-                onClick={() => {
-                  navigator.clipboard.writeText(sponsorInfo.email);
-                  toast({
-                    title: "Copied!",
-                    description: "Email copied to clipboard",
-                  });
-                }}
-              >
-                <Copy className="w-3 h-3" />
-              </Button>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <p className="text-2xl font-bold">{teamStats?.first_line_count || 0}</p>
+              <p className="text-sm text-muted-foreground">First Line</p>
             </div>
           </CardContent>
         </Card>
-
-        {/* My Team Stats */}
+        
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">My Team</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-3 mb-4">
-              <Avatar className="w-12 h-12">
-                <AvatarFallback>PA</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">Peter Adelodun</p>
-                <p className="text-xs text-muted-foreground">Not verified</p>
-              </div>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <p className="text-2xl font-bold">{teamStats?.total_team_size || 0}</p>
+              <p className="text-sm text-muted-foreground">Total Team</p>
             </div>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">First Line</span>
-                <span className="text-2xl font-bold">{teamStats.firstLine}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">All Team</span>
-                <span className="text-2xl font-bold">{teamStats.allTeam}</span>
-              </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <p className="text-2xl font-bold">{teamStats?.active_members || 0}</p>
+              <p className="text-sm text-muted-foreground">Active Members</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <p className="text-2xl font-bold">€{teamStats?.total_team_turnover?.toFixed(0) || '0'}</p>
+              <p className="text-sm text-muted-foreground">Team Turnover</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* Referral Link */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <QrCode className="w-5 h-5" />
+            Referral Link
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            <Input value={referralLink} readOnly className="flex-1" />
+            <Button onClick={copyReferralLink} variant="outline">
+              <Copy className="w-4 h-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Team Tabs */}
-      <Tabs defaultValue="search" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="search">Search My Team</TabsTrigger>
-          <TabsTrigger value="tree">Performance Tree</TabsTrigger>
+      <Tabs defaultValue="tree" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="tree">Team Tree</TabsTrigger>
+          <TabsTrigger value="list">Team List</TabsTrigger>
+          <TabsTrigger value="legs">Leg Breakdown</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="search" className="space-y-4">
-          {/* Filters */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-medium">Filter</h3>
-                <Button 
-                  variant="link" 
-                  className="text-sm"
-                  onClick={() => {
-                    toast({
-                      title: "Advanced Filters",
-                      description: "Advanced filtering options coming soon",
-                    });
-                  }}
-                >
-                  Advanced
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Input
-                    placeholder="Search name"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="newest">Registered: Newest on Top</SelectItem>
-                      <SelectItem value="oldest">Registered: Oldest on Top</SelectItem>
-                      <SelectItem value="turnover">Highest Turnover</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Select value={rankFilter} onValueChange={setRankFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Rank" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="amber">Amber</SelectItem>
-                      <SelectItem value="jade">Jade</SelectItem>
-                      <SelectItem value="ruby">Ruby</SelectItem>
-                      <SelectItem value="diamond">Diamond</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <Button className="w-full md:w-auto mt-4">Filter</Button>
-            </CardContent>
-          </Card>
-
-          {/* Empty State or Results */}
-          {filteredTeamList.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-16">
-                <div className="w-32 h-32 mb-4 opacity-50">
-                  <Search className="w-full h-full text-muted-foreground" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Empty</h3>
-                <p className="text-muted-foreground">You don't have a tree</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardContent className="p-4">
-                {/* Team list would go here */}
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
 
         <TabsContent value="tree" className="space-y-4">
           <Card>
             <CardHeader>
-              <Input
-                placeholder="Search team members..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-md"
-              />
+              <CardTitle>Team Structure</CardTitle>
             </CardHeader>
             <CardContent>
-              {!(Array.isArray(teamTree) && teamTree.length > 0) ? (
-                <div className="flex flex-col items-center justify-center py-16">
-                  <div className="w-32 h-32 mb-4 opacity-50">
-                    <Search className="w-full h-full text-muted-foreground" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Empty</h3>
-                  <p className="text-muted-foreground">You don't have a tree</p>
+              {treeLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin" />
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {(Array.isArray(teamTree) ? teamTree : []).map(member => renderTreeNode(member))}
+                  {teamTree?.map((member: TeamMemberInfo) => renderTeamMember(member))}
+                  {!teamTree?.length && (
+                    <p className="text-center text-muted-foreground py-8">
+                      No team members found. Start building your team!
+                    </p>
+                  )}
                 </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="list" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Team Members</CardTitle>
+                <div className="flex gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                      placeholder="Search members..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 w-64"
+                    />
+                  </div>
+                  <Select value={rankFilter} onValueChange={setRankFilter}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Ranks</SelectItem>
+                      <SelectItem value="Pearl">Pearl</SelectItem>
+                      <SelectItem value="Sapphire">Sapphire</SelectItem>
+                      <SelectItem value="Ruby">Ruby</SelectItem>
+                      <SelectItem value="Emerald">Emerald</SelectItem>
+                      <SelectItem value="Diamond">Diamond</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="newest">Newest</SelectItem>
+                      <SelectItem value="oldest">Oldest</SelectItem>
+                      <SelectItem value="turnover">Turnover</SelectItem>
+                      <SelectItem value="team_size">Team Size</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {searchLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {(searchQuery || rankFilter !== 'all' ? searchResults : firstLine)?.map((member: TeamMemberInfo) => 
+                    renderListMember(member)
+                  )}
+                  {!(searchQuery || rankFilter !== 'all' ? searchResults : firstLine)?.length && (
+                    <p className="text-center text-muted-foreground py-8">
+                      No team members found.
+                    </p>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="legs" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Leg Breakdown</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {legLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              ) : legBreakdown ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardContent className="p-4">
+                      <h4 className="font-semibold mb-2">First Leg (50%)</h4>
+                      <p className="text-lg font-bold">€{legBreakdown.first_leg?.turnover?.toFixed(0) || '0'}</p>
+                      <p className="text-sm text-muted-foreground">{legBreakdown.first_leg?.team_size || 0} members</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="p-4">
+                      <h4 className="font-semibold mb-2">Second Leg (30%)</h4>
+                      <p className="text-lg font-bold">€{legBreakdown.second_leg?.turnover?.toFixed(0) || '0'}</p>
+                      <p className="text-sm text-muted-foreground">{legBreakdown.second_leg?.team_size || 0} members</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="p-4">
+                      <h4 className="font-semibold mb-2">Other Legs</h4>
+                      <p className="text-lg font-bold">€{legBreakdown.other_legs_combined?.turnover?.toFixed(0) || '0'}</p>
+                      <p className="text-sm text-muted-foreground">{legBreakdown.other_legs_combined?.team_size || 0} members</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-8">
+                  No leg data available yet.
+                </p>
               )}
             </CardContent>
           </Card>

@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import RankBadge from '@/components/common/RankBadge';
 import { useDashboardStats, useTeamStats } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
+import { DashboardStats, TeamStats } from '@/types/dashboard';
 
 const Dashboard = () => {
   const { toast } = useToast();
