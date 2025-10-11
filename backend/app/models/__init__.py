@@ -1,4 +1,4 @@
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.models.transaction import Transaction, TransactionType, TransactionStatus
 from app.models.bonus import Bonus, BonusType, BonusStatus
 from app.models.rank import Rank
@@ -9,9 +9,10 @@ from app.models.activity import ActivityLog
 from app.models.legal import LegalDocument
 from app.models.notification import Notification, NotificationType
 from app.models.notification_preferences import NotificationPreferences
+from app.models.system_config import SystemConfig
 
 __all__ = [
-    "User",
+    "User", "UserRole",
     "Transaction", "TransactionType", "TransactionStatus",
     "Bonus", "BonusType", "BonusStatus",
     "Rank",
@@ -21,5 +22,6 @@ __all__ = [
     "ActivityLog",
     "LegalDocument",
     "Notification", "NotificationType",
-    "NotificationPreferences"
+    "NotificationPreferences",
+    "SystemConfig"
 ]

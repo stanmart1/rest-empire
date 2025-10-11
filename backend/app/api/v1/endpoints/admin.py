@@ -4,7 +4,7 @@ from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel
 from app.core.database import get_db
-from app.api.deps import get_current_user
+from app.api.deps import get_admin_user, get_finance_user
 from app.models.user import User
 from app.models.transaction import Transaction, TransactionType, TransactionStatus
 from app.models.payout import Payout, PayoutStatus
@@ -32,13 +32,6 @@ class PayoutApproval(BaseModel):
 
 class PayoutRejection(BaseModel):
     reason: str
-
-# Note: Add proper admin authentication check in production
-def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
-    # TODO: Add admin role check
-    # if not current_user.is_admin:
-    #     raise HTTPException(status_code=403, detail="Admin access required")
-    return current_user
 
 @router.get("/transactions", response_model=List[TransactionResponse])
 def admin_get_all_transactions(
@@ -147,7 +140,7 @@ def admin_get_all_payouts(
     status: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(get_finance_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all payout requests"""
@@ -166,7 +159,7 @@ def admin_get_all_payouts(
 @router.post("/payouts/{payout_id}/approve")
 def admin_approve_payout(
     payout_id: int,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(get_finance_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Approve a payout request"""
@@ -181,7 +174,7 @@ def admin_approve_payout(
 def admin_complete_payout(
     payout_id: int,
     completion: PayoutApproval,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(get_finance_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Mark payout as completed"""
@@ -201,7 +194,7 @@ def admin_complete_payout(
 def admin_reject_payout(
     payout_id: int,
     rejection: PayoutRejection,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(get_finance_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Reject a payout request"""
