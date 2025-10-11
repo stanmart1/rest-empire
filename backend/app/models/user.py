@@ -1,7 +1,15 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Numeric, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Numeric, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from datetime import datetime
+import enum
 from app.core.database import Base
+
+class UserRole(enum.Enum):
+    user = "user"
+    support = "support"
+    finance = "finance"
+    admin = "admin"
+    super_admin = "super_admin"
 
 class User(Base):
     __tablename__ = "users"
@@ -17,6 +25,8 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     is_inactive = Column(Boolean, default=False)
     
+    role = Column(Enum(UserRole), default=UserRole.user, index=True)
+    
     sponsor_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     referral_code = Column(String, unique=True, index=True)
     registration_date = Column(DateTime, default=datetime.utcnow)
@@ -25,8 +35,8 @@ class User(Base):
     rank_achieved_date = Column(DateTime)
     highest_rank_achieved = Column(String)
     
-    balance_eur = Column(Numeric(10, 2), default=0)
-    balance_dbsp = Column(Numeric(10, 2), default=0)
+    balance_ngn = Column(Numeric(10, 2), default=0)
+    balance_usdt = Column(Numeric(10, 2), default=0)
     total_earnings = Column(Numeric(10, 2), default=0)
     
     last_login = Column(DateTime)

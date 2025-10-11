@@ -7,6 +7,8 @@ from app.models.payout import Payout, PayoutStatus
 from app.models.support import SupportTicket, SupportResponse, TicketStatus, TicketPriority
 from app.models.activity import ActivityLog
 from app.models.legal import LegalDocument
+from app.models.notification import Notification, NotificationType
+from app.models.notification_preferences import NotificationPreferences
 
 __all__ = [
     "User",
@@ -17,5 +19,7 @@ __all__ = [
     "Payout", "PayoutStatus",
     "SupportTicket", "SupportResponse", "TicketStatus", "TicketPriority",
     "ActivityLog",
-    "LegalDocument"
+    "LegalDocument",
+    "Notification", "NotificationType",
+    "NotificationPreferences"
 ]

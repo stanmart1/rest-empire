@@ -4,7 +4,7 @@ from typing import List
 class Settings(BaseSettings):
     # Database
     DATABASE_URL: str
-    DATABASE_POOL_SIZE: int = 30
+    DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
     
     # Security
@@ -25,12 +25,27 @@ class Settings(BaseSettings):
     # Frontend
     FRONTEND_URL: str = "http://localhost:5173"
     
-    # Payment Gateways
-    STRIPE_SECRET_KEY: str = ""
-    STRIPE_PUBLISHABLE_KEY: str = ""
-    STRIPE_WEBHOOK_SECRET: str = ""
+    # Payment Gateways - GTPay
+    GTPAY_MERCHANT_ID: str = ""
+    GTPAY_API_KEY: str = ""
+    GTPAY_HASH_KEY: str = ""
+    GTPAY_GATEWAY_URL: str = "https://gtweb.gtbank.com/GTPay/Tranx.aspx"
+    
+    # Payment Gateways - Providus Bank
+    PROVIDUS_MERCHANT_ID: str = ""
+    PROVIDUS_API_KEY: str = ""
+    PROVIDUS_ACCOUNT_NUMBER: str = ""
+    PROVIDUS_API_URL: str = "https://api.providusbank.com"
+    
+    # Crypto
     CRYPTO_WALLET_ADDRESS: str = ""
     CRYPTO_API_KEY: str = ""
+    CRYPTO_NETWORK: str = "TRC20"
+    
+    # Bank Transfer
+    BANK_NAME: str = "Providus Bank"
+    BANK_ACCOUNT_NUMBER: str = ""
+    BANK_ACCOUNT_NAME: str = "Rest Empire"
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
