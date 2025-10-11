@@ -42,9 +42,9 @@ def check_rank_qualification(db: Session, user_id: int, rank: Rank) -> dict:
     
     # Check requirements
     total_met = total_turnover >= float(rank.team_turnover_required)
-    first_leg_met = first_leg_turnover >= float(rank.first_leg_requirement)
-    second_leg_met = second_leg_turnover >= float(rank.second_leg_requirement)
-    other_legs_met = other_legs_turnover >= float(rank.other_legs_requirement)
+    first_leg_met = first_leg_turnover >= float(getattr(rank, 'first_leg_requirement', 0) or 0)
+    second_leg_met = second_leg_turnover >= float(getattr(rank, 'second_leg_requirement', 0) or 0)
+    other_legs_met = other_legs_turnover >= float(getattr(rank, 'other_legs_requirement', 0) or 0)
     
     qualified = total_met and first_leg_met and second_leg_met and other_legs_met
     
@@ -53,190 +53,82 @@ def check_rank_qualification(db: Session, user_id: int, rank: Rank) -> dict:
         "total_turnover": total_turnover,
         "first_leg": first_leg_turnover,
         "second_leg": second_leg_turnover,
-        "other_legs": other_legs_turnover,
-        "requirements": {
-            "total_met": total_met,
-            "first_leg_met": first_leg_met,
-            "second_leg_met": second_leg_met,
-            "other_legs_met": other_legs_met
-        }
+        "other_legs": other_legs_turnover
     }
 
-def calculate_user_rank(db: Session, user_id: int) -> bool:
-    """Calculate and update user's rank. Returns True if rank changed."""
+def calculate_rank_advancement(db: Session, user_id: int) -> str:
+    """Calculate and apply rank advancement for user"""
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        return False
+        return None
     
     current_rank = get_rank_by_name(db, user.current_rank)
     if not current_rank:
-        return False
+        return user.current_rank
     
-    # Get all ranks above current
+    # Get all ranks higher than current
     higher_ranks = db.query(Rank).filter(
-        Rank.level > current_rank.level,
-        Rank.is_active == True
+        Rank.level > current_rank.level
     ).order_by(Rank.level).all()
     
     # Check qualification for each higher rank
-    new_rank = None
-    qualification_data = None
+    new_rank = user.current_rank
     for rank in higher_ranks:
         qualification = check_rank_qualification(db, user_id, rank)
         if qualification["qualified"]:
-            new_rank = rank
-            qualification_data = qualification
+            new_rank = rank.name
+            
+            # Update user rank
+            user.current_rank = rank.name
+            user.rank_achieved_date = datetime.utcnow()
+            if not user.highest_rank_achieved or rank.level > get_rank_by_name(db, user.highest_rank_achieved).level:
+                user.highest_rank_achieved = rank.name
+            
+            db.commit()
+            
+            # Log activity
+            log_activity(db, user_id, "rank_advancement", f"Advanced to {rank.name}")
         else:
-            break  # Stop at first unqualified rank
+            break  # Stop at first non-qualifying rank
     
-    # Update rank if qualified for higher
-    if new_rank:
-        old_rank = user.current_rank
-        user.current_rank = new_rank.name
-        user.rank_achieved_date = datetime.utcnow()
-        
-        # Update highest rank if applicable
-        if not user.highest_rank_achieved:
-            user.highest_rank_achieved = new_rank.name
-        else:
-            highest = get_rank_by_name(db, user.highest_rank_achieved)
-            if highest and new_rank.level > highest.level:
-                user.highest_rank_achieved = new_rank.name
-        
-        db.commit()
-        
-        # Award rank bonus
-        award_rank_bonus(db, user_id, new_rank)
-        
-        # Log rank achievement
-        log_activity(
-            db, user_id, "rank_achieved",
-            details={"old_rank": old_rank, "new_rank": new_rank.name}
-        )
-        
-        # Send notification email
-        team_size = get_team_size(db, user_id)
-        asyncio.create_task(send_rank_notification(
-            user.email,
-            user.full_name or "Member",
-            new_rank.name,
-            float(new_rank.bonus_amount),
-            qualification_data["total_turnover"],
-            team_size
-        ))
-        
-        return True
-    
-    return False
+    return new_rank
 
-async def send_rank_notification(email: str, name: str, rank_name: str, bonus: float, turnover: float, team_size: int):
-    """Send rank achievement notification email"""
-    from app.services.email_service import send_rank_achievement_email
-    await send_rank_achievement_email(email, name, rank_name, bonus, turnover, team_size)
-
-def award_rank_bonus(db: Session, user_id: int, rank: Rank):
-    """Award one-time rank bonus"""
-    if float(rank.bonus_amount) <= 0:
-        return
-    
-    # Check if bonus already awarded
-    existing = db.query(Bonus).filter(
-        Bonus.user_id == user_id,
-        Bonus.bonus_type == BonusType.rank_bonus,
-        Bonus.rank_achieved == rank.name
-    ).first()
-    
-    if existing:
-        return  # Already awarded
-    
-    # Create bonus
-    bonus = Bonus(
-        user_id=user_id,
-        bonus_type=BonusType.rank_bonus,
-        amount=rank.bonus_amount,
-        currency="EUR",
-        status=BonusStatus.paid,
-        rank_achieved=rank.name,
-        paid_date=datetime.utcnow().date()
-    )
-    db.add(bonus)
-    
-    # Create transaction
-    transaction = Transaction(
-        user_id=user_id,
-        transaction_type=TransactionType.bonus,
-        amount=rank.bonus_amount,
-        currency="EUR",
-        status=TransactionStatus.completed,
-        description=f"Rank bonus for achieving {rank.name}",
-        completed_at=datetime.utcnow()
-    )
-    db.add(transaction)
-    
-    # Update user balance
-    user = db.query(User).filter(User.id == user_id).first()
-    if user:
-        user.balance_eur += rank.bonus_amount
-        user.total_earnings += rank.bonus_amount
-    
-    db.commit()
+def calculate_user_rank(db: Session, user_id: int) -> str:
+    """Calculate user rank (alias for calculate_rank_advancement)"""
+    return calculate_rank_advancement(db, user_id)
 
 def get_rank_progress(db: Session, user_id: int) -> dict:
-    """Get user's progress toward next rank"""
+    """Get user's rank progress information"""
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        return None
+        return {}
     
     current_rank = get_rank_by_name(db, user.current_rank)
     if not current_rank:
-        return None
+        return {}
     
     # Get next rank
     next_rank = db.query(Rank).filter(
-        Rank.level == current_rank.level + 1,
-        Rank.is_active == True
-    ).first()
+        Rank.level > current_rank.level
+    ).order_by(Rank.level).first()
     
-    if not next_rank:
-        return {
-            "current_rank": current_rank,
-            "next_rank": None,
-            "at_max_rank": True
-        }
-    
-    # Get current turnovers
+    # Get current leg breakdown
     breakdown = calculate_leg_breakdown(db, user_id)
     
-    total_turnover = sum(leg["turnover"] for leg in breakdown["all_legs"]) if breakdown["all_legs"] else 0
-    first_leg = breakdown["first_leg"]["turnover"] if breakdown["first_leg"] else 0
-    second_leg = breakdown["second_leg"]["turnover"] if breakdown["second_leg"] else 0
-    other_legs = breakdown["other_legs"]["turnover"]
-    
-    # Calculate progress percentages
-    total_progress = (total_turnover / float(next_rank.team_turnover_required) * 100) if next_rank.team_turnover_required > 0 else 0
-    first_leg_progress = (first_leg / float(next_rank.first_leg_requirement) * 100) if next_rank.first_leg_requirement > 0 else 0
-    second_leg_progress = (second_leg / float(next_rank.second_leg_requirement) * 100) if next_rank.second_leg_requirement > 0 else 0
-    other_legs_progress = (other_legs / float(next_rank.other_legs_requirement) * 100) if next_rank.other_legs_requirement > 0 else 0
-    
-    # Overall progress is the minimum of all requirements
-    overall_progress = min(total_progress, first_leg_progress, second_leg_progress, other_legs_progress)
-    
-    return {
-        "current_rank": current_rank,
-        "next_rank": next_rank,
-        "total_turnover": total_turnover,
-        "total_turnover_progress": min(total_progress, 100),
-        "first_leg_turnover": first_leg,
-        "first_leg_progress": min(first_leg_progress, 100),
-        "second_leg_turnover": second_leg,
-        "second_leg_progress": min(second_leg_progress, 100),
-        "other_legs_turnover": other_legs,
-        "other_legs_progress": min(other_legs_progress, 100),
-        "overall_progress": min(overall_progress, 100),
-        "requirements_met": {
-            "total": total_turnover >= float(next_rank.team_turnover_required),
-            "first_leg": first_leg >= float(next_rank.first_leg_requirement),
-            "second_leg": second_leg >= float(next_rank.second_leg_requirement),
-            "other_legs": other_legs >= float(next_rank.other_legs_requirement)
-        }
+    progress = {
+        "current_rank": current_rank.name,
+        "current_level": current_rank.level,
+        "next_rank": next_rank.name if next_rank else None,
+        "next_level": next_rank.level if next_rank else None,
+        "total_turnover": sum(leg["turnover"] for leg in breakdown["all_legs"]) if breakdown["all_legs"] else 0,
+        "required_turnover": float(next_rank.team_turnover_required) if next_rank else 0,
+        "first_leg_turnover": breakdown["first_leg"]["turnover"] if breakdown["first_leg"] else 0,
+        "second_leg_turnover": breakdown["second_leg"]["turnover"] if breakdown["second_leg"] else 0,
+        "other_legs_turnover": breakdown["other_legs"]["turnover"] if breakdown["other_legs"] else 0,
+        "progress_percentage": 0
     }
+    
+    if next_rank and progress["required_turnover"] > 0:
+        progress["progress_percentage"] = min(100, (progress["total_turnover"] / progress["required_turnover"]) * 100)
+    
+    return progress
