@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, Eye, EyeOff, Check } from 'lucide-react';
+import { Loader2, Eye, EyeOff, Check, ArrowLeft } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -44,6 +44,15 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-8 items-center py-8">
+        {/* Back to Home Button */}
+        <div className="relative lg:col-span-2 mb-4">
+          <Link to="/">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+          </Link>
+        </div>
         {/* Left side - Login Form */}
         <Card className="w-full">
           <CardHeader className="space-y-1">
@@ -128,14 +137,6 @@ const Login = () => {
               </p>
             </CardFooter>
           </form>
-          {/* Back to Home Button */}
-          <div className="px-6 pb-6">
-            <Link to="/">
-              <Button variant="outline" className="w-full">
-                Back to Home
-              </Button>
-            </Link>
-          </div>
         </Card>
 
         {/* Right side - Info Section */}

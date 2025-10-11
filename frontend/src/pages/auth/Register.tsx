@@ -69,9 +69,8 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-5xl relative py-8">
-        <div className="flex flex-col lg:flex-row gap-8 items-center">
         {/* Back to Home Button */}
-        <div className="absolute top-4 left-4">
+        <div className="relative mb-4">
           <Link to="/">
             <Button variant="outline" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -79,6 +78,7 @@ const Register = () => {
             </Button>
           </Link>
         </div>
+        <div className="flex flex-col lg:flex-row gap-8 items-center">
         {/* Registration Form */}
         <Card className={`w-full lg:w-1/2 transition-all duration-500 ease-in-out ${step === 1 ? 'lg:translate-x-0' : 'lg:translate-x-[calc(100%+2rem)]'}`}>
           <CardHeader className="space-y-1 pb-4">

@@ -107,14 +107,6 @@ const ForgotPassword = () => {
             </CardFooter>
           </form>
         )}
-        {/* Back to Home Button */}
-        <div className="px-6 pb-6">
-          <Link to="/">
-            <Button variant="outline" className="w-full">
-              Back to Home
-            </Button>
-          </Link>
-        </div>
       </Card>
     </div>
   );
