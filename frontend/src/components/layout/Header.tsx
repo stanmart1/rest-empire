@@ -2,11 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
+    <>
     <header className="bg-background border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
@@ -56,29 +58,111 @@ const Header = () => {
             </button>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
-            <div className="flex flex-col space-y-4">
-              <Link to="/" className="text-foreground hover:text-primary font-medium" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-              <Link to="/about" className="text-foreground hover:text-primary font-medium" onClick={() => setMobileMenuOpen(false)}>About</Link>
-              <Link to="/blog" className="text-foreground hover:text-primary font-medium" onClick={() => setMobileMenuOpen(false)}>Blog</Link>
-              <Link to="/contact" className="text-foreground hover:text-primary font-medium" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
-              <Link to="/faq" className="text-foreground hover:text-primary font-medium" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
-              <div className="flex flex-col space-y-2 pt-4 border-t border-border">
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/login">Login</Link>
-                </Button>
-                <Button asChild className="w-full">
-                  <Link to="/register">Sign Up</Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </header>
+
+    {/* Mobile Sidebar Overlay */}
+    <AnimatePresence>
+      {mobileMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+    </AnimatePresence>
+
+    {/* Mobile Sidebar */}
+    <AnimatePresence>
+      {mobileMenuOpen && (
+        <motion.div
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className="fixed right-0 top-0 h-screen w-64 bg-background border-l border-border z-50 md:hidden overflow-y-auto"
+        >
+          <div className="flex justify-end p-4">
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-foreground hover:text-primary"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+          
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } }
+            }}
+            className="p-6 space-y-6"
+          >
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, x: 20 },
+                visible: { opacity: 1, x: 0 }
+              }}
+            >
+              <div className="flex items-center gap-2 mb-8">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-sm">RE</span>
+                </div>
+                <span className="font-bold text-lg text-foreground">
+                  <span className="text-primary">REST</span> EMPIRE
+                </span>
+              </div>
+            </motion.div>
+
+            <div className="flex flex-col space-y-4">
+              {[
+                { to: "/", label: "Home" },
+                { to: "/about", label: "About" },
+                { to: "/blog", label: "Blog" },
+                { to: "/contact", label: "Contact" },
+                { to: "/faq", label: "FAQ" }
+              ].map((link) => (
+                <motion.div
+                  key={link.to}
+                  variants={{
+                    hidden: { opacity: 0, x: 20 },
+                    visible: { opacity: 1, x: 0 }
+                  }}
+                >
+                  <Link 
+                    to={link.to} 
+                    className="text-foreground hover:text-primary font-medium block py-2" 
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div 
+              variants={{
+                hidden: { opacity: 0, x: 20 },
+                visible: { opacity: 1, x: 0 }
+              }}
+              className="flex flex-col space-y-3 pt-6 border-t border-border"
+            >
+              <Button asChild variant="outline" className="w-full">
+                <Link to="/login" onClick={() => setMobileMenuOpen(false)}>Login</Link>
+              </Button>
+              <Button asChild className="w-full">
+                <Link to="/register" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link>
+              </Button>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+    </>
   );
 };
 

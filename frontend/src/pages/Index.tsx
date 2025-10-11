@@ -1,16 +1,36 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, Users, Gift, TrendingUp, Shield, Award, Globe, CheckCircle, BarChart3, Zap, Lock } from "lucide-react";
+import { ArrowRight, ArrowLeft, Users, Gift, TrendingUp, Shield, Award, Globe, CheckCircle, BarChart3, Zap, Lock } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Index = () => {
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
+  
+  // Carousel state
+  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1));
+  };
+  
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1));
+  };
+  
+  // Auto-advance carousel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, []);
+  
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -19,7 +39,7 @@ const Index = () => {
       <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-secondary">
         {/* Decorative elements */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxjaXJjbGUgY3g9IjEwIiBjeT0iMTAiIHI9IjEuNSIgZmlsbD0id2hpdGUiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=')]"></div>
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHBhdHRlcm5Vbml0cz0idXNlckNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxjaXJjbGUgY3g9IjEwIiBjeT0iMTAiIHI9IjEuNSIgZmlsbD0id2hpdGUiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=')]"></div>
         </div>
         
         <div className="container mx-auto px-4 py-28 md:py-36 lg:py-44 relative z-10">
@@ -61,7 +81,7 @@ const Index = () => {
             </div>
             
             <div className="lg:w-1/2 flex justify-center">
-              <div className="relative w-full max-w-lg">
+              <div className="relative w-full max-w-lg hidden sm:block">
                 <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
                   <div className="bg-white rounded-xl p-6 shadow-lg">
                     <div className="flex justify-between items-center mb-6">
@@ -190,7 +210,9 @@ const Index = () => {
       {/* Features Section - Removed negative margin to prevent color overlap */}
       <div className="container mx-auto px-4 py-16 relative z-10 bg-background">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground">Powerful Features for Your Success</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        {/* Desktop Grid (hidden on mobile) */}
+        <div className="hidden sm:grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-card p-8 rounded-xl border shadow-sm hover:shadow-md transition-shadow">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
               <Users className="w-8 h-8 text-primary" />
@@ -249,6 +271,116 @@ const Index = () => {
                 <span className="text-sm">Custom reporting</span>
               </li>
             </ul>
+          </div>
+        </div>
+        
+        {/* Mobile Carousel (visible only on mobile) */}
+        <div className="sm:hidden">
+          {/* Carousel Container */}
+          <div className="relative overflow-hidden rounded-xl">
+            {/* Slides */}
+            <div 
+              className="flex transition-transform duration-300 ease-in-out"
+              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            >
+              {/* Slide 1 */}
+              <div className="w-full flex-shrink-0 p-4">
+                <div className="bg-card p-6 rounded-xl border shadow-sm">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                    <Users className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Team Building</h3>
+                  <p className="text-foreground mb-4">
+                    Easily manage and support your growing team with our intuitive dashboard and powerful analytics tools.
+                  </p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Real-time team visualization</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Performance tracking</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              {/* Slide 2 */}
+              <div className="w-full flex-shrink-0 p-4">
+                <div className="bg-card p-6 rounded-xl border shadow-sm">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                    <Gift className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Multiple Bonuses</h3>
+                  <p className="text-foreground mb-4">
+                    Earn through various bonus structures including Rank, Unilevel, and Infinity bonuses for maximum income potential.
+                  </p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Rank bonuses up to €1.2M</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Unilevel commissions</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              {/* Slide 3 */}
+              <div className="w-full flex-shrink-0 p-4">
+                <div className="bg-card p-6 rounded-xl border shadow-sm">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                    <TrendingUp className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Real-time Analytics</h3>
+                  <p className="text-foreground mb-4">
+                    Track your team performance and earnings in real-time with comprehensive reporting and visualization tools.
+                  </p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Live dashboard updates</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Custom reporting</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Pagination Dots */}
+          <div className="flex justify-center gap-2 mt-4">
+            {[0, 1, 2].map((index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-3 h-3 rounded-full ${
+                  currentSlide === index ? 'bg-primary' : 'bg-gray-300'
+                }`}
+              />
+            ))}
+          </div>
+          
+          {/* Navigation Controls */}
+          <div className="flex justify-center gap-4 mt-6">
+            <button 
+              onClick={prevSlide}
+              className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={nextSlide}
+              className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+            >
+              <ArrowRight className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </div>
