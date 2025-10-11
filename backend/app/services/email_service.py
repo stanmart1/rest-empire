@@ -71,3 +71,27 @@ async def send_welcome_email(email: str, name: str):
     if settings.MAIL_USERNAME or settings.RESEND_API_KEY:
         fm = FastMail(conf)
         await fm.send_message(message)
+
+async def send_rank_achievement_email(email: str, user_name: str, rank_name: str, bonus_amount: float, total_turnover: float, team_size: int):
+    dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
+    
+    html_content = load_template(
+        "rank_achievement.html",
+        user_name=user_name,
+        rank_name=rank_name,
+        bonus_amount=f"{bonus_amount:,.2f}",
+        total_turnover=f"{total_turnover:,.2f}",
+        team_size=team_size,
+        dashboard_url=dashboard_url
+    )
+    
+    message = MessageSchema(
+        subject=f"🎉 Congratulations! You've Achieved {rank_name} - Rest Empire",
+        recipients=[email],
+        body=html_content,
+        subtype="html"
+    )
+    
+    if settings.MAIL_USERNAME or settings.RESEND_API_KEY:
+        fm = FastMail(conf)
+        await fm.send_message(message)
