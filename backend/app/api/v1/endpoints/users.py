@@ -35,6 +35,19 @@ def update_profile(
     if profile_data.phone_number is not None:
         current_user.phone_number = profile_data.phone_number
     
+    if profile_data.gender is not None:
+        current_user.gender = profile_data.gender
+    
+    if profile_data.date_of_birth is not None:
+        if profile_data.date_of_birth:
+            from datetime import datetime as dt
+            current_user.date_of_birth = dt.fromisoformat(profile_data.date_of_birth)
+        else:
+            current_user.date_of_birth = None
+    
+    if profile_data.occupation is not None:
+        current_user.occupation = profile_data.occupation
+    
     current_user.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(current_user)

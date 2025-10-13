@@ -14,6 +14,9 @@ export interface User {
   balance_ngn: number;
   balance_usdt: number;
   total_earnings: number;
+  gender?: string;
+  date_of_birth?: string;
+  occupation?: string;
 }
 
 export interface DashboardStats {

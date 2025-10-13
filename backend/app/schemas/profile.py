@@ -5,10 +5,19 @@ from datetime import datetime
 class ProfileUpdate(BaseModel):
     full_name: Optional[str] = None
     phone_number: Optional[str] = None
+    gender: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    occupation: Optional[str] = None
 
 class EmailChange(BaseModel):
     new_email: EmailStr
     password: str
+
+class RankProgress(BaseModel):
+    percentage: float
+    current_turnover: float
+    next_requirement: Optional[float]
+    next_rank: Optional[str]
 
 class DashboardStats(BaseModel):
     balance_ngn: float
@@ -19,6 +28,8 @@ class DashboardStats(BaseModel):
     first_line_count: int
     pending_payouts: float
     recent_earnings_30d: float
+    is_active: bool
+    rank_progress: RankProgress
     
 class ReferralInfo(BaseModel):
     referral_code: str

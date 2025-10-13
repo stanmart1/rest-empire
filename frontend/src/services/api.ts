@@ -48,7 +48,7 @@ export const userAPI = {
     return response.data;
   },
 
-  updateProfile: async (data: { full_name?: string; phone_number?: string }) => {
+  updateProfile: async (data: { full_name?: string; phone_number?: string; gender?: string; date_of_birth?: string; occupation?: string }) => {
     const response = await api.put('/users/profile', data);
     return response.data;
   }

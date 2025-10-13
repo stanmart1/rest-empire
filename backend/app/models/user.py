@@ -16,6 +16,9 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     full_name = Column(String)
     phone_number = Column(String)
+    gender = Column(String)
+    date_of_birth = Column(DateTime)
+    occupation = Column(String)
     
     is_verified = Column(Boolean, default=False)
     verification_token = Column(String, nullable=True)

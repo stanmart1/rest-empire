@@ -40,6 +40,9 @@ class UserResponse(UserBase):
     referral_code: str
     sponsor_id: Optional[int] = None
     phone_number: Optional[str] = None
+    gender: Optional[str] = None
+    date_of_birth: Optional[datetime] = None
+    occupation: Optional[str] = None
     registration_date: datetime
     created_at: datetime
     
