@@ -5,11 +5,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash2, Download } from 'lucide-react';
+import { Plus, Trash2, Download, Pencil, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 
@@ -28,6 +29,10 @@ interface PromoMaterial {
 
 const AdminPromoMaterials = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editingMaterial, setEditingMaterial] = useState<PromoMaterial | null>(null);
+  const [materialToDelete, setMaterialToDelete] = useState<PromoMaterial | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -66,6 +71,21 @@ const AdminPromoMaterials = () => {
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      await api.put(`/admin/promo-materials/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminPromoMaterials'] });
+      toast.success('Material updated successfully');
+      setEditDialogOpen(false);
+      setEditingMaterial(null);
+    },
+    onError: () => {
+      toast.error('Failed to update material');
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       await api.delete(`/admin/promo-materials/${id}`);
@@ -73,15 +93,47 @@ const AdminPromoMaterials = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminPromoMaterials'] });
       toast.success('Material deleted successfully');
+      setDeleteDialogOpen(false);
+      setMaterialToDelete(null);
     },
     onError: () => {
       toast.error('Failed to delete material');
     },
   });
 
+  const handleDeleteClick = (material: PromoMaterial) => {
+    setMaterialToDelete(material);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (materialToDelete) {
+      deleteMutation.mutate(materialToDelete.id);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     createMutation.mutate(formData);
+  };
+
+  const handleEditClick = (material: PromoMaterial) => {
+    setEditingMaterial(material);
+    setFormData({
+      title: material.title,
+      description: material.description,
+      material_type: material.material_type,
+      file_url: material.file_url,
+      language: material.language,
+    });
+    setEditDialogOpen(true);
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingMaterial) {
+      updateMutation.mutate({ id: editingMaterial.id, data: formData });
+    }
   };
 
   const formatFileSize = (bytes?: number) => {
@@ -191,18 +243,19 @@ const AdminPromoMaterials = () => {
                 <TableHead>Language</TableHead>
                 <TableHead>Size</TableHead>
                 <TableHead>Downloads</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center">Loading...</TableCell>
+                  <TableCell colSpan={6} className="text-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                  </TableCell>
                 </TableRow>
               ) : !materials || materials.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
                     No materials found
                   </TableCell>
                 </TableRow>
@@ -220,19 +273,23 @@ const AdminPromoMaterials = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={material.is_active ? 'default' : 'secondary'}>
-                        {material.is_active ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteMutation.mutate(material.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditClick(material)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteClick(material)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -241,6 +298,97 @@ const AdminPromoMaterials = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Promotional Material</DialogTitle>
+            <DialogDescription>Update marketing content details</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="edit-title">Title</Label>
+              <Input
+                id="edit-title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-description">Description</Label>
+              <Textarea
+                id="edit-description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={3}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-material_type">Material Type</Label>
+                <Select value={formData.material_type} onValueChange={(value) => setFormData({ ...formData, material_type: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="presentation">Presentation</SelectItem>
+                    <SelectItem value="calculator">Calculator</SelectItem>
+                    <SelectItem value="brochure">Brochure</SelectItem>
+                    <SelectItem value="video">Video</SelectItem>
+                    <SelectItem value="image">Image</SelectItem>
+                    <SelectItem value="document">Document</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="edit-language">Language</Label>
+                <Select value={formData.language} onValueChange={(value) => setFormData({ ...formData, language: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Spanish</SelectItem>
+                    <SelectItem value="fr">French</SelectItem>
+                    <SelectItem value="de">German</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="edit-file_url">File URL</Label>
+              <Input
+                id="edit-file_url"
+                value={formData.file_url}
+                onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
+                placeholder="https://..."
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? 'Updating...' : 'Update Material'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Material</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{materialToDelete?.title}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

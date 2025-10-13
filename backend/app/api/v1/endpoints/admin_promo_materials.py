@@ -36,6 +36,28 @@ def create_promo_material(
     db.refresh(material)
     return material
 
+@router.put("/promo-materials/{material_id}")
+def update_promo_material(
+    material_id: int,
+    data: PromoMaterialCreate,
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Update promotional material (admin only)"""
+    material = db.query(PromoMaterial).filter(PromoMaterial.id == material_id).first()
+    if not material:
+        raise HTTPException(status_code=404, detail="Material not found")
+    
+    material.title = data.title
+    material.description = data.description
+    material.material_type = MaterialType[data.material_type]
+    material.file_url = data.file_url
+    material.language = data.language
+    
+    db.commit()
+    db.refresh(material)
+    return material
+
 @router.delete("/promo-materials/{material_id}")
 def delete_promo_material(
     material_id: int,
