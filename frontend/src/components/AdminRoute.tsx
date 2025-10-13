@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
-export const RootRedirect = () => {
+export const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -13,9 +13,13 @@ export const RootRedirect = () => {
     );
   }
 
-  if (isAuthenticated) {
-    return <Navigate to={user?.role === 'admin' ? "/admin/dashboard" : "/dashboard"} replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
 
-  return <Navigate to="/home" replace />;
+  if (user?.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
 };

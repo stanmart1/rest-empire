@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel
 from app.core.database import get_db
 from app.api.deps import get_admin_user
 from app.models.user import User
@@ -10,28 +9,75 @@ from app.models.transaction import Transaction, TransactionType, TransactionStat
 from app.models.payout import Payout, PayoutStatus
 from app.schemas.transaction import TransactionResponse
 from app.schemas.payout import PayoutResponse
+from app.schemas.admin import AdminStatsResponse, ManualTransaction, RefundRequest, PayoutApproval, PayoutRejection
 from app.services.transaction_service import refund_transaction, fail_transaction
 from app.services.payout_service import approve_payout, complete_payout, reject_payout
 from app.utils.activity import log_activity
 
 router = APIRouter()
 
-class ManualTransaction(BaseModel):
-    user_id: int
-    amount: float
-    currency: str = "NGN"
-    description: str
-    transaction_type: str = "bonus"
+@router.get("/stats", response_model=AdminStatsResponse)
+def get_admin_stats(
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    from app.models.bonus import Bonus, BonusStatus
+    from app.models.verification import UserVerification, VerificationStatus
+    from sqlalchemy import func
+    
+    total_users = db.query(User).count()
+    active_users = db.query(User).filter(User.is_active == True).count()
+    
+    pending_verifications = db.query(UserVerification).filter(
+        UserVerification.status == VerificationStatus.pending
+    ).count()
+    
+    total_revenue_ngn = db.query(func.sum(Transaction.amount)).filter(
+        Transaction.transaction_type == TransactionType.purchase,
+        Transaction.currency == "NGN",
+        Transaction.status == TransactionStatus.completed
+    ).scalar() or 0
+    
+    total_revenue_usdt = db.query(func.sum(Transaction.amount)).filter(
+        Transaction.transaction_type == TransactionType.purchase,
+        Transaction.currency == "USDT",
+        Transaction.status == TransactionStatus.completed
+    ).scalar() or 0
+    
+    pending_payouts = db.query(Payout).filter(
+        Payout.status.in_([PayoutStatus.pending, PayoutStatus.approved])
+    ).count()
+    
+    total_bonuses_paid = db.query(func.sum(Bonus.amount)).filter(
+        Bonus.status == BonusStatus.paid
+    ).scalar() or 0
+    
+    return AdminStatsResponse(
+        total_users=total_users,
+        active_users=active_users,
+        pending_verifications=pending_verifications,
+        total_revenue_ngn=float(total_revenue_ngn),
+        total_revenue_usdt=float(total_revenue_usdt),
+        pending_payouts=pending_payouts,
+        total_bonuses_paid=float(total_bonuses_paid)
+    )
 
-class RefundRequest(BaseModel):
-    reason: str
+@router.get("/users")
+def get_admin_users(
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    users = db.query(User).all()
+    return users
 
-class PayoutApproval(BaseModel):
-    external_transaction_id: Optional[str] = None
-    external_response: Optional[dict] = None
-
-class PayoutRejection(BaseModel):
-    reason: str
+@router.get("/verifications")
+def get_admin_verifications(
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    from app.models.verification import UserVerification
+    verifications = db.query(UserVerification).all()
+    return verifications
 
 @router.get("/transactions", response_model=List[TransactionResponse])
 def admin_get_all_transactions(

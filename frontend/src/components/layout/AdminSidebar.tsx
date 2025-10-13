@@ -1,0 +1,68 @@
+import { NavLink } from 'react-router-dom';
+import { 
+  LayoutDashboard, 
+  Users, 
+  CheckCircle,
+  CreditCard,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
+const AdminSidebar = () => {
+  const { user } = useAuth();
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase();
+  };
+
+  const adminLinks = [
+    { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/admin/users', icon: Users, label: 'Users' },
+    { to: '/admin/verifications', icon: CheckCircle, label: 'Verifications' },
+    { to: '/admin/payouts', icon: CreditCard, label: 'Payouts' },
+  ];
+
+  return (
+    <aside className="hidden md:block fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border overflow-y-auto">
+      <div className="p-4 border-b border-sidebar-border">
+        <div className="flex items-center gap-3 mb-3">
+          <Avatar className="w-12 h-12">
+            <AvatarFallback className="bg-primary text-white">
+              {user?.full_name ? getInitials(user.full_name) : 'A'}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-sm truncate text-sidebar-foreground">{user?.full_name || 'Admin'}</p>
+            <p className="text-xs text-sidebar-muted">Administrator</p>
+          </div>
+        </div>
+      </div>
+
+      <nav className="p-3 space-y-1 bg-sidebar">
+        {adminLinks.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            className={({ isActive }) =>
+              cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm",
+                "text-sidebar-foreground hover:bg-sidebar-accent",
+                isActive && "bg-sidebar-accent text-sidebar-primary font-medium"
+              )
+            }
+          >
+            <link.icon className="w-4 h-4 flex-shrink-0" />
+            <span>{link.label}</span>
+          </NavLink>
+        ))}
+      </nav>
+    </aside>
+  );
+};
+
+export default AdminSidebar;

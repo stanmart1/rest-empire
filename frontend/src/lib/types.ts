@@ -5,6 +5,7 @@ export interface User {
   phone_number: string;
   current_rank: string;
   rankLevel: number;
+  role: 'user' | 'admin';
   isAdmin: boolean;
   is_verified: boolean;
   is_active: boolean;

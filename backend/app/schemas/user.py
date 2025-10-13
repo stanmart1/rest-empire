@@ -33,6 +33,7 @@ class UserResponse(UserBase):
     id: int
     is_verified: bool
     is_active: bool
+    role: str
     current_rank: str
     balance_ngn: float
     balance_usdt: float

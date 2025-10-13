@@ -20,7 +20,7 @@ const loginSchema = z.object({
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
@@ -35,13 +35,18 @@ const Login = () => {
       await login(data.email, data.password);
       setLoginSuccess(true);
       toast.success('Login successful!');
-      setTimeout(() => navigate('/dashboard'), 500);
     } catch (error: any) {
       toast.error(error.response?.data?.detail || 'Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
   };
+  
+  // Redirect after user state is updated
+  if (loginSuccess && user) {
+    const redirectPath = user.role === 'admin' ? '/admin/dashboard' : '/dashboard';
+    setTimeout(() => navigate(redirectPath), 500);
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">

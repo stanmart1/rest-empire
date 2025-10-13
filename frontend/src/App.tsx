@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AdminRoute } from "./components/AdminRoute";
 import { RootRedirect } from "./components/RootRedirect";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import { motion, AnimatePresence } from "motion/react";
@@ -33,6 +34,10 @@ import UnilevelBonus from "./pages/bonuses/UnilevelBonus";
 import InfinityBonus from "./pages/bonuses/InfinityBonus";
 import NotFound from "./pages/NotFound";
 import Books from "./pages/Books";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminVerifications from "./pages/admin/AdminVerifications";
+import AdminPayouts from "./pages/admin/AdminPayouts";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -80,6 +85,10 @@ const AnimatedRoutes = () => {
         <Route path="/activation" element={<ProtectedRoute><DashboardLayout><PageWrapper><Activation /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/support" element={<ProtectedRoute><DashboardLayout><PageWrapper><Support /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/books" element={<ProtectedRoute><DashboardLayout><PageWrapper><Books /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/admin/dashboard" element={<AdminRoute><DashboardLayout><PageWrapper><AdminDashboard /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/users" element={<AdminRoute><DashboardLayout><PageWrapper><AdminUsers /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/verifications" element={<AdminRoute><DashboardLayout><PageWrapper><AdminVerifications /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/payouts" element={<AdminRoute><DashboardLayout><PageWrapper><AdminPayouts /></PageWrapper></DashboardLayout></AdminRoute>} />
 
         {/* Catch-all */}
         <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
