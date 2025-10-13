@@ -97,60 +97,100 @@ const AdminSupport = () => {
           <CardTitle>All Tickets</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Subject</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
+          {/* Desktop Table */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center">Loading...</TableCell>
+                  <TableHead>ID</TableHead>
+                  <TableHead>User</TableHead>
+                  <TableHead>Subject</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Priority</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ) : !tickets || tickets.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">No tickets</TableCell>
-                </TableRow>
-              ) : (
-                tickets.map((ticket) => (
-                  <TableRow key={ticket.id}>
-                    <TableCell>#{ticket.id}</TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{ticket.user?.full_name || `User ${ticket.user_id}`}</div>
-                        <div className="text-sm text-muted-foreground">{ticket.user?.email || ''}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{ticket.subject}</TableCell>
-                    <TableCell>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center">Loading...</TableCell>
+                  </TableRow>
+                ) : !tickets || tickets.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground">No tickets</TableCell>
+                  </TableRow>
+                ) : (
+                  tickets.map((ticket) => (
+                    <TableRow key={ticket.id}>
+                      <TableCell>#{ticket.id}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{ticket.user?.full_name || `User ${ticket.user_id}`}</div>
+                          <div className="text-sm text-muted-foreground">{ticket.user?.email || ''}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>{ticket.subject}</TableCell>
+                      <TableCell>
+                        <Badge variant={ticket.status === 'closed' ? 'default' : 'secondary'}>
+                          {ticket.status.replace('_', ' ')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={ticket.priority === 'high' || ticket.priority === 'urgent' ? 'destructive' : 'secondary'}>
+                          {ticket.priority}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{new Date(ticket.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <Button size="sm" variant="outline" onClick={() => handleViewDetails(ticket)}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-4">
+            {isLoading ? (
+              <p className="text-center">Loading...</p>
+            ) : !tickets || tickets.length === 0 ? (
+              <p className="text-center text-muted-foreground">No tickets</p>
+            ) : (
+              tickets.map((ticket) => (
+                <div key={ticket.id} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm text-muted-foreground">#{ticket.id}</p>
+                      <p className="font-medium">{ticket.user?.full_name || `User ${ticket.user_id}`}</p>
+                      <p className="text-sm text-muted-foreground">{ticket.user?.email || ''}</p>
+                    </div>
+                    <div className="flex flex-col gap-1">
                       <Badge variant={ticket.status === 'closed' ? 'default' : 'secondary'}>
                         {ticket.status.replace('_', ' ')}
                       </Badge>
-                    </TableCell>
-                    <TableCell>
                       <Badge variant={ticket.priority === 'high' || ticket.priority === 'urgent' ? 'destructive' : 'secondary'}>
                         {ticket.priority}
                       </Badge>
-                    </TableCell>
-                    <TableCell>{new Date(ticket.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <Button size="sm" variant="outline" onClick={() => handleViewDetails(ticket)}>
-                        <Eye className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-medium">{ticket.subject}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{new Date(ticket.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <Button size="sm" variant="outline" className="w-full" onClick={() => handleViewDetails(ticket)}>
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Details
+                  </Button>
+                </div>
+              ))
+            )}
+          </div>
         </CardContent>
       </Card>
 

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -12,13 +13,18 @@ import {
   BookOpen,
   Calendar,
   FileText,
+  Menu,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const AdminSidebar = () => {
   const { user } = useAuth();
+  const [open, setOpen] = useState(false);
 
   const getInitials = (name: string) => {
     return name
@@ -43,8 +49,8 @@ const AdminSidebar = () => {
     { to: '/admin/settings', icon: Settings, label: 'Settings' },
   ];
 
-  return (
-    <aside className="hidden md:block fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border overflow-y-auto">
+  const SidebarContent = () => (
+    <>
       <div className="p-4 border-b border-sidebar-border">
         <div className="flex items-center gap-3 mb-3">
           <Avatar className="w-12 h-12">
@@ -64,6 +70,7 @@ const AdminSidebar = () => {
           <NavLink
             key={link.to}
             to={link.to}
+            onClick={() => setOpen(false)}
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm",
@@ -77,7 +84,30 @@ const AdminSidebar = () => {
           </NavLink>
         ))}
       </nav>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile Menu Button */}
+      <div className="md:hidden fixed top-4 left-4 z-50">
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="icon">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 p-0 bg-sidebar">
+            <SidebarContent />
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:block fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border overflow-y-auto">
+        <SidebarContent />
+      </aside>
+    </>
   );
 };
 

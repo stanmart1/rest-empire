@@ -78,56 +78,93 @@ const AdminVerifications = () => {
         <CardTitle>Verification Requests</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Document Type</TableHead>
-              <TableHead>Document Number</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Submitted</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
+        {/* Desktop Table */}
+        <div className="hidden md:block">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center">Loading...</TableCell>
+                <TableHead>User</TableHead>
+                <TableHead>Document Type</TableHead>
+                <TableHead>Document Number</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Submitted</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ) : !verifications || verifications.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
-                  No verification requests
-                </TableCell>
-              </TableRow>
-            ) : (
-              verifications.map((verification) => (
-                <TableRow key={verification.id}>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{verification.user_name}</div>
-                      <div className="text-sm text-muted-foreground">{verification.user_email}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="capitalize">{verification.document_type.replace('_', ' ')}</TableCell>
-                  <TableCell>{verification.document_number}</TableCell>
-                  <TableCell>
-                    <Badge variant={verification.status === 'approved' ? 'default' : verification.status === 'rejected' ? 'destructive' : 'secondary'}>
-                      {verification.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{new Date(verification.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <Button size="sm" variant="outline" onClick={() => handleViewDetails(verification)}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center">Loading...</TableCell>
+                </TableRow>
+              ) : !verifications || verifications.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    No verification requests
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                verifications.map((verification) => (
+                  <TableRow key={verification.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{verification.user_name}</div>
+                        <div className="text-sm text-muted-foreground">{verification.user_email}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="capitalize">{verification.document_type.replace('_', ' ')}</TableCell>
+                    <TableCell>{verification.document_number}</TableCell>
+                    <TableCell>
+                      <Badge variant={verification.status === 'approved' ? 'default' : verification.status === 'rejected' ? 'destructive' : 'secondary'}>
+                        {verification.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{new Date(verification.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <Button size="sm" variant="outline" onClick={() => handleViewDetails(verification)}>
+                        <Eye className="h-4 w-4 mr-1" />
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Mobile Cards */}
+        <div className="md:hidden space-y-4">
+          {isLoading ? (
+            <p className="text-center">Loading...</p>
+          ) : !verifications || verifications.length === 0 ? (
+            <p className="text-center text-muted-foreground">No verification requests</p>
+          ) : (
+            verifications.map((verification) => (
+              <div key={verification.id} className="border rounded-lg p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-medium">{verification.user_name}</p>
+                    <p className="text-sm text-muted-foreground">{verification.user_email}</p>
+                  </div>
+                  <Badge variant={verification.status === 'approved' ? 'default' : verification.status === 'rejected' ? 'destructive' : 'secondary'}>
+                    {verification.status}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground capitalize">{verification.document_type.replace('_', ' ')}</p>
+                  <p className="font-medium">{verification.document_number}</p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Submitted: {new Date(verification.created_at).toLocaleDateString()}
+                </p>
+                <Button size="sm" variant="outline" className="w-full" onClick={() => handleViewDetails(verification)}>
+                  <Eye className="h-4 w-4 mr-1" />
+                  View Details
+                </Button>
+              </div>
+            ))
+          )}
+        </div>
       </CardContent>
 
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>

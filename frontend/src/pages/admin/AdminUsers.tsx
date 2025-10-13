@@ -64,7 +64,9 @@ const AdminUsers = () => {
         <CardTitle>User Management</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
+        {/* Desktop Table */}
+        <div className="hidden md:block">
+          <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Email</TableHead>
@@ -119,6 +121,57 @@ const AdminUsers = () => {
             )}
           </TableBody>
         </Table>
+        </div>
+
+        {/* Mobile Cards */}
+        <div className="md:hidden space-y-4">
+          {isLoading ? (
+            <div className="text-center py-8">Loading...</div>
+          ) : !users || users.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8">No users found</div>
+          ) : (
+            users.map((user) => (
+              <div
+                key={user.id}
+                className="border rounded-lg p-4 space-y-3 cursor-pointer hover:bg-muted/50"
+                onClick={() => handleUserClick(user)}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="font-medium">{user.full_name}</p>
+                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => handleDeleteClick(e, user)}
+                    className="h-8 w-8 text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Rank:</span>
+                  <span>{user.current_rank}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Status:</span>
+                  <Badge variant={user.is_active ? 'default' : 'secondary'}>
+                    {user.is_active ? 'Active' : 'Inactive'}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Balance:</span>
+                  <span className="font-medium">₦{user.balance_ngn.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Registered:</span>
+                  <span>{new Date(user.registration_date).toLocaleDateString()}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </CardContent>
       <UserDetailsModal 
         user={selectedUser} 

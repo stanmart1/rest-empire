@@ -235,67 +235,120 @@ const AdminPromoMaterials = () => {
           <CardTitle>All Materials</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Language</TableHead>
-                <TableHead>Size</TableHead>
-                <TableHead>Downloads</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
+          {/* Desktop Table */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-                  </TableCell>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Language</TableHead>
+                  <TableHead>Size</TableHead>
+                  <TableHead>Downloads</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ) : !materials || materials.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
-                    No materials found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                materials.map((material) => (
-                  <TableRow key={material.id}>
-                    <TableCell className="font-medium">{material.title}</TableCell>
-                    <TableCell className="capitalize">{material.material_type}</TableCell>
-                    <TableCell className="uppercase">{material.language}</TableCell>
-                    <TableCell>{formatFileSize(material.file_size)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Download className="h-4 w-4" />
-                        {material.download_count}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEditClick(material)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteClick(material)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : !materials || materials.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                      No materials found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  materials.map((material) => (
+                    <TableRow key={material.id}>
+                      <TableCell className="font-medium">{material.title}</TableCell>
+                      <TableCell className="capitalize">{material.material_type}</TableCell>
+                      <TableCell className="uppercase">{material.language}</TableCell>
+                      <TableCell>{formatFileSize(material.file_size)}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Download className="h-4 w-4" />
+                          {material.download_count}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditClick(material)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteClick(material)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-4">
+            {isLoading ? (
+              <div className="text-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+              </div>
+            ) : !materials || materials.length === 0 ? (
+              <p className="text-center text-muted-foreground">No materials found</p>
+            ) : (
+              materials.map((material) => (
+                <div key={material.id} className="border rounded-lg p-4 space-y-3">
+                  <div>
+                    <h3 className="font-medium">{material.title}</h3>
+                    <div className="flex gap-2 mt-2 text-sm text-muted-foreground">
+                      <span className="capitalize">{material.material_type}</span>
+                      <span>•</span>
+                      <span className="uppercase">{material.language}</span>
+                      <span>•</span>
+                      <span>{formatFileSize(material.file_size)}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 text-sm">
+                    <Download className="h-4 w-4" />
+                    {material.download_count} downloads
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleEditClick(material)}
+                    >
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleDeleteClick(material)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </CardContent>
       </Card>
 

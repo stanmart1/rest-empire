@@ -238,69 +238,117 @@ const AdminEvents = () => {
           <CardTitle>All Events</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Start Date</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Attendees</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
+          {/* Desktop Table */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center">Loading...</TableCell>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Start Date</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Attendees</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ) : !events || events.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
-                    No events found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                events.map((event) => (
-                  <TableRow key={event.id}>
-                    <TableCell className="font-medium">{event.title}</TableCell>
-                    <TableCell className="capitalize">{event.event_type}</TableCell>
-                    <TableCell>{new Date(event.start_date).toLocaleString()}</TableCell>
-                    <TableCell>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center">Loading...</TableCell>
+                  </TableRow>
+                ) : !events || events.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                      No events found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  events.map((event) => (
+                    <TableRow key={event.id}>
+                      <TableCell className="font-medium">{event.title}</TableCell>
+                      <TableCell className="capitalize">{event.event_type}</TableCell>
+                      <TableCell>{new Date(event.start_date).toLocaleString()}</TableCell>
+                      <TableCell>
+                        {event.is_virtual ? (
+                          <Badge variant="outline">Virtual</Badge>
+                        ) : (
+                          event.location || 'N/A'
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Users className="h-4 w-4" />
+                          {event.current_attendees}
+                          {event.max_attendees && `/${event.max_attendees}`}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={event.status === 'upcoming' ? 'default' : event.status === 'completed' ? 'secondary' : 'outline'}>
+                          {event.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteMutation.mutate(event.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-4">
+            {isLoading ? (
+              <p className="text-center">Loading...</p>
+            ) : !events || events.length === 0 ? (
+              <p className="text-center text-muted-foreground">No events found</p>
+            ) : (
+              events.map((event) => (
+                <div key={event.id} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-medium">{event.title}</h3>
+                    <Badge variant={event.status === 'upcoming' ? 'default' : event.status === 'completed' ? 'secondary' : 'outline'}>
+                      {event.status}
+                    </Badge>
+                  </div>
+                  <div className="space-y-1 text-sm">
+                    <p className="text-muted-foreground capitalize">{event.event_type}</p>
+                    <p>{new Date(event.start_date).toLocaleString()}</p>
+                    <p>
                       {event.is_virtual ? (
                         <Badge variant="outline">Virtual</Badge>
                       ) : (
                         event.location || 'N/A'
                       )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        {event.current_attendees}
-                        {event.max_attendees && `/${event.max_attendees}`}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={event.status === 'upcoming' ? 'default' : event.status === 'completed' ? 'secondary' : 'outline'}>
-                        {event.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteMutation.mutate(event.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                    </p>
+                    <div className="flex items-center gap-1">
+                      <Users className="h-4 w-4" />
+                      {event.current_attendees}
+                      {event.max_attendees && `/${event.max_attendees}`}
+                    </div>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => deleteMutation.mutate(event.id)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Event
+                  </Button>
+                </div>
+              ))
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

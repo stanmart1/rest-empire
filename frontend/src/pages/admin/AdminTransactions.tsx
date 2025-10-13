@@ -22,7 +22,9 @@ const AdminTransactions = () => {
           <CardTitle>All Transactions</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
+          {/* Desktop Table */}
+          <div className="hidden md:block">
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
@@ -60,6 +62,41 @@ const AdminTransactions = () => {
               )}
             </TableBody>
           </Table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-4">
+            {isLoading ? (
+              <div className="text-center py-8">Loading...</div>
+            ) : !transactions || transactions.length === 0 ? (
+              <div className="text-center text-muted-foreground py-8">No transactions</div>
+            ) : (
+              transactions.map((tx: any) => (
+                <div key={tx.id} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">#{tx.id}</span>
+                    <Badge variant={tx.status === 'completed' ? 'default' : 'secondary'}>{tx.status}</Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">User ID:</span>
+                    <span>{tx.user_id}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Type:</span>
+                    <span className="capitalize">{tx.transaction_type}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Amount:</span>
+                    <span className="font-medium">{tx.amount.toLocaleString()} {tx.currency}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Date:</span>
+                    <span>{new Date(tx.created_at).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
