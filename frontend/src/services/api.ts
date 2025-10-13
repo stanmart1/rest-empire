@@ -80,6 +80,11 @@ export const teamAPI = {
   }) => {
     const response = await api.get('/team/search', { params });
     return response.data;
+  },
+
+  getMemberChildren: async (memberId: number) => {
+    const response = await api.get(`/team/member/${memberId}/children`);
+    return response.data;
   }
 };
 

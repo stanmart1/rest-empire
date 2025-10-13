@@ -91,11 +91,9 @@ const PromoMaterials = () => {
             <Badge variant="secondary">
               {material.material_type}
             </Badge>
-            {material.file_size && (
-              <Badge variant="outline">
-                {formatFileSize(material.file_size)}
-              </Badge>
-            )}
+            <Badge variant="outline">
+              {material.file_size ? formatFileSize(material.file_size) : 'Size unknown'}
+            </Badge>
           </div>
           
           <h3 className="font-semibold">{material.title}</h3>
@@ -176,12 +174,12 @@ const PromoMaterials = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="presentation">Presentations</SelectItem>
-            <SelectItem value="calculator">Calculators</SelectItem>
-            <SelectItem value="document">Documents</SelectItem>
-            <SelectItem value="brochure">Brochures</SelectItem>
-            <SelectItem value="video">Videos</SelectItem>
-            <SelectItem value="image">Images</SelectItem>
+            <SelectItem value="presentation">Presentation</SelectItem>
+            <SelectItem value="calculator">Calculator</SelectItem>
+            <SelectItem value="brochure">Brochure</SelectItem>
+            <SelectItem value="video">Video</SelectItem>
+            <SelectItem value="image">Image</SelectItem>
+            <SelectItem value="document">Document</SelectItem>
           </SelectContent>
         </Select>
 

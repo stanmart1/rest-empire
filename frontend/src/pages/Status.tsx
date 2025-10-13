@@ -37,11 +37,11 @@ const Status = () => {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-muted-foreground mb-2">My Status</p>
-                <RankBadge rank={progress?.current_rank?.name || 'Pearl'} showLabel size="md" />
+                {progress?.current_rank && <RankBadge rank={progress.current_rank.name} showLabel size="md" />}
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Total Team Turnover</p>
-                <p className="text-2xl font-bold">€{progress?.total_turnover?.toFixed(0) || '0'}</p>
+                <p className="text-2xl font-bold">₦{progress?.total_turnover?.toFixed(0) || '0'}</p>
               </div>
             </div>
           </CardContent>
@@ -54,39 +54,43 @@ const Status = () => {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">Next rank</p>
-                  <RankBadge rank={progress?.next_rank?.name || 'Sapphire'} showLabel size="md" />
+                  {progress?.next_rank && <RankBadge rank={progress.next_rank.name} showLabel size="md" />}
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground mb-1">Rank turnover</p>
-                  <p className="text-xl font-bold">€{progress?.next_rank?.team_turnover_required?.toLocaleString() || '25,000'}</p>
-                </div>
+                {progress?.next_rank && (
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground mb-1">Rank turnover</p>
+                    <p className="text-xl font-bold">₦{progress.next_rank.team_turnover_required.toLocaleString()}</p>
+                  </div>
+                )}
               </div>
               
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-muted-foreground">
-                    €{progress?.total_turnover?.toFixed(0) || '0'} / €{progress?.next_rank?.team_turnover_required?.toLocaleString() || '25,000'}
-                  </span>
-                  <span>{progress?.overall_progress?.toFixed(0) || '0'}%</span>
+              {progress?.next_rank && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-muted-foreground">
+                      ₦{progress.total_turnover.toFixed(0)} / ₦{progress.next_rank.team_turnover_required.toLocaleString()}
+                    </span>
+                    <span>{progress.overall_progress.toFixed(0)}%</span>
+                  </div>
+                  <Progress value={progress.overall_progress} className="h-2" />
+                  <div className="flex gap-2 mt-3">
+                    <Badge variant="secondary" className="bg-success text-white">
+                      {progress.first_leg_progress.toFixed(0)}%
+                    </Badge>
+                    <Badge variant="secondary" className="bg-blue-500 text-white">
+                      {progress.second_leg_progress.toFixed(0)}%
+                    </Badge>
+                    <Badge variant="secondary" className="bg-orange-500 text-white">
+                      {progress.other_legs_progress.toFixed(0)}%
+                    </Badge>
+                  </div>
+                  <div className="flex gap-4 text-xs text-muted-foreground mt-2">
+                    <span>■ First Leg (50% max)</span>
+                    <span>■ Second Leg (30% max)</span>
+                    <span>■ Other Legs</span>
+                  </div>
                 </div>
-                <Progress value={progress?.overall_progress || 0} className="h-2" />
-                <div className="flex gap-2 mt-3">
-                  <Badge variant="secondary" className="bg-success text-white">
-                    {progress?.first_leg_progress?.toFixed(0) || '0'}%
-                  </Badge>
-                  <Badge variant="secondary" className="bg-blue-500 text-white">
-                    {progress?.second_leg_progress?.toFixed(0) || '0'}%
-                  </Badge>
-                  <Badge variant="secondary" className="bg-orange-500 text-white">
-                    {progress?.other_legs_progress?.toFixed(0) || '0'}%
-                  </Badge>
-                </div>
-                <div className="flex gap-4 text-xs text-muted-foreground mt-2">
-                  <span>■ 50%</span>
-                  <span>■ 30%</span>
-                  <span>■ All Team</span>
-                </div>
-              </div>
+              )}
 
               <Button className="w-full">Leg Rules</Button>
             </div>
@@ -130,9 +134,9 @@ const Status = () => {
                       <td className="p-4">
                         <RankBadge rank={rank.name} showLabel size="sm" />
                       </td>
-                      <td className="p-4">€{rank.team_turnover_required.toLocaleString()}</td>
-                      <td className="p-4">€{rank.first_leg_requirement.toLocaleString()}</td>
-                      <td className="p-4">€{rank.second_leg_requirement.toLocaleString()}</td>
+                      <td className="p-4">₦{rank.team_turnover_required.toLocaleString()}</td>
+                      <td className="p-4">₦{rank.first_leg_requirement.toLocaleString()}</td>
+                      <td className="p-4">₦{rank.second_leg_requirement.toLocaleString()}</td>
                       <td className="p-4">
                         {isCurrent && (
                           <Badge variant="secondary" className="bg-blue-100 text-blue-700">
@@ -158,7 +162,7 @@ const Status = () => {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">
-                    €{progress.total_turnover.toFixed(0)} / €{progress.next_rank.team_turnover_required.toLocaleString()}
+                    ₦{progress.total_turnover.toFixed(0)} / ₦{progress.next_rank.team_turnover_required.toLocaleString()}
                   </span>
                   <span className="text-sm font-medium">{progress.overall_progress.toFixed(0)}%</span>
                 </div>
@@ -175,20 +179,23 @@ const Status = () => {
                   </Badge>
                 </div>
                 <div className="flex gap-4 text-xs text-muted-foreground">
-                  <span>■ 50%</span>
-                  <span>■ 30%</span>
-                  <span>■ All Team</span>
+                  <span>■ First Leg (50% max)</span>
+                  <span>■ Second Leg (30% max)</span>
+                  <span>■ Other Legs</span>
                 </div>
                 <Button className="w-full mt-2">Leg Rules</Button>
               </div>
 
               <div className="mt-4 flex items-start gap-2 text-sm text-muted-foreground">
                 <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <p>
-                  To reach the {progress.next_rank.name} rank, your team turnover required for raising the rank must be the following proportions: no
-                  more than €{progress.next_rank.first_leg_requirement.toLocaleString()} in the strongest leg, €{progress.next_rank.second_leg_requirement.toLocaleString()} in the second strongest leg, and €{progress.next_rank.other_legs_requirement.toLocaleString()} from all
-                  other legs.
-                </p>
+                <div>
+                  <p className="font-medium mb-2">To reach {progress.next_rank.name} rank:</p>
+                  <ul className="space-y-1 list-disc list-inside">
+                    <li>First Leg: Max ₦{progress.next_rank.first_leg_requirement.toLocaleString()}</li>
+                    <li>Second Leg: Max ₦{progress.next_rank.second_leg_requirement.toLocaleString()}</li>
+                    <li>Other Legs: Min ₦{progress.next_rank.other_legs_requirement.toLocaleString()}</li>
+                  </ul>
+                </div>
               </div>
             </div>
           )}

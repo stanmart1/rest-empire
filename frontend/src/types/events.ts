@@ -11,6 +11,7 @@ export interface Event {
   max_attendees?: number;
   current_attendees: number;
   is_registered: boolean;
+  attendance_status?: 'registered' | 'attended' | 'no_show';
   registration_required: boolean;
   registration_deadline?: string;
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';

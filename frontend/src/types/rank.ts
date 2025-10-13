@@ -18,7 +18,6 @@ export interface RankProgress {
   current_rank: RankResponse;
   next_rank?: RankResponse;
   total_turnover: number;
-  total_turnover_progress: number;
   first_leg_turnover: number;
   first_leg_progress: number;
   second_leg_turnover: number;

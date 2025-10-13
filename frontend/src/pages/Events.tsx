@@ -10,12 +10,15 @@ import { useEvents, useMyEvents, useEventStats } from '@/hooks/useApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiService from '@/services/api';
 import { Event } from '@/types/events';
+import EventDetailModal from '@/components/events/EventDetailModal';
 
 const Events = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [eventTypeFilter, setEventTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const { data: allEvents, isLoading: allEventsLoading } = useEvents({
     event_type: eventTypeFilter !== 'all' ? eventTypeFilter : undefined,
@@ -95,18 +98,32 @@ const Events = () => {
     });
   };
 
+  const getAttendanceColor = (status: string) => {
+    const colors = {
+      registered: 'bg-blue-100 text-blue-700',
+      attended: 'bg-green-100 text-green-700',
+      no_show: 'bg-red-100 text-red-700',
+    };
+    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-700';
+  };
+
   const renderEventCard = (event: Event) => (
     <Card key={event.id} className="hover:shadow-md transition-shadow">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Badge className={getEventTypeColor(event.event_type)}>
                 {event.event_type}
               </Badge>
               <Badge className={getStatusColor(event.status)}>
                 {event.status}
               </Badge>
+              {event.is_registered && event.attendance_status && (
+                <Badge className={getAttendanceColor(event.attendance_status)}>
+                  {event.attendance_status.replace('_', ' ')}
+                </Badge>
+              )}
             </div>
             <CardTitle className="text-lg">{event.title}</CardTitle>
           </div>
@@ -145,61 +162,93 @@ const Events = () => {
           </div>
           
           {event.registration_required && (
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              <span>
-                {event.current_attendees}
-                {event.max_attendees && ` / ${event.max_attendees}`} registered
-              </span>
-            </div>
+            <>
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                <span>
+                  {event.current_attendees}
+                  {event.max_attendees && ` / ${event.max_attendees}`} registered
+                </span>
+              </div>
+              {event.registration_deadline && event.status === 'upcoming' && (
+                <div className="flex items-center gap-2 text-orange-600">
+                  <Clock className="w-4 h-4" />
+                  <span className="text-xs">Registration closes: {formatDate(event.registration_deadline)}</span>
+                </div>
+              )}
+            </>
           )}
         </div>
 
-        {event.registration_required && event.status === 'upcoming' && (
-          <div className="flex gap-2">
-            {event.is_registered ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => unregisterMutation.mutate(event.id)}
-                disabled={unregisterMutation.isPending}
-              >
-                {unregisterMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  'Unregister'
-                )}
-              </Button>
-            ) : (
-              <Button
-                size="sm"
-                onClick={() => registerMutation.mutate(event.id)}
-                disabled={registerMutation.isPending}
-              >
-                {registerMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  'Register'
-                )}
-              </Button>
-            )}
-            
-            {event.is_virtual && event.meeting_link && event.is_registered && (
-              <Button variant="outline" size="sm" asChild>
-                <a href={event.meeting_link} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-4 h-4 mr-1" />
-                  Join
-                </a>
-              </Button>
-            )}
-          </div>
-        )}
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              setSelectedEvent(event);
+              setIsDetailModalOpen(true);
+            }}
+          >
+            View Details
+          </Button>
+          
+          {event.registration_required && event.status === 'upcoming' && (
+            <>
+              {event.is_registered ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => unregisterMutation.mutate(event.id)}
+                  disabled={unregisterMutation.isPending}
+                >
+                  {unregisterMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    'Unregister'
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={() => registerMutation.mutate(event.id)}
+                  disabled={registerMutation.isPending}
+                >
+                  {registerMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    'Register'
+                  )}
+                </Button>
+              )}
+              
+              {event.is_virtual && event.meeting_link && event.is_registered && (
+                <Button variant="outline" size="sm" asChild>
+                  <a href={event.meeting_link} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="w-4 h-4 mr-1" />
+                    Join
+                  </a>
+                </Button>
+              )}
+            </>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
 
   return (
-    <div className="space-y-6">
+    <>
+      <EventDetailModal
+        event={selectedEvent}
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        onRegister={(eventId) => registerMutation.mutate(eventId)}
+        onUnregister={(eventId) => unregisterMutation.mutate(eventId)}
+        isRegistering={registerMutation.isPending}
+        isUnregistering={unregisterMutation.isPending}
+      />
+      
+      <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold mb-2">Our Events</h1>
         <p className="text-muted-foreground">
@@ -336,6 +385,7 @@ const Events = () => {
         </TabsContent>
       </Tabs>
     </div>
+    </>
   );
 };
 

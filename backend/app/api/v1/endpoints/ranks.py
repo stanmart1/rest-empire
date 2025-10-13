@@ -43,7 +43,6 @@ def get_user_rank_progress(
         current_rank=current_rank_obj,
         next_rank=next_rank_obj,
         total_turnover=progress.get("total_turnover", 0),
-        total_turnover_progress=progress.get("total_turnover_progress", 0),
         first_leg_turnover=progress.get("first_leg_turnover", 0),
         first_leg_progress=progress.get("first_leg_progress", 0),
         second_leg_turnover=progress.get("second_leg_turnover", 0),

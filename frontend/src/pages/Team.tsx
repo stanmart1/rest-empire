@@ -9,19 +9,20 @@ import { Copy, QrCode, ChevronDown, ChevronRight, Search, Loader2 } from 'lucide
 import { useToast } from '@/hooks/use-toast';
 import RankBadge from '@/components/common/RankBadge';
 import StatusBadge from '@/components/common/StatusBadge';
-import { useTeamTree, useFirstLine, useTeamStats, useLegBreakdown, useSearchMembers } from '@/hooks/useApi';
+import { useFirstLine, useTeamStats, useLegBreakdown, useSearchMembers } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
 import { TeamMemberInfo } from '@/types/team';
+import apiService from '@/services/api';
 
 const Team = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
+  const [childrenCache, setChildrenCache] = useState<Record<number, TeamMemberInfo[]>>({});
   const [sortBy, setSortBy] = useState('newest');
   const [rankFilter, setRankFilter] = useState('all');
   
-  const { data: teamTree, isLoading: treeLoading } = useTeamTree({ depth: 5 });
   const { data: firstLine, isLoading: firstLineLoading } = useFirstLine();
   const { data: teamStats, isLoading: statsLoading } = useTeamStats();
   const { data: legBreakdown, isLoading: legLoading } = useLegBreakdown();
@@ -31,8 +32,8 @@ const Team = () => {
   });
   
   const referralLink = user?.referral_code 
-    ? `https://restempire.com/register?ref=${user.referral_code}`
-    : "https://restempire.com/register";
+    ? `${window.location.origin}/register?ref=${user.referral_code}`
+    : `${window.location.origin}/register`;
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -42,55 +43,74 @@ const Team = () => {
     });
   };
 
-  const toggleNode = (nodeId: number) => {
+  const toggleNode = async (nodeId: number) => {
     const newExpanded = new Set(expandedNodes);
     if (newExpanded.has(nodeId)) {
       newExpanded.delete(nodeId);
     } else {
       newExpanded.add(nodeId);
+      if (!childrenCache[nodeId]) {
+        try {
+          const children = await apiService.team.getMemberChildren(nodeId);
+          setChildrenCache(prev => ({ ...prev, [nodeId]: children }));
+        } catch (error) {
+          console.error('Failed to load children:', error);
+        }
+      }
     }
     setExpandedNodes(newExpanded);
   };
 
-  const renderTeamMember = (member: TeamMemberInfo, depth = 0) => (
-    <div key={member.id} className={`border-l-2 border-gray-200 ${depth > 0 ? 'ml-6' : ''}`}>
-      <div className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg">
-        <button
-          onClick={() => toggleNode(member.id)}
-          className="p-1 hover:bg-gray-200 rounded"
-        >
-          {expandedNodes.has(member.id) ? (
-            <ChevronDown className="w-4 h-4" />
-          ) : (
-            <ChevronRight className="w-4 h-4" />
-          )}
-        </button>
-        
-        <Avatar className="w-10 h-10">
-          <AvatarFallback>
-            {member.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
-          </AvatarFallback>
-        </Avatar>
-        
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="font-medium">{member.full_name || 'Unknown'}</span>
-            <RankBadge rank={member.current_rank} size="sm" />
-            <StatusBadge status={member.is_active ? 'active' : 'inactive'} />
+  const renderTeamMember = (member: TeamMemberInfo, depth = 0) => {
+    const isExpanded = expandedNodes.has(member.id);
+    const children = childrenCache[member.id] || [];
+    
+    return (
+      <div key={member.id} className={`${depth > 0 ? 'ml-6' : ''}`}>
+        <div className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg border-l-2 border-gray-200">
+          <button
+            onClick={() => toggleNode(member.id)}
+            className="p-1 hover:bg-gray-200 rounded"
+          >
+            {isExpanded ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
+          </button>
+          
+          <Avatar className="w-10 h-10">
+            <AvatarFallback>
+              {member.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
+            </AvatarFallback>
+          </Avatar>
+          
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-medium">{member.full_name || 'Unknown'}</span>
+              <RankBadge rank={member.current_rank} size="sm" />
+              <StatusBadge status={member.is_active ? 'active' : 'inactive'} />
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {member.email} • Team: {member.team_size} • ₦{member.personal_turnover.toFixed(0)}
+            </div>
           </div>
-          <div className="text-sm text-muted-foreground">
-            {member.email} • Team: {member.team_size} • €{member.personal_turnover.toFixed(0)}
+          
+          <div className="text-right text-sm">
+            <div className="text-muted-foreground">
+              {new Date(member.registration_date).toLocaleDateString()}
+            </div>
           </div>
         </div>
         
-        <div className="text-right text-sm">
-          <div className="text-muted-foreground">
-            {new Date(member.registration_date).toLocaleDateString()}
+        {isExpanded && children.length > 0 && (
+          <div className="ml-4">
+            {children.map(child => renderTeamMember(child, depth + 1))}
           </div>
-        </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderListMember = (member: TeamMemberInfo) => (
     <div key={member.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg border-b">
@@ -107,7 +127,7 @@ const Team = () => {
           <StatusBadge status={member.is_active ? 'active' : 'inactive'} />
         </div>
         <div className="text-sm text-muted-foreground">
-          {member.email} • Team: {member.team_size} • €{member.personal_turnover.toFixed(0)}
+          {member.email} • Team: {member.team_size} • ₦{member.personal_turnover.toFixed(0)}
         </div>
       </div>
       
@@ -166,7 +186,7 @@ const Team = () => {
         <Card>
           <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-2xl font-bold">€{teamStats?.total_team_turnover?.toFixed(0) || '0'}</p>
+              <p className="text-2xl font-bold">₦{teamStats?.total_team_turnover?.toFixed(0) || '0'}</p>
               <p className="text-sm text-muted-foreground">Team Turnover</p>
             </div>
           </CardContent>
@@ -205,14 +225,14 @@ const Team = () => {
               <CardTitle>Team Structure</CardTitle>
             </CardHeader>
             <CardContent>
-              {treeLoading ? (
+              {firstLineLoading ? (
                 <div className="flex justify-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin" />
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {teamTree?.map((member: TeamMemberInfo) => renderTeamMember(member))}
-                  {!teamTree?.length && (
+                  {firstLine?.map((member: TeamMemberInfo) => renderTeamMember(member))}
+                  {!firstLine?.length && (
                     <p className="text-center text-muted-foreground py-8">
                       No team members found. Start building your team!
                     </p>
@@ -301,7 +321,7 @@ const Team = () => {
                   <Card>
                     <CardContent className="p-4">
                       <h4 className="font-semibold mb-2">First Leg (50%)</h4>
-                      <p className="text-lg font-bold">€{legBreakdown.first_leg?.turnover?.toFixed(0) || '0'}</p>
+                      <p className="text-lg font-bold">₦{legBreakdown.first_leg?.turnover?.toFixed(0) || '0'}</p>
                       <p className="text-sm text-muted-foreground">{legBreakdown.first_leg?.team_size || 0} members</p>
                     </CardContent>
                   </Card>
@@ -309,7 +329,7 @@ const Team = () => {
                   <Card>
                     <CardContent className="p-4">
                       <h4 className="font-semibold mb-2">Second Leg (30%)</h4>
-                      <p className="text-lg font-bold">€{legBreakdown.second_leg?.turnover?.toFixed(0) || '0'}</p>
+                      <p className="text-lg font-bold">₦{legBreakdown.second_leg?.turnover?.toFixed(0) || '0'}</p>
                       <p className="text-sm text-muted-foreground">{legBreakdown.second_leg?.team_size || 0} members</p>
                     </CardContent>
                   </Card>
@@ -317,7 +337,7 @@ const Team = () => {
                   <Card>
                     <CardContent className="p-4">
                       <h4 className="font-semibold mb-2">Other Legs</h4>
-                      <p className="text-lg font-bold">€{legBreakdown.other_legs_combined?.turnover?.toFixed(0) || '0'}</p>
+                      <p className="text-lg font-bold">₦{legBreakdown.other_legs_combined?.turnover?.toFixed(0) || '0'}</p>
                       <p className="text-sm text-muted-foreground">{legBreakdown.other_legs_combined?.team_size || 0} members</p>
                     </CardContent>
                   </Card>

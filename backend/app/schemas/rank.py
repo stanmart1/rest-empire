@@ -24,7 +24,6 @@ class RankProgress(BaseModel):
     current_rank: RankResponse
     next_rank: Optional[RankResponse]
     total_turnover: float
-    total_turnover_progress: float
     first_leg_turnover: float
     first_leg_progress: float
     second_leg_turnover: float
