@@ -6,7 +6,7 @@ from app.core.database import get_db
 from app.api.deps import get_current_user
 from app.models.user import User
 from app.models.promo_material import PromoMaterial, MaterialType
-from app.schemas.promo_material import PromoMaterialResponse, PromoMaterialStats
+from app.schemas.promo_material import PromoMaterialResponse
 
 router = APIRouter()
 
@@ -30,32 +30,6 @@ def get_promo_materials(
     
     materials = query.order_by(PromoMaterial.created_at.desc()).offset(skip).limit(limit).all()
     return materials
-
-@router.get("/stats", response_model=PromoMaterialStats)
-def get_promo_stats(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    """Get promotional materials statistics"""
-    total_materials = db.query(PromoMaterial).filter(PromoMaterial.is_active == True).count()
-    total_downloads = db.query(PromoMaterial).with_entities(
-        func.sum(PromoMaterial.download_count)
-    ).scalar() or 0
-    
-    # Materials by type
-    materials_by_type = {}
-    for material_type in MaterialType:
-        count = db.query(PromoMaterial).filter(
-            PromoMaterial.material_type == material_type,
-            PromoMaterial.is_active == True
-        ).count()
-        materials_by_type[material_type.value] = count
-    
-    return PromoMaterialStats(
-        total_materials=total_materials,
-        total_downloads=int(total_downloads),
-        materials_by_type=materials_by_type
-    )
 
 @router.post("/{material_id}/download")
 def download_material(

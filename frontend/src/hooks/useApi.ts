@@ -190,12 +190,7 @@ export const usePromoMaterials = (params?: {
   });
 };
 
-export const usePromoStats = () => {
-  return useQuery({
-    queryKey: ['promo-stats'],
-    queryFn: apiService.promoMaterials.getStats,
-  });
-};
+
 
 // Transactions hooks
 export const useTransactions = (params?: {

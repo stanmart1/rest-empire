@@ -216,11 +216,6 @@ export const promoMaterialsAPI = {
     return response.data;
   },
 
-  getStats: async () => {
-    const response = await api.get('/promo-materials/stats');
-    return response.data;
-  },
-
   downloadMaterial: async (id: number) => {
     const response = await api.post(`/promo-materials/${id}/download`);
     return response.data;

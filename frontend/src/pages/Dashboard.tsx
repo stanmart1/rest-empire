@@ -7,10 +7,12 @@ import { useToast } from '@/hooks/use-toast';
 import RankBadge from '@/components/common/RankBadge';
 import { useDashboardStats } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: dashboardStats, isLoading: statsLoading, error: statsError } = useDashboardStats();
 
   const referralLink = user?.referral_code 
@@ -94,7 +96,7 @@ const Dashboard = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Wallet className="w-5 h-5 text-blue-600" />
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" onClick={() => navigate('/payouts')}>
                   Payout
                 </Button>
               </div>
@@ -113,7 +115,7 @@ const Dashboard = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Wallet className="w-5 h-5 text-green-600" />
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" onClick={() => navigate('/payouts')}>
                   Payout
                 </Button>
               </div>

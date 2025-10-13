@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Download, FileText, Presentation, Video, Image, File, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { usePromoMaterials, usePromoStats } from '@/hooks/useApi';
+import { usePromoMaterials } from '@/hooks/useApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiService from '@/services/api';
 import { PromoMaterial } from '@/types/promo';
@@ -20,8 +20,6 @@ const PromoMaterials = () => {
     material_type: typeFilter !== 'all' ? typeFilter : undefined,
     language: languageFilter !== 'all' ? languageFilter : undefined,
   });
-
-  const { data: stats, isLoading: statsLoading } = usePromoStats();
 
   const downloadMutation = useMutation({
     mutationFn: (materialId: number) => apiService.promoMaterials.downloadMaterial(materialId),
@@ -134,37 +132,7 @@ const PromoMaterials = () => {
         </p>
       </div>
 
-      {/* Stats */}
-      {!statsLoading && stats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold">{stats.total_materials}</p>
-                <p className="text-sm text-muted-foreground">Total Materials</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold">{stats.total_downloads}</p>
-                <p className="text-sm text-muted-foreground">Total Downloads</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold">{Object.keys(stats.materials_by_type).length}</p>
-                <p className="text-sm text-muted-foreground">Material Types</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+
 
       {/* Filters */}
       <div className="flex gap-4">
