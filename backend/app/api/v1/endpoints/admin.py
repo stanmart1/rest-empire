@@ -16,6 +16,28 @@ from app.utils.activity import log_activity
 
 router = APIRouter()
 
+@router.get("/transactions/stats")
+def admin_get_transaction_stats(
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Admin: Get transaction statistics by type"""
+    from sqlalchemy import func
+    
+    stats = db.query(
+        Transaction.transaction_type,
+        func.count(Transaction.id).label('count')
+    ).filter(
+        Transaction.status == TransactionStatus.completed
+    ).group_by(Transaction.transaction_type).all()
+    
+    return {
+        "by_type": [
+            {"type": t.transaction_type.value.capitalize(), "count": t.count}
+            for t in stats
+        ]
+    }
+
 @router.get("/transactions", response_model=List[TransactionResponse])
 def admin_get_all_transactions(
     user_id: Optional[int] = None,

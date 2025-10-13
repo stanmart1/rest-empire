@@ -11,10 +11,28 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Loader2, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import apiService from '@/services/api';
+
+interface Ticket {
+  id: number;
+  subject: string;
+  category: string;
+  message: string;
+  status: string;
+  priority: string;
+  created_at: string;
+  responses?: Array<{
+    id: number;
+    message: string;
+    created_at: string;
+    author: { full_name: string };
+  }>;
+}
 
 const Support = () => {
   const { toast } = useToast();
@@ -22,6 +40,16 @@ const Support = () => {
     subject: '',
     category: 'general',
     message: ''
+  });
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
+  const { data: tickets } = useQuery<Ticket[]>({
+    queryKey: ['userTickets'],
+    queryFn: async () => {
+      const response = await apiService.support.getTickets();
+      return response;
+    },
   });
 
   const submitMutation = useMutation({
@@ -102,6 +130,40 @@ const Support = () => {
         </CardContent>
       </Card>
 
+      {/* My Tickets */}
+      {tickets && tickets.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>My Tickets</CardTitle>
+            <CardDescription>View your support ticket history</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {tickets.map((ticket) => (
+                <div key={ticket.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer" onClick={() => {
+                  setSelectedTicket(ticket);
+                  setDetailsOpen(true);
+                }}>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium">#{ticket.id}</span>
+                      <Badge variant={ticket.status === 'closed' ? 'default' : 'secondary'}>
+                        {ticket.status.replace('_', ' ')}
+                      </Badge>
+                    </div>
+                    <p className="font-medium">{ticket.subject}</p>
+                    <p className="text-sm text-muted-foreground">{new Date(ticket.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <MessageSquare className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Contact Form */}
       <Card>
         <CardHeader>
@@ -162,6 +224,50 @@ const Support = () => {
           </form>
         </CardContent>
       </Card>
+
+      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Ticket #{selectedTicket?.id} - {selectedTicket?.subject}</DialogTitle>
+          </DialogHeader>
+          {selectedTicket && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Badge variant={selectedTicket.status === 'closed' ? 'default' : 'secondary'}>
+                  {selectedTicket.status.replace('_', ' ')}
+                </Badge>
+                <span className="text-sm text-muted-foreground">
+                  {new Date(selectedTicket.created_at).toLocaleDateString()}
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm font-medium mb-1">Your Message</p>
+                  <p className="text-sm whitespace-pre-wrap">{selectedTicket.message}</p>
+                </div>
+
+                {selectedTicket.responses && selectedTicket.responses.length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-sm font-medium">Responses</p>
+                    {selectedTicket.responses.map((response) => (
+                      <div key={response.id} className="p-4 bg-primary/10 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium">{response.author.full_name} (Support)</span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(response.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-sm whitespace-pre-wrap">{response.message}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

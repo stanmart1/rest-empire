@@ -6,6 +6,7 @@ export interface AdminStats {
   total_revenue_usdt: number;
   pending_payouts: number;
   total_bonuses_paid: number;
+  total_books: number;
 }
 
 export interface AdminUser {

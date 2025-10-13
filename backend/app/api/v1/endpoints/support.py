@@ -34,17 +34,43 @@ def create_support_ticket(
         "status": "open"
     }
 
-@router.get("/tickets", response_model=List[SupportTicketResponse])
+@router.get("/tickets")
 def get_user_tickets(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get user's support tickets"""
+    """Get user's support tickets with responses"""
     tickets = db.query(SupportTicket).filter(
         SupportTicket.user_id == current_user.id
     ).order_by(SupportTicket.created_at.desc()).all()
     
-    return tickets
+    result = []
+    for ticket in tickets:
+        responses = db.query(SupportResponse).filter(
+            SupportResponse.ticket_id == ticket.id
+        ).order_by(SupportResponse.created_at).all()
+        
+        ticket_dict = {
+            "id": ticket.id,
+            "subject": ticket.subject,
+            "category": ticket.category,
+            "message": ticket.message,
+            "status": ticket.status.value,
+            "priority": ticket.priority.value,
+            "created_at": ticket.created_at.isoformat(),
+            "responses": [
+                {
+                    "id": r.id,
+                    "message": r.message,
+                    "created_at": r.created_at.isoformat(),
+                    "author": {"full_name": r.author.full_name}
+                }
+                for r in responses
+            ]
+        }
+        result.append(ticket_dict)
+    
+    return result
 
 @router.get("/tickets/{ticket_id}", response_model=SupportTicketResponse)
 def get_ticket_details(

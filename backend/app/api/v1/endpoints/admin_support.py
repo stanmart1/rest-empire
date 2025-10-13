@@ -100,10 +100,9 @@ def admin_respond_to_ticket(
     # Create response
     ticket_response = SupportResponse(
         ticket_id=ticket_id,
-        responder_id=admin.id,
+        user_id=admin.id,
         message=response.message,
-        is_internal=False,
-        internal_note=response.internal_note
+        is_internal_note=False
     )
     db.add(ticket_response)
     

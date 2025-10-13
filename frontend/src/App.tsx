@@ -41,6 +41,7 @@ import AdminVerifications from "./pages/admin/AdminVerifications";
 import AdminPayouts from "./pages/admin/AdminPayouts";
 import AdminFinance from "./pages/admin/AdminFinance";
 import AdminBonuses from "./pages/admin/AdminBonuses";
+import AdminBooks from "./pages/admin/AdminBooks";
 import AdminSupport from "./pages/admin/AdminSupport";
 import AdminSettings from "./pages/admin/AdminSettings";
 import Index from "./pages/Index";
@@ -97,6 +98,7 @@ const AnimatedRoutes = () => {
         <Route path="/admin/payouts" element={<AdminRoute><DashboardLayout><PageWrapper><AdminPayouts /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/finance" element={<AdminRoute><DashboardLayout><PageWrapper><AdminFinance /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/bonuses" element={<AdminRoute><DashboardLayout><PageWrapper><AdminBonuses /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/books" element={<AdminRoute><DashboardLayout><PageWrapper><AdminBooks /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/support" element={<AdminRoute><DashboardLayout><PageWrapper><AdminSupport /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><DashboardLayout><PageWrapper><AdminSettings /></PageWrapper></DashboardLayout></AdminRoute>} />
 

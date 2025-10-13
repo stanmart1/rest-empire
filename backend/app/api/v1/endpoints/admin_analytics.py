@@ -8,6 +8,8 @@ from app.models.user import User
 from app.models.transaction import Transaction, TransactionStatus
 from app.models.bonus import Bonus, BonusStatus
 from app.models.payout import Payout, PayoutStatus
+from app.models.verification import UserVerification, VerificationStatus
+from app.models.book import Book
 
 router = APIRouter()
 
@@ -20,58 +22,45 @@ def admin_get_dashboard_analytics(
     # User stats
     total_users = db.query(User).count()
     active_users = db.query(User).filter(User.is_active == True).count()
-    verified_users = db.query(User).filter(User.is_verified == True).count()
     
-    # Today's stats
-    today = datetime.utcnow().date()
-    new_users_today = db.query(User).filter(
-        func.date(User.created_at) == today
+    # Verification stats
+    pending_verifications = db.query(UserVerification).filter(
+        UserVerification.status == VerificationStatus.pending
     ).count()
     
-    # Transaction stats
-    total_revenue = db.query(func.sum(Transaction.amount)).filter(
+    # Revenue stats by currency
+    total_revenue_ngn = db.query(func.sum(Transaction.amount)).filter(
         Transaction.status == TransactionStatus.completed,
-        Transaction.transaction_type == "purchase"
+        Transaction.currency == "NGN"
     ).scalar() or 0
     
-    revenue_today = db.query(func.sum(Transaction.amount)).filter(
+    total_revenue_usdt = db.query(func.sum(Transaction.amount)).filter(
         Transaction.status == TransactionStatus.completed,
-        Transaction.transaction_type == "purchase",
-        func.date(Transaction.created_at) == today
+        Transaction.currency == "USDT"
     ).scalar() or 0
     
     # Bonus stats
-    total_bonuses = db.query(func.sum(Bonus.amount)).filter(
+    total_bonuses_paid = db.query(func.sum(Bonus.amount)).filter(
         Bonus.status == BonusStatus.paid
     ).scalar() or 0
     
     # Payout stats
-    pending_payouts = db.query(func.sum(Payout.amount)).filter(
+    pending_payouts = db.query(Payout).filter(
         Payout.status.in_([PayoutStatus.pending, PayoutStatus.approved])
-    ).scalar() or 0
+    ).count()
     
-    completed_payouts = db.query(func.sum(Payout.amount)).filter(
-        Payout.status == PayoutStatus.completed
-    ).scalar() or 0
+    # Book stats
+    total_books = db.query(Book).count()
     
     return {
-        "users": {
-            "total": total_users,
-            "active": active_users,
-            "verified": verified_users,
-            "new_today": new_users_today
-        },
-        "revenue": {
-            "total": float(total_revenue),
-            "today": float(revenue_today)
-        },
-        "bonuses": {
-            "total_paid": float(total_bonuses)
-        },
-        "payouts": {
-            "pending": float(pending_payouts),
-            "completed": float(completed_payouts)
-        }
+        "total_users": total_users,
+        "active_users": active_users,
+        "pending_verifications": pending_verifications,
+        "total_revenue_ngn": float(total_revenue_ngn),
+        "total_revenue_usdt": float(total_revenue_usdt),
+        "pending_payouts": pending_payouts,
+        "total_bonuses_paid": float(total_bonuses_paid),
+        "total_books": total_books
     }
 
 @router.get("/analytics/users")

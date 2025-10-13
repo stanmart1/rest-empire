@@ -1,11 +1,23 @@
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 import api from '@/lib/api';
 import { AdminUser } from '@/lib/admin-types';
+import UserDetailsModal from '@/components/admin/UserDetailsModal';
 
 const AdminUsers = () => {
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
+  const queryClient = useQueryClient();
+
   const { data: users, isLoading } = useQuery<AdminUser[]>({
     queryKey: ['adminUsers'],
     queryFn: async () => {
@@ -13,6 +25,38 @@ const AdminUsers = () => {
       return response.data;
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (userId: number) => {
+      await api.delete(`/admin/users/${userId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
+      toast.success('User deleted successfully');
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+    },
+    onError: () => {
+      toast.error('Failed to delete user');
+    },
+  });
+
+  const handleUserClick = (user: AdminUser) => {
+    setSelectedUser(user);
+    setModalOpen(true);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, user: AdminUser) => {
+    e.stopPropagation();
+    setUserToDelete(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (userToDelete) {
+      deleteMutation.mutate(userToDelete.id);
+    }
+  };
 
   return (
     <Card>
@@ -29,6 +73,7 @@ const AdminUsers = () => {
               <TableHead>Status</TableHead>
               <TableHead>Balance (NGN)</TableHead>
               <TableHead>Registered</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -44,7 +89,11 @@ const AdminUsers = () => {
               </TableRow>
             ) : (
               users.map((user) => (
-                <TableRow key={user.id}>
+                <TableRow 
+                  key={user.id} 
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleUserClick(user)}
+                >
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.full_name}</TableCell>
                   <TableCell>{user.current_rank}</TableCell>
@@ -55,12 +104,43 @@ const AdminUsers = () => {
                   </TableCell>
                   <TableCell>₦{user.balance_ngn.toLocaleString()}</TableCell>
                   <TableCell>{new Date(user.registration_date).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => handleDeleteClick(e, user)}
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             )}
           </TableBody>
         </Table>
       </CardContent>
+      <UserDetailsModal 
+        user={selectedUser} 
+        open={modalOpen} 
+        onClose={() => setModalOpen(false)} 
+      />
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {userToDelete?.full_name} ({userToDelete?.email})? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };

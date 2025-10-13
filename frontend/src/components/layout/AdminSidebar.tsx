@@ -9,6 +9,7 @@ import {
   Gift,
   HelpCircle,
   Settings,
+  BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,6 +34,7 @@ const AdminSidebar = () => {
     { to: '/admin/payouts', icon: CreditCard, label: 'Payouts' },
     { to: '/admin/finance', icon: DollarSign, label: 'Finance' },
     { to: '/admin/bonuses', icon: Gift, label: 'Bonuses' },
+    { to: '/admin/books', icon: BookOpen, label: 'Books' },
     { to: '/admin/support', icon: HelpCircle, label: 'Support' },
     { to: '/admin/settings', icon: Settings, label: 'Settings' },
   ];
