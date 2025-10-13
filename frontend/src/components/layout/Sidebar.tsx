@@ -102,17 +102,16 @@ const Sidebar = () => {
           <div className="flex items-center gap-3 mb-3">
             <Avatar className="w-12 h-12">
               <AvatarFallback className="bg-muted text-foreground">
-                {user?.name ? getInitials(user.name) : 'U'}
+                {user?.full_name ? getInitials(user.full_name) : 'U'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm truncate text-sidebar-foreground">{user?.name || 'User'}</p>
-              <p className="text-xs text-sidebar-muted">Not verified</p>
+              <p className="font-medium text-sm truncate text-sidebar-foreground">{user?.full_name || 'User'}</p>
             </div>
           </div>
           <div className="text-center py-2 bg-muted rounded-lg">
-            <p className="text-xs text-white mb-1">Inactive</p>
-            <p className="text-sm font-medium text-white">since {new Date().toLocaleDateString('en-GB')}</p>
+            <p className="text-xs text-white mb-1">{user?.is_active ? "Active" : "Inactive"}</p>
+            <p className="text-sm font-medium text-white">since {user?.registration_date ? new Date(user.registration_date).toLocaleDateString('en-GB') : 'N/A'}</p>
           </div>
         </div>
 
@@ -235,17 +234,16 @@ const Sidebar = () => {
           <div className="flex items-center gap-3 mb-3">
             <Avatar className="w-12 h-12">
               <AvatarFallback className="bg-muted text-foreground">
-                {user?.name ? getInitials(user.name) : 'U'}
+                {user?.full_name ? getInitials(user.full_name) : 'U'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm truncate text-sidebar-foreground">{user?.name || 'User'}</p>
-              <p className="text-xs text-sidebar-muted">Not verified</p>
+              <p className="font-medium text-sm truncate text-sidebar-foreground">{user?.full_name || 'User'}</p>
             </div>
           </div>
           <div className="text-center py-2 bg-muted rounded-lg">
-            <p className="text-xs text-white mb-1">Inactive</p>
-            <p className="text-sm font-medium text-white">since {new Date().toLocaleDateString('en-GB')}</p>
+            <p className="text-xs text-white mb-1">{user?.is_active ? "Active" : "Inactive"}</p>
+            <p className="text-sm font-medium text-white">since {user?.registration_date ? new Date(user.registration_date).toLocaleDateString('en-GB') : 'N/A'}</p>
           </div>
         </div>
 

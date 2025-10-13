@@ -72,10 +72,10 @@ const Topbar = () => {
             <Button variant="ghost" className="flex items-center gap-2 h-10">
               <Avatar className="w-8 h-8">
                 <AvatarFallback className="bg-muted text-foreground text-sm">
-                  {user?.name ? getInitials(user.name) : 'U'}
+                  {user?.full_name ? getInitials(user.full_name) : 'U'}
                 </AvatarFallback>
               </Avatar>
-              <span className="font-medium text-sm hidden sm:block text-foreground">{user?.name || 'User'}</span>
+              <span className="font-medium text-sm hidden sm:block text-foreground">{user?.full_name || 'User'}</span>
               <ChevronDown className="w-4 h-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Dict
 from pydantic import BaseModel
 from app.core.database import get_db
-from app.api.deps import get_admin_user, get_super_admin_user
+from app.api.deps import get_admin_user
 from app.models.user import User
 from app.models.system_config import SystemConfig
 from app.services.config_service import get_config, set_config, get_all_configs, delete_config
@@ -45,7 +45,7 @@ def admin_get_config(
 @router.post("/config")
 def admin_create_config(
     config: ConfigUpdate,
-    admin: User = Depends(get_super_admin_user),
+    admin: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Create or update configuration"""
@@ -75,7 +75,7 @@ def admin_create_config(
 def admin_update_config(
     key: str,
     config_value: ConfigValue,
-    admin: User = Depends(get_super_admin_user),
+    admin: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Update configuration value"""
@@ -101,7 +101,7 @@ def admin_update_config(
 @router.delete("/config/{key}")
 def admin_delete_config(
     key: str,
-    admin: User = Depends(get_super_admin_user),
+    admin: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Delete configuration"""
@@ -126,7 +126,7 @@ def get_public_configs(db: Session = Depends(get_db)) -> Dict[str, str]:
 @router.post("/config/maintenance-mode")
 def admin_toggle_maintenance_mode(
     enabled: bool,
-    admin: User = Depends(get_super_admin_user),
+    admin: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Toggle maintenance mode"""
@@ -159,7 +159,7 @@ def admin_get_platform_settings(
 @router.put("/config/settings/platform")
 def admin_update_platform_settings(
     settings: Dict[str, str],
-    admin: User = Depends(get_super_admin_user),
+    admin: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Update platform settings"""

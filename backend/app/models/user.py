@@ -6,10 +6,7 @@ from app.core.database import Base
 
 class UserRole(enum.Enum):
     user = "user"
-    support = "support"
-    finance = "finance"
     admin = "admin"
-    super_admin = "super_admin"
 
 class User(Base):
     __tablename__ = "users"

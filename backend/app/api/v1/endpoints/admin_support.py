@@ -4,7 +4,7 @@ from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel
 from app.core.database import get_db
-from app.api.deps import get_support_user
+from app.api.deps import get_admin_user
 from app.models.user import User
 from app.models.support import SupportTicket, SupportResponse, TicketStatus
 from app.utils.activity import log_activity
@@ -25,7 +25,7 @@ def admin_get_all_tickets(
     assigned_to: Optional[int] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    admin: User = Depends(get_support_user),
+    admin: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all support tickets"""
@@ -47,7 +47,7 @@ def admin_get_all_tickets(
 @router.get("/tickets/{ticket_id}")
 def admin_get_ticket_details(
     ticket_id: int,
-    admin: User = Depends(get_support_user),
+    admin: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Get ticket details with responses"""
@@ -69,7 +69,7 @@ def admin_get_ticket_details(
 def admin_assign_ticket(
     ticket_id: int,
     assigned_to: int,
-    admin: User = Depends(get_support_user),
+    admin: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Assign ticket to support agent"""
@@ -88,7 +88,7 @@ def admin_assign_ticket(
 def admin_respond_to_ticket(
     ticket_id: int,
     response: TicketResponse,
-    admin: User = Depends(get_support_user),
+    admin: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Respond to ticket"""
@@ -119,7 +119,7 @@ def admin_respond_to_ticket(
 def admin_update_ticket_status(
     ticket_id: int,
     status_update: TicketStatusUpdate,
-    admin: User = Depends(get_support_user),
+    admin: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Update ticket status"""
@@ -140,7 +140,7 @@ def admin_update_ticket_status(
 
 @router.get("/tickets/stats/overview")
 def admin_get_ticket_stats(
-    admin: User = Depends(get_support_user),
+    admin: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """Admin: Get ticket statistics"""

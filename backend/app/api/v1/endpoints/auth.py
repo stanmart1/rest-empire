@@ -36,14 +36,14 @@ async def register(user_data: UserCreate, request: Request, db: Session = Depend
             raise HTTPException(status_code=400, detail="Sponsor account is not active")
     
     # Create user
-    verification_token = generate_verification_token()
     user = User(
         email=user_data.email,
         hashed_password=get_password_hash(user_data.password),
         full_name=user_data.full_name,
         phone_number=user_data.phone_number,
         referral_code=secrets.token_urlsafe(8),
-        verification_token=verification_token,
+        is_verified=True,
+        is_active=False,
         sponsor_id=sponsor.id if sponsor else None
     )
     
@@ -75,9 +75,6 @@ async def register(user_data: UserCreate, request: Request, db: Session = Depend
         ip_address=request.client.host
     )
     
-    # Send verification email
-    await send_verification_email(user.email, verification_token)
-    
     return user
 
 @router.post("/login", response_model=Token)
@@ -90,22 +87,21 @@ def login(credentials: UserLogin, request: Request, db: Session = Depends(get_db
             log_activity(db, user.id, "login_failed", ip_address=request.client.host)
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    if not user.is_verified:
-        raise HTTPException(status_code=403, detail="Email not verified")
-    
-    if not user.is_active:
-        raise HTTPException(status_code=403, detail="Account is inactive")
-    
     # Update last login
     user.last_login = datetime.utcnow()
     db.commit()
+    
+    # Return account status in token if inactive
+    if not user.is_active:
+        # Allow login but frontend should show payment required message
+        pass
     
     # Log successful login
     log_activity(db, user.id, "login_success", ip_address=request.client.host)
     
     # Create tokens
-    access_token = create_access_token(data={"sub": user.id})
-    refresh_token = create_refresh_token(data={"sub": user.id})
+    access_token = create_access_token(data={"sub": str(user.id)})
+    refresh_token = create_refresh_token(data={"sub": str(user.id)})
     
     return {
         "access_token": access_token,
@@ -117,7 +113,7 @@ def login(credentials: UserLogin, request: Request, db: Session = Depends(get_db
 def refresh_token(token_data: TokenRefresh, db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(token_data.refresh_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        user_id: int = payload.get("sub")
+        user_id: int = int(payload.get("sub"))
         token_type: str = payload.get("type")
         
         if token_type != "refresh":
@@ -136,8 +132,8 @@ def refresh_token(token_data: TokenRefresh, db: Session = Depends(get_db)):
     log_activity(db, user.id, "token_refreshed")
     
     # Create new tokens
-    access_token = create_access_token(data={"sub": user.id})
-    refresh_token = create_refresh_token(data={"sub": user.id})
+    access_token = create_access_token(data={"sub": str(user.id)})
+    refresh_token = create_refresh_token(data={"sub": str(user.id)})
     
     return {
         "access_token": access_token,
