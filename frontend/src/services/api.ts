@@ -46,6 +46,11 @@ export const userAPI = {
   getReferralInfo: async () => {
     const response = await api.get('/users/referral');
     return response.data;
+  },
+
+  updateProfile: async (data: { full_name?: string; phone_number?: string }) => {
+    const response = await api.put('/users/profile', data);
+    return response.data;
   }
 };
 
