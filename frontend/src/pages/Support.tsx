@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation } from '@tanstack/react-query';
@@ -19,18 +20,19 @@ const Support = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     subject: '',
+    category: 'general',
     message: ''
   });
 
   const submitMutation = useMutation({
-    mutationFn: (data: { subject: string; message: string }) =>
+    mutationFn: (data: { subject: string; category: string; message: string }) =>
       apiService.support.createTicket(data),
     onSuccess: (data) => {
       toast({
         title: "Ticket Created",
         description: `Your support ticket #${data.ticket_id} has been submitted successfully.`,
       });
-      setFormData({ subject: '', message: '' });
+      setFormData({ subject: '', category: 'general', message: '' });
     },
     onError: (error: any) => {
       toast({
@@ -119,6 +121,22 @@ const Support = () => {
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 required
               />
+            </div>
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="general">General Inquiry</SelectItem>
+                  <SelectItem value="account">Account Issues</SelectItem>
+                  <SelectItem value="payment">Payment & Payouts</SelectItem>
+                  <SelectItem value="bonus">Bonus Questions</SelectItem>
+                  <SelectItem value="technical">Technical Support</SelectItem>
+                  <SelectItem value="verification">Verification</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="message">Message</Label>

@@ -101,7 +101,7 @@ const Sidebar = () => {
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center gap-3 mb-3">
             <Avatar className="w-12 h-12">
-              <AvatarFallback className="bg-muted text-foreground">
+              <AvatarFallback className="bg-primary text-white">
                 {user?.full_name ? getInitials(user.full_name) : 'U'}
               </AvatarFallback>
             </Avatar>
@@ -233,7 +233,7 @@ const Sidebar = () => {
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center gap-3 mb-3">
             <Avatar className="w-12 h-12">
-              <AvatarFallback className="bg-muted text-foreground">
+              <AvatarFallback className="bg-primary text-white">
                 {user?.full_name ? getInitials(user.full_name) : 'U'}
               </AvatarFallback>
             </Avatar>

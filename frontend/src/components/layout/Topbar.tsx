@@ -71,7 +71,7 @@ const Topbar = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2 h-10">
               <Avatar className="w-8 h-8">
-                <AvatarFallback className="bg-muted text-foreground text-sm">
+                <AvatarFallback className="bg-primary text-white text-sm">
                   {user?.full_name ? getInitials(user.full_name) : 'U'}
                 </AvatarFallback>
               </Avatar>

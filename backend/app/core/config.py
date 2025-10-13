@@ -4,8 +4,10 @@ from typing import List
 class Settings(BaseSettings):
     # Database
     DATABASE_URL: str
-    DATABASE_POOL_SIZE: int = 5
+    DATABASE_POOL_SIZE: int = 30
     DATABASE_MAX_OVERFLOW: int = 10
+    POOL_PRE_PING: bool = True
+    POOL_RECYCLE: int = 1800  # 30 minutes
     
     # Security
     SECRET_KEY: str

@@ -54,12 +54,14 @@ class OptimizedTeamService:
     @staticmethod
     def get_team_stats_bulk(db: Session, user_id: int) -> Dict:
         """Get all team statistics in optimized bulk query"""
+        from sqlalchemy import case
+        
         # Single query for team counts and turnovers
         stats_query = db.query(
             func.count(TeamMember.user_id).label('total_team'),
             func.sum(TeamMember.personal_turnover).label('total_turnover'),
-            func.count(
-                func.case([(TeamMember.depth == 1, 1)])
+            func.sum(
+                case((TeamMember.depth == 1, 1), else_=0)
             ).label('first_line_count')
         ).filter(
             TeamMember.ancestor_id == user_id,
@@ -69,7 +71,7 @@ class OptimizedTeamService:
         return {
             "total_team": stats_query.total_team or 0,
             "total_turnover": float(stats_query.total_turnover or 0),
-            "first_line_count": stats_query.first_line_count or 0
+            "first_line_count": int(stats_query.first_line_count or 0)
         }
     
     @staticmethod

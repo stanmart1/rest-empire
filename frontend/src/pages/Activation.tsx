@@ -18,7 +18,7 @@ const Activation = () => {
   const { data: status, isLoading: statusLoading } = useActivationStatus();
 
   const activationMutation = useMutation({
-    mutationFn: (data: { package: string; payment_method: string }) =>
+    mutationFn: (data: { package_id: number; payment_method: string }) =>
       apiService.activation.requestActivation(data),
     onSuccess: (data) => {
       toast({
@@ -37,10 +37,10 @@ const Activation = () => {
     },
   });
 
-  const handleActivationRequest = (packageType: string) => {
+  const handleActivationRequest = (packageId: number) => {
     activationMutation.mutate({
-      package: packageType,
-      payment_method: 'manual' // Since payment requires manual processing
+      package_id: packageId,
+      payment_method: 'manual'
     });
   };
 
@@ -116,7 +116,7 @@ const Activation = () => {
               </Badge>
               {status?.package && (
                 <p className="text-sm text-muted-foreground mt-2">
-                  Package: {status.package.charAt(0).toUpperCase() + status.package.slice(1)}
+                  Package: {status.package.name}
                 </p>
               )}
               {status?.activated_at && (
@@ -125,10 +125,13 @@ const Activation = () => {
                 </p>
               )}
             </div>
-            {status?.status === 'pending_payment' && (
+            {status?.status === 'pending_payment' && status?.package && (
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Amount Due</p>
-                <p className="text-xl font-bold">€{status.activation_fee}</p>
+                <p className="text-xl font-bold">
+                  {status.package.currency === 'NGN' ? '₦' : status.package.currency === 'USDT' ? '$' : '€'}
+                  {status.activation_fee?.toLocaleString()}
+                </p>
                 <p className="text-xs text-muted-foreground">Contact support to complete payment</p>
               </div>
             )}
@@ -137,18 +140,18 @@ const Activation = () => {
       </Card>
 
       {/* Activation Packages */}
-      {status?.status !== 'active' && (
+      {status?.status !== 'active' && packages && packages.length > 0 && (
         <div>
           <h2 className="text-xl font-semibold mb-4">Choose Your Activation Package</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {packages?.map((pkg: ActivationPackage) => (
+            {packages.map((pkg: ActivationPackage) => (
               <Card 
-                key={pkg.package} 
+                key={pkg.id} 
                 className={`relative hover:shadow-lg transition-shadow ${
-                  pkg.package === 'professional' ? 'border-primary shadow-md' : ''
+                  pkg.slug === 'professional' ? 'border-primary shadow-md' : ''
                 }`}
               >
-                {pkg.package === 'professional' && (
+                {pkg.slug === 'professional' && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <Badge className="bg-primary text-primary-foreground">Most Popular</Badge>
                   </div>
@@ -159,7 +162,10 @@ const Activation = () => {
                     {pkg.name}
                   </CardTitle>
                   <div className="text-center">
-                    <span className="text-3xl font-bold">€{pkg.price}</span>
+                    <span className="text-3xl font-bold">
+                      {pkg.currency === 'NGN' ? '₦' : pkg.currency === 'USDT' ? '$' : '€'}
+                      {pkg.price.toLocaleString()}
+                    </span>
                     <span className="text-muted-foreground"> one-time</span>
                   </div>
                 </CardHeader>
@@ -180,8 +186,8 @@ const Activation = () => {
                   
                   <Button 
                     className="w-full"
-                    variant={pkg.package === 'professional' ? 'default' : 'outline'}
-                    onClick={() => handleActivationRequest(pkg.package)}
+                    variant={pkg.slug === 'professional' ? 'default' : 'outline'}
+                    onClick={() => handleActivationRequest(pkg.id)}
                     disabled={activationMutation.isPending || status?.status === 'pending_payment'}
                   >
                     {activationMutation.isPending ? (
@@ -194,6 +200,15 @@ const Activation = () => {
             ))}
           </div>
         </div>
+      )}
+      
+      {/* No Packages Available */}
+      {status?.status !== 'active' && (!packages || packages.length === 0) && (
+        <Card>
+          <CardContent className="p-6 text-center">
+            <p className="text-muted-foreground">No activation packages available at the moment. Please contact support.</p>
+          </CardContent>
+        </Card>
       )}
 
       {/* Payment Instructions */}
@@ -212,13 +227,12 @@ const Activation = () => {
               </p>
               <ol className="list-decimal list-inside space-y-1 text-sm text-yellow-600">
                 <li>Contact our support team</li>
-                <li>Complete payment of €{status.activation_fee}</li>
+                <li>Complete payment of {status.package?.currency === 'NGN' ? '₦' : status.package?.currency === 'USDT' ? '$' : '€'}{status.activation_fee?.toLocaleString()}</li>
                 <li>Your account will be activated within 24 hours</li>
               </ol>
               <div className="mt-4 p-3 bg-white rounded border">
                 <p className="text-sm font-medium">Support Contact:</p>
-                <p className="text-sm">Email: support@restempire.com</p>
-                <p className="text-sm">Phone: +1 (555) 123-4567</p>
+                <p className="text-sm">Contact support through the Support page</p>
               </div>
             </div>
           </CardContent>

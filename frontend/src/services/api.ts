@@ -143,17 +143,17 @@ export const payoutAPI = {
 // Ranks API
 export const ranksAPI = {
   getRanks: async () => {
-    const response = await api.get('/ranks');
+    const response = await api.get('/ranks/');
     return response.data;
   },
 
   getRankProgress: async () => {
-    const response = await api.get('/ranks/progress');
+    const response = await api.get('/ranks/progress/');
     return response.data;
   },
 
   getRankHistory: async () => {
-    const response = await api.get('/ranks/history');
+    const response = await api.get('/ranks/history/');
     return response.data;
   },
 
@@ -257,7 +257,7 @@ export const activationAPI = {
     return response.data;
   },
 
-  requestActivation: async (data: { package: string; payment_method: string }) => {
+  requestActivation: async (data: { package_id: number; payment_method: string }) => {
     const response = await api.post('/activation/request', data);
     return response.data;
   }

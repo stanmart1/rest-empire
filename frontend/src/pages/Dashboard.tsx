@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Copy, QrCode, Euro, Gem, CircleDot, Info, Loader2 } from 'lucide-react';
+import { Copy, QrCode, Wallet, CircleDot, Info, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import RankBadge from '@/components/common/RankBadge';
 import { useDashboardStats } from '@/hooks/useApi';
@@ -14,8 +14,8 @@ const Dashboard = () => {
   const { data: dashboardStats, isLoading: statsLoading, error: statsError } = useDashboardStats();
 
   const referralLink = user?.referral_code 
-    ? `https://restempire.com/register?ref=${user.referral_code}`
-    : "https://restempire.com/register";
+    ? `${window.location.origin}/register?ref=${user.referral_code}`
+    : `${window.location.origin}/register`;
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -87,13 +87,13 @@ const Dashboard = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Available Balance</p>
+                <p className="text-sm text-muted-foreground">NGN Balance</p>
                 <p className="text-2xl font-bold">
-                  €{dashboardStats?.balance_eur?.toFixed(2) || '0.00'}
+                  ₦{dashboardStats?.balance_ngn?.toLocaleString() || '0.00'}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Euro className="w-5 h-5 text-blue-600" />
+                <Wallet className="w-5 h-5 text-blue-600" />
                 <Button size="sm" variant="outline">
                   Payout
                 </Button>
@@ -106,13 +106,13 @@ const Dashboard = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">DBSP Balance</p>
+                <p className="text-sm text-muted-foreground">USDT Balance</p>
                 <p className="text-2xl font-bold">
-                  {dashboardStats?.balance_dbsp?.toFixed(2) || '0.00'}
+                  ${dashboardStats?.balance_usdt?.toFixed(2) || '0.00'}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Gem className="w-5 h-5 text-purple-600" />
+                <Wallet className="w-5 h-5 text-green-600" />
                 <Button size="sm" variant="outline">
                   Payout
                 </Button>
@@ -148,7 +148,7 @@ const Dashboard = () => {
               </div>
               <Progress value={progressPercentage} className="h-2" />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>€{currentTurnover.toFixed(0)} / €{nextRequirement.toFixed(0)}</span>
+                <span>₦{currentTurnover.toLocaleString()} / ₦{nextRequirement.toLocaleString()}</span>
                 <span>Next: {nextRank}</span>
               </div>
             </div>
@@ -196,11 +196,11 @@ const Dashboard = () => {
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-purple-100 rounded-lg">
-                <Euro className="w-5 h-5 text-purple-600" />
+                <Wallet className="w-5 h-5 text-purple-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  €{dashboardStats?.total_earnings?.toFixed(0) || '0'}
+                  ₦{dashboardStats?.total_earnings?.toLocaleString() || '0'}
                 </p>
                 <p className="text-sm text-muted-foreground">Total Earnings</p>
               </div>
@@ -216,13 +216,13 @@ const Dashboard = () => {
             <div>
               <h3 className="font-semibold mb-1">Recent Earnings (30 days)</h3>
               <p className="text-2xl font-bold text-green-600">
-                €{dashboardStats?.recent_earnings_30d?.toFixed(2) || '0.00'}
+                ₦{dashboardStats?.recent_earnings_30d?.toLocaleString() || '0'}
               </p>
             </div>
             <div className="text-right">
               <p className="text-sm text-muted-foreground">Pending Payouts</p>
               <p className="text-lg font-semibold">
-                €{dashboardStats?.pending_payouts?.toFixed(2) || '0.00'}
+                ₦{dashboardStats?.pending_payouts?.toLocaleString() || '0'}
               </p>
             </div>
           </div>

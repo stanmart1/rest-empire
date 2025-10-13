@@ -7,28 +7,36 @@ export interface User {
   rankLevel: number;
   isAdmin: boolean;
   is_verified: boolean;
+  is_active: boolean;
   referral_code: string;
   sponsor_id?: string;
   registration_date: string;
-  balance_eur: number;
-  balance_dbsp: number;
+  balance_ngn: number;
+  balance_usdt: number;
   total_earnings: number;
 }
 
 export interface DashboardStats {
-  balance_eur: number;
-  balance_dbsp: number;
+  balance_ngn: number;
+  balance_usdt: number;
   total_earnings: number;
   current_rank: string;
   team_size: number;
   first_line_count: number;
   pending_payouts: number;
   recent_earnings_30d: number;
+  is_active: boolean;
+  rank_progress?: {
+    current_rank: string;
+    next_rank?: string;
+    current_turnover: number;
+    next_requirement?: number;
+    percentage: number;
+  };
 }
 
 export interface Balance {
-  eur: number;
-  dbsp: number;
+  ngn: number;
   usdt: number;
 }
 
@@ -47,14 +55,15 @@ export interface RankProgress {
 
 export interface Transaction {
   id: string;
-  type: 'purchase' | 'bonus' | 'payout' | 'refund';
+  transaction_type: 'purchase' | 'bonus' | 'payout' | 'refund' | 'fee';
   amount: number;
-  currency: 'EUR' | 'USDT' | 'DBSP';
-  status: 'pending' | 'completed' | 'failed' | 'processing' | 'cancelled';
-  paymentMethod?: string;
+  currency: 'NGN' | 'USDT';
+  status: 'pending' | 'completed' | 'failed' | 'cancelled';
+  payment_method?: string;
   description: string;
   created_at: string;
   updated_at: string;
+  completed_at?: string;
 }
 
 export interface Bonus {
