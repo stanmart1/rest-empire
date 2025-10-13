@@ -1,9 +1,14 @@
 import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  Users, 
+  Users,
+  Receipt,
   CheckCircle,
   CreditCard,
+  DollarSign,
+  Gift,
+  HelpCircle,
+  Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,8 +28,13 @@ const AdminSidebar = () => {
   const adminLinks = [
     { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/admin/users', icon: Users, label: 'Users' },
+    { to: '/admin/transactions', icon: Receipt, label: 'Transactions' },
     { to: '/admin/verifications', icon: CheckCircle, label: 'Verifications' },
     { to: '/admin/payouts', icon: CreditCard, label: 'Payouts' },
+    { to: '/admin/finance', icon: DollarSign, label: 'Finance' },
+    { to: '/admin/bonuses', icon: Gift, label: 'Bonuses' },
+    { to: '/admin/support', icon: HelpCircle, label: 'Support' },
+    { to: '/admin/settings', icon: Settings, label: 'Settings' },
   ];
 
   return (

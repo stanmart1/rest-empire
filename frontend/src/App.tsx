@@ -36,8 +36,13 @@ import NotFound from "./pages/NotFound";
 import Books from "./pages/Books";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminTransactions from "./pages/admin/AdminTransactions";
 import AdminVerifications from "./pages/admin/AdminVerifications";
 import AdminPayouts from "./pages/admin/AdminPayouts";
+import AdminFinance from "./pages/admin/AdminFinance";
+import AdminBonuses from "./pages/admin/AdminBonuses";
+import AdminSupport from "./pages/admin/AdminSupport";
+import AdminSettings from "./pages/admin/AdminSettings";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -87,8 +92,13 @@ const AnimatedRoutes = () => {
         <Route path="/books" element={<ProtectedRoute><DashboardLayout><PageWrapper><Books /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/admin/dashboard" element={<AdminRoute><DashboardLayout><PageWrapper><AdminDashboard /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/users" element={<AdminRoute><DashboardLayout><PageWrapper><AdminUsers /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/transactions" element={<AdminRoute><DashboardLayout><PageWrapper><AdminTransactions /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/verifications" element={<AdminRoute><DashboardLayout><PageWrapper><AdminVerifications /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/payouts" element={<AdminRoute><DashboardLayout><PageWrapper><AdminPayouts /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/finance" element={<AdminRoute><DashboardLayout><PageWrapper><AdminFinance /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/bonuses" element={<AdminRoute><DashboardLayout><PageWrapper><AdminBonuses /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/support" element={<AdminRoute><DashboardLayout><PageWrapper><AdminSupport /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/settings" element={<AdminRoute><DashboardLayout><PageWrapper><AdminSettings /></PageWrapper></DashboardLayout></AdminRoute>} />
 
         {/* Catch-all */}
         <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />

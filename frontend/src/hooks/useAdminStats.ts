@@ -6,7 +6,7 @@ export const useAdminStats = () => {
   return useQuery<AdminStats>({
     queryKey: ['adminStats'],
     queryFn: async () => {
-      const response = await api.get('/admin/stats');
+      const response = await api.get('/admin/analytics/dashboard');
       return response.data;
     },
   });

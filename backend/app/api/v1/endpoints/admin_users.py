@@ -255,3 +255,13 @@ def admin_get_overview_stats(
         "pending_payouts": float(pending_payouts),
         "total_bonuses_paid": float(total_bonuses)
     }
+
+@router.get("/verifications")
+def admin_get_verifications(
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Admin: Get all verification requests"""
+    from app.models.verification import UserVerification
+    verifications = db.query(UserVerification).order_by(UserVerification.created_at.desc()).all()
+    return verifications
