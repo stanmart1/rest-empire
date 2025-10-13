@@ -108,7 +108,7 @@ export const useRegister = () => {
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Registration successful! Please check your email for verification.",
+        description: "Registration successful!",
       });
     },
     onError: (error: any) => {

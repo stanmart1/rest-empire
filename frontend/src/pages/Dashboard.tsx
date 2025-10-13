@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const Dashboard = () => {
   const { toast } = useToast();
   const { user } = useAuth();
-  const { data: dashboardStats, isLoading: statsLoading } = useDashboardStats();
+  const { data: dashboardStats, isLoading: statsLoading, error: statsError } = useDashboardStats();
 
   const referralLink = user?.referral_code 
     ? `https://restempire.com/register?ref=${user.referral_code}`
@@ -29,6 +29,17 @@ const Dashboard = () => {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (statsError) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-red-500">Error loading dashboard</p>
+          <p className="text-sm text-muted-foreground mt-2">{statsError?.message || 'Unknown error'}</p>
+        </div>
       </div>
     );
   }

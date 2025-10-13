@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List, Optional
 from app.core.database import get_db
 from app.api.deps import get_current_user
@@ -38,7 +39,7 @@ def get_promo_stats(
     """Get promotional materials statistics"""
     total_materials = db.query(PromoMaterial).filter(PromoMaterial.is_active == True).count()
     total_downloads = db.query(PromoMaterial).with_entities(
-        db.func.sum(PromoMaterial.download_count)
+        func.sum(PromoMaterial.download_count)
     ).scalar() or 0
     
     # Materials by type

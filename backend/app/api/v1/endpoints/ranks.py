@@ -24,15 +24,24 @@ def get_user_rank_progress(
     db: Session = Depends(get_db)
 ):
     """Get user's rank progress"""
+    from app.models.rank import Rank
+    from fastapi import HTTPException
+    
     progress = get_rank_progress(db, current_user.id)
     
     if not progress:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Rank progress not found")
     
+    # Get rank objects
+    current_rank_obj = db.query(Rank).filter(Rank.name == progress["current_rank"]).first()
+    next_rank_obj = db.query(Rank).filter(Rank.name == progress.get("next_rank")).first() if progress.get("next_rank") else None
+    
+    if not current_rank_obj:
+        raise HTTPException(status_code=404, detail="Current rank not found")
+    
     return RankProgress(
-        current_rank=progress["current_rank"],
-        next_rank=progress.get("next_rank"),
+        current_rank=current_rank_obj,
+        next_rank=next_rank_obj,
         total_turnover=progress.get("total_turnover", 0),
         total_turnover_progress=progress.get("total_turnover_progress", 0),
         first_leg_turnover=progress.get("first_leg_turnover", 0),

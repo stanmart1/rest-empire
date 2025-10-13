@@ -49,7 +49,7 @@ class LegStats(BaseModel):
     percentage: float
 
 class TeamLegBreakdown(BaseModel):
-    first_leg: LegStats
-    second_leg: LegStats
-    other_legs_combined: LegStats
+    first_leg: Optional[LegStats]
+    second_leg: Optional[LegStats]
+    other_legs_combined: Optional[LegStats]
     all_legs: List[LegStats]
