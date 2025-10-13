@@ -6,12 +6,10 @@ from app.api.deps import get_current_user
 from app.models.user import User
 from app.models.payout import Payout, PayoutStatus
 from app.schemas.payout import (
-    PayoutRequest, PayoutResponse, PayoutStats,
+    PayoutRequest, PayoutResponse,
     BankAccountDetails, CryptoAccountDetails
 )
-from app.services.payout_service import (
-    create_payout_request, get_payout_stats
-)
+from app.services.payout_service import create_payout_request
 
 router = APIRouter()
 
@@ -67,15 +65,6 @@ def get_payouts(
     payouts = query.order_by(Payout.requested_at.desc()).offset(skip).limit(limit).all()
     
     return payouts
-
-@router.get("/stats", response_model=PayoutStats)
-def get_user_payout_stats(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    """Get payout statistics"""
-    stats = get_payout_stats(db, current_user.id)
-    return PayoutStats(**stats)
 
 @router.get("/{payout_id}", response_model=PayoutResponse)
 def get_payout_details(

@@ -10,6 +10,7 @@ class BonusResponse(BaseModel):
     status: str
     level: Optional[int]
     source_user_id: Optional[int]
+    source_user_name: Optional[str] = None
     rank_achieved: Optional[str]
     percentage: Optional[float]
     base_amount: Optional[float]
@@ -27,9 +28,4 @@ class BonusSummary(BaseModel):
     pending_bonuses: float
     paid_bonuses: float
 
-class BonusAnalytics(BaseModel):
-    period: str
-    total_earned: float
-    by_type: dict
-    top_earning_month: Optional[str]
-    growth_rate: Optional[float]
+

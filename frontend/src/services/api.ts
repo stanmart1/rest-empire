@@ -125,7 +125,7 @@ export const payoutAPI = {
     limit?: number;
     status?: string;
   }) => {
-    const response = await api.get('/payouts', { params });
+    const response = await api.get('/payouts/', { params });
     return response.data;
   },
 
@@ -135,7 +135,7 @@ export const payoutAPI = {
     method: string;
     account_details: string;
   }) => {
-    const response = await api.post('/payouts', data);
+    const response = await api.post('/payouts/request', data);
     return response.data;
   }
 };

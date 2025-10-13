@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, Coins, Clock, Loader2 } from 'lucide-react';
+import { TrendingUp, Coins, Clock, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import StatCard from '@/components/common/StatCard';
 import { formatCurrency, formatDate } from '@/utils/formatters';
 import { useBonuses, useBonusSummary } from '@/hooks/useApi';
@@ -10,14 +11,22 @@ import { Bonus } from '@/lib/types';
 
 const Bonuses = () => {
   const [activeTab, setActiveTab] = useState('all');
+  const [page, setPage] = useState(0);
+  const limit = 20;
   
   const { data: bonuses, isLoading: bonusesLoading } = useBonuses({
-    type: activeTab !== 'all' ? activeTab : undefined
+    type: activeTab !== 'all' ? activeTab : undefined,
+    page,
+    limit
   });
   
   const { data: summary, isLoading: summaryLoading } = useBonusSummary('30d');
 
   const isLoading = bonusesLoading || summaryLoading;
+
+  useEffect(() => {
+    setPage(0);
+  }, [activeTab]);
 
   if (isLoading) {
     return (
@@ -33,9 +42,9 @@ const Bonuses = () => {
   })) || [];
 
   const stats = {
-    totalEarned: summary?.total_earned || 0,
-    thisMonth: summary?.period_total || 0,
-    pending: summary?.pending_amount || 0,
+    totalEarned: summary?.paid_bonuses || 0,
+    thisMonth: summary?.total_bonuses || 0,
+    pending: summary?.pending_bonuses || 0,
   };
 
   return (
@@ -89,7 +98,7 @@ const Bonuses = () => {
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="unilevel">Unilevel</TabsTrigger>
-              <TabsTrigger value="rank">Rank</TabsTrigger>
+              <TabsTrigger value="rank_bonus">Rank</TabsTrigger>
               <TabsTrigger value="infinity">Infinity</TabsTrigger>
             </TabsList>
 
@@ -143,6 +152,32 @@ const Bonuses = () => {
                   <p className="text-center text-muted-foreground py-8">No bonuses found</p>
                 )}
               </div>
+              
+              {bonuses && bonuses.length >= limit && (
+                <div className="flex items-center justify-center gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(p => Math.max(0, p - 1))}
+                    disabled={page === 0}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Page {page + 1}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(p => p + 1)}
+                    disabled={bonuses.length < limit}
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>

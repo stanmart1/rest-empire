@@ -34,11 +34,4 @@ class PayoutResponse(BaseModel):
     class Config:
         from_attributes = True
 
-class PayoutStats(BaseModel):
-    total_payouts: float
-    pending_payouts: float
-    completed_payouts: float
-    rejected_payouts: float
-    available_balance_ngn: float
-    available_balance_usdt: float
-    minimum_payout: float
+

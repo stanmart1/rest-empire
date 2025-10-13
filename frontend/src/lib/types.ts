@@ -85,15 +85,16 @@ export interface TeamMember {
 export interface Payout {
   id: string;
   amount: number;
-  currency: 'EUR' | 'USDT' | 'DBSP';
-  method: 'bank' | 'crypto';
-  account_details: string;
+  currency: 'NGN' | 'USDT';
+  payout_method: 'bank_transfer' | 'crypto';
+  account_details: any;
   status: 'pending' | 'approved' | 'processing' | 'completed' | 'rejected';
-  fee: number;
+  processing_fee: number;
   net_amount: number;
   rejection_reason?: string;
-  created_at: string;
-  updated_at: string;
+  requested_at: string;
+  approved_at?: string;
+  completed_at?: string;
 }
 
 export interface Rank {

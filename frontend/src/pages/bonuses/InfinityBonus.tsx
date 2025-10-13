@@ -4,11 +4,25 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Infinity, TrendingUp } from 'lucide-react';
+import { Infinity, TrendingUp, Loader2 } from 'lucide-react';
 import RankBadge from '@/components/common/RankBadge';
+import { useBonuses, useBonusSummary, useRankProgress } from '@/hooks/useApi';
+import { formatCurrency, formatDate } from '@/utils/formatters';
+import { Bonus } from '@/lib/types';
 
 const InfinityBonus = () => {
   const [selectedMonth, setSelectedMonth] = useState('October 2025');
+  const { data: bonuses, isLoading: bonusesLoading } = useBonuses({ type: 'infinity' });
+  const { data: summary, isLoading: summaryLoading } = useBonusSummary('30d');
+  const { data: progress, isLoading: progressLoading } = useRankProgress();
+
+  if (bonusesLoading || summaryLoading || progressLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="h-12 w-12 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -73,7 +87,9 @@ const InfinityBonus = () => {
                 <CardTitle className="text-lg">Your bonus</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold mb-6">0</div>
+                <div className="text-4xl font-bold mb-6">
+                  {formatCurrency(summary?.infinity_bonuses || 0)}
+                </div>
               </CardContent>
             </Card>
 
@@ -129,7 +145,7 @@ const InfinityBonus = () => {
                   </div>
                 </div>
                 <div className="text-center mt-2">
-                  <RankBadge rank="Diamond" showLabel />
+                  {progress?.current_rank && <RankBadge rank={progress.current_rank.name} showLabel />}
                 </div>
               </CardContent>
             </Card>
@@ -140,25 +156,27 @@ const InfinityBonus = () => {
                 <CardTitle className="text-sm">Turnover</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">Progress</span>
-                    <span>0 / 0 EUR</span>
+                {progress?.next_rank && (
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">Progress</span>
+                      <span>₦{progress.total_turnover.toFixed(0)} / ₦{progress.next_rank.team_turnover_required.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span>{progress.overall_progress.toFixed(0)}%</span>
+                    </div>
+                    <div className="flex gap-1 mb-2">
+                      <Badge className="bg-success">{progress.first_leg_progress.toFixed(0)}%</Badge>
+                      <Badge className="bg-blue-500">{progress.second_leg_progress.toFixed(0)}%</Badge>
+                      <Badge className="bg-warning">{progress.other_legs_progress.toFixed(0)}%</Badge>
+                    </div>
+                    <div className="flex gap-2 text-xs text-muted-foreground">
+                      <span>■ First Leg (50% max)</span>
+                      <span>■ Second Leg (30% max)</span>
+                      <span>■ Other Legs</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>0%</span>
-                  </div>
-                  <div className="flex gap-1 mb-2">
-                    <Badge className="bg-success">0%</Badge>
-                    <Badge className="bg-blue-500">0%</Badge>
-                    <Badge className="bg-warning">0%</Badge>
-                  </div>
-                  <div className="flex gap-2 text-xs text-muted-foreground">
-                    <span>■ 50%</span>
-                    <span>■ 30%</span>
-                    <span>■ All Team</span>
-                  </div>
-                </div>
+                )}
                 <Button className="w-full">Leg Rules</Button>
               </CardContent>
             </Card>
@@ -171,15 +189,15 @@ const InfinityBonus = () => {
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">1st level</span>
-                  <span className="font-medium">0 EUR</span>
+                  <span className="font-medium">₦{progress?.first_leg_turnover?.toFixed(0) || '0'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">2nd level</span>
-                  <span className="font-medium">0 EUR</span>
+                  <span className="font-medium">₦{progress?.second_leg_turnover?.toFixed(0) || '0'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">3rd level</span>
-                  <span className="font-medium">0 EUR</span>
+                  <span className="font-medium">₦{progress?.other_legs_turnover?.toFixed(0) || '0'}</span>
                 </div>
               </CardContent>
             </Card>
@@ -236,8 +254,42 @@ const InfinityBonus = () => {
 
         <TabsContent value="history">
           <Card>
-            <CardContent className="py-16 text-center">
-              <p className="text-muted-foreground">No bonus history available</p>
+            <CardContent className="p-6">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-3 font-medium">Date</th>
+                      <th className="text-left p-3 font-medium">Rank</th>
+                      <th className="text-left p-3 font-medium">Source</th>
+                      <th className="text-right p-3 font-medium">Amount</th>
+                      <th className="text-center p-3 font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bonuses?.map((bonus: Bonus) => (
+                      <tr key={bonus.id} className="border-b hover:bg-muted/50">
+                        <td className="p-3 text-sm">{formatDate(bonus.created_at)}</td>
+                        <td className="p-3">
+                          {bonus.rank_achieved && <RankBadge rank={bonus.rank_achieved} size="sm" />}
+                        </td>
+                        <td className="p-3 text-sm">{bonus.source_user_name || 'N/A'}</td>
+                        <td className="p-3 text-right font-semibold text-success">
+                          {formatCurrency(bonus.amount, bonus.currency)}
+                        </td>
+                        <td className="p-3 text-center">
+                          <Badge variant={bonus.status === 'paid' ? 'default' : 'secondary'}>
+                            {bonus.status}
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {!bonuses?.length && (
+                  <p className="text-center text-muted-foreground py-8">No infinity bonus history available</p>
+                )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

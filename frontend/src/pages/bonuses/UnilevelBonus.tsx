@@ -1,8 +1,22 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, CheckCircle } from 'lucide-react';
+import { TrendingUp, CheckCircle, Loader2 } from 'lucide-react';
+import { useBonuses, useBonusSummary } from '@/hooks/useApi';
+import { formatCurrency, formatDate } from '@/utils/formatters';
+import { Bonus } from '@/lib/types';
 
 const UnilevelBonus = () => {
+  const { data: bonuses, isLoading: bonusesLoading } = useBonuses({ type: 'unilevel' });
+  const { data: summary, isLoading: summaryLoading } = useBonusSummary('30d');
+
+  if (bonusesLoading || summaryLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="h-12 w-12 animate-spin" />
+      </div>
+    );
+  }
+
   const distributionData = [
     { label: 'Direct bonus', level: 'Level 1', percentage: 40, color: 'bg-blue-600' },
     { label: 'Team Bonus', level: 'Level 2', percentage: 7, color: 'bg-purple-500' },
@@ -126,20 +140,69 @@ const UnilevelBonus = () => {
         </CardContent>
       </Card>
 
-      {/* Direct Bonus Section */}
+      {/* Bonus History */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-blue-600" />
             </div>
-            <CardTitle className="text-lg">Direct Bonus</CardTitle>
+            <CardTitle className="text-lg">Unilevel Bonus History</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">
-            Direct bonus information and details will be displayed here.
-          </p>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-muted-foreground mb-1">Total Earned</p>
+                <p className="text-2xl font-bold">{formatCurrency(summary?.unilevel_bonuses || 0)}</p>
+              </div>
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-muted-foreground mb-1">This Month</p>
+                <p className="text-2xl font-bold">{formatCurrency(summary?.total_bonuses || 0)}</p>
+              </div>
+              <div className="text-center p-4 bg-orange-50 rounded-lg">
+                <p className="text-sm text-muted-foreground mb-1">Total Bonuses</p>
+                <p className="text-2xl font-bold">{bonuses?.length || 0}</p>
+              </div>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-3 font-medium">Date</th>
+                    <th className="text-left p-3 font-medium">Level</th>
+                    <th className="text-left p-3 font-medium">Source</th>
+                    <th className="text-right p-3 font-medium">Amount</th>
+                    <th className="text-center p-3 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bonuses?.map((bonus: Bonus) => (
+                    <tr key={bonus.id} className="border-b hover:bg-muted/50">
+                      <td className="p-3 text-sm">{formatDate(bonus.created_at)}</td>
+                      <td className="p-3">
+                        <Badge variant="secondary">Level {bonus.level || 1}</Badge>
+                      </td>
+                      <td className="p-3 text-sm">{bonus.source_user_name || 'N/A'}</td>
+                      <td className="p-3 text-right font-semibold text-success">
+                        {formatCurrency(bonus.amount, bonus.currency)}
+                      </td>
+                      <td className="p-3 text-center">
+                        <Badge variant={bonus.status === 'paid' ? 'default' : 'secondary'}>
+                          {bonus.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {!bonuses?.length && (
+                <p className="text-center text-muted-foreground py-8">No unilevel bonuses yet</p>
+              )}
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
