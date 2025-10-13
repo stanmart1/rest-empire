@@ -1,4 +1,5 @@
-from pydantic_settings import BaseSettings
+from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
 
 class Settings(BaseSettings):
@@ -57,11 +58,21 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "Rest Empire API"
     DEBUG_MODE: bool = False
-    CORS_ORIGINS: List[str] = ["http://localhost:8080"]
+    CORS_ORIGINS: List[str] | str = ["http://localhost:8080"]
     API_V1_PREFIX: str = "/api/v1"
-    
-    class Config:
-        env_file = ".env"
-        extra = "ignore"
+
+    # ✅ Pydantic v2 config style
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    # ✅ Handles Coolify env var format
+    @field_validator("CORS_ORIGINS", mode="before")
+    def parse_cors_origins(cls, v):
+        if not v:
+            return []
+        if isinstance(v, str):
+            # Split comma-separated values and trim spaces
+            return [s.strip() for s in v.split(",") if s.strip()]
+        return v
+
 
 settings = Settings()
