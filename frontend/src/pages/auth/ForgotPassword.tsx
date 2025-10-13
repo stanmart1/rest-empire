@@ -27,12 +27,12 @@ const ForgotPassword = () => {
   const onSubmit = async (data: ForgotPasswordFormData) => {
     setIsLoading(true);
     try {
-      // TODO: Implement forgot password API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const authAPI = (await import('@/services/authApi')).default;
+      await authAPI.forgotPassword({ email: data.email });
       setEmailSent(true);
       toast.success('Password reset link sent to your email');
     } catch (error: any) {
-      toast.error('Failed to send reset link. Please try again.');
+      toast.error(error.response?.data?.detail || 'Failed to send reset link. Please try again.');
     } finally {
       setIsLoading(false);
     }

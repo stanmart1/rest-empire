@@ -1,6 +1,6 @@
 export interface DashboardStats {
-  balance_eur: number;
-  balance_dbsp: number;
+  balance_ngn: number;
+  balance_usdt: number;
   total_earnings: number;
   current_rank: string;
   team_size: number;

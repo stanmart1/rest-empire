@@ -17,7 +17,11 @@ import { motion, AnimatePresence } from 'motion/react';
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/\d/, 'Password must contain at least one number'),
   confirmPassword: z.string(),
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
@@ -57,7 +61,7 @@ const Register = () => {
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     try {
-      await registerUser({
+      const response = await registerUser({
         email: data.email,
         password: data.password,
         full_name: data.fullName,

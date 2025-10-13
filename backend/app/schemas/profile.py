@@ -11,8 +11,8 @@ class EmailChange(BaseModel):
     password: str
 
 class DashboardStats(BaseModel):
-    balance_eur: float
-    balance_dbsp: float
+    balance_ngn: float
+    balance_usdt: float
     total_earnings: float
     current_rank: str
     team_size: int

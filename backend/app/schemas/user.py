@@ -34,9 +34,13 @@ class UserResponse(UserBase):
     is_verified: bool
     is_active: bool
     current_rank: str
-    balance_eur: float
-    balance_dbsp: float
+    balance_ngn: float
+    balance_usdt: float
+    total_earnings: float
     referral_code: str
+    sponsor_id: Optional[int] = None
+    phone_number: Optional[str] = None
+    registration_date: datetime
     created_at: datetime
     
     class Config:

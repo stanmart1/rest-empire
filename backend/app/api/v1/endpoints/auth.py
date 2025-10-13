@@ -205,3 +205,26 @@ def reset_password(reset: PasswordReset, db: Session = Depends(get_db)):
     log_activity(db, user.id, "password_reset_completed")
     
     return {"message": "Password reset successfully"}
+
+@router.post("/resend-verification")
+async def resend_verification(email_data: PasswordResetRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == email_data.email).first()
+    
+    if not user:
+        return {"message": "If the email exists, a verification link has been sent"}
+    
+    if user.is_verified:
+        raise HTTPException(status_code=400, detail="Email already verified")
+    
+    # Generate new verification token
+    verification_token = generate_verification_token()
+    user.verification_token = verification_token
+    db.commit()
+    
+    # Log resend verification
+    log_activity(db, user.id, "verification_resent")
+    
+    # Send verification email
+    await send_verification_email(user.email, verification_token)
+    
+    return {"message": "If the email exists, a verification link has been sent"}

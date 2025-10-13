@@ -34,9 +34,20 @@ export interface LoginResponse {
 }
 
 export interface RegisterResponse {
-  message: string;
-  user: AuthUser;
-  verification_required: boolean;
+  id: number;
+  email: string;
+  full_name: string;
+  phone_number?: string;
+  current_rank: string;
+  is_verified: boolean;
+  is_active: boolean;
+  referral_code: string;
+  sponsor_id?: number;
+  registration_date: string;
+  balance_ngn: number;
+  balance_usdt: number;
+  total_earnings: number;
+  created_at: string;
 }
 
 export interface AuthUser {
@@ -50,8 +61,8 @@ export interface AuthUser {
   referral_code: string;
   sponsor_id?: number;
   registration_date: string;
-  balance_eur: number;
-  balance_dbsp: number;
+  balance_ngn: number;
+  balance_usdt: number;
   total_earnings: number;
 }
 

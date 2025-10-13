@@ -24,7 +24,7 @@ export const authAPI = {
 
   // Get current authenticated user
   getCurrentUser: async (): Promise<AuthUser> => {
-    const response = await api.get('/auth/me');
+    const response = await api.get('/users/me');
     return response.data;
   },
 
@@ -38,7 +38,7 @@ export const authAPI = {
 
   // Forgot password
   forgotPassword: async (data: ForgotPasswordRequest): Promise<{ message: string }> => {
-    const response = await api.post('/auth/forgot-password', data);
+    const response = await api.post('/auth/request-password-reset', data);
     return response.data;
   },
 
@@ -50,7 +50,7 @@ export const authAPI = {
 
   // Verify email
   verifyEmail: async (token: string): Promise<{ message: string }> => {
-    const response = await api.get(`/auth/verify-email?token=${token}`);
+    const response = await api.post('/auth/verify-email', { token });
     return response.data;
   },
 
@@ -60,10 +60,10 @@ export const authAPI = {
     return response.data;
   },
 
-  // Logout (if backend supports it)
+  // Logout (client-side only, no backend endpoint)
   logout: async (): Promise<{ message: string }> => {
-    const response = await api.post('/auth/logout');
-    return response.data;
+    // No backend endpoint, just return success
+    return { message: 'Logged out successfully' };
   }
 };
 

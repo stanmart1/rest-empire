@@ -111,11 +111,11 @@ def calculate_unilevel_bonus(db: Session, transaction_id: int):
         # Update user balance
         user = db.query(User).filter(User.id == active_member_id).first()
         if user:
-            if transaction.currency == "EUR":
-                user.balance_eur += bonus_amount
-            elif transaction.currency == "DBSP":
-                user.balance_dbsp += bonus_amount
-            user.total_earnings += bonus_amount
+            if transaction.currency == "NGN":
+                user.balance_ngn = (user.balance_ngn or 0) + bonus_amount
+            elif transaction.currency == "USDT":
+                user.balance_usdt = (user.balance_usdt or 0) + bonus_amount
+            user.total_earnings = (user.total_earnings or 0) + bonus_amount
         
         bonuses_created.append(bonus)
     
@@ -168,7 +168,7 @@ def calculate_infinity_bonus(db: Session, month: int, year: int):
             user_id=user.id,
             bonus_type=BonusType.infinity,
             amount=bonus_amount,
-            currency="EUR",
+            currency="NGN",
             status=BonusStatus.paid,
             rank_achieved=user.current_rank,
             percentage=percentage,
@@ -195,8 +195,11 @@ def calculate_infinity_bonus(db: Session, month: int, year: int):
         db.add(transaction)
         
         # Update balance
-        user.balance_eur += bonus_amount
-        user.total_earnings += bonus_amount
+        if bonus.currency == "NGN":
+            user.balance_ngn = (user.balance_ngn or 0) + bonus_amount
+        else:
+            user.balance_usdt = (user.balance_usdt or 0) + bonus_amount
+        user.total_earnings = (user.total_earnings or 0) + bonus_amount
         
         bonuses_created.append(bonus)
     
@@ -218,11 +221,11 @@ def reverse_bonuses(db: Session, transaction_id: int):
         # Reverse user balance
         user = db.query(User).filter(User.id == bonus.user_id).first()
         if user:
-            if bonus.currency == "EUR":
-                user.balance_eur -= float(bonus.amount)
-            elif bonus.currency == "DBSP":
-                user.balance_dbsp -= float(bonus.amount)
-            user.total_earnings -= float(bonus.amount)
+            if bonus.currency == "NGN":
+                user.balance_ngn = (user.balance_ngn or 0) - float(bonus.amount)
+            elif bonus.currency == "USDT":
+                user.balance_usdt = (user.balance_usdt or 0) - float(bonus.amount)
+            user.total_earnings = (user.total_earnings or 0) - float(bonus.amount)
         
         # Create reversal transaction
         reversal = Transaction(
