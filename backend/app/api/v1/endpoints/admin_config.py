@@ -123,22 +123,6 @@ def get_public_configs(db: Session = Depends(get_db)) -> Dict[str, str]:
     """Public: Get public configurations (no auth required)"""
     return get_all_configs(db, public_only=True)
 
-@router.post("/config/maintenance-mode")
-def admin_toggle_maintenance_mode(
-    enabled: bool,
-    admin: User = Depends(get_admin_user),
-    db: Session = Depends(get_db)
-):
-    """Admin: Toggle maintenance mode"""
-    set_config(db, "maintenance_mode", str(enabled).lower())
-    
-    log_activity(
-        db, admin.id, "maintenance_mode_toggled",
-        details={"enabled": enabled}
-    )
-    
-    return {"message": f"Maintenance mode {'enabled' if enabled else 'disabled'}"}
-
 @router.get("/config/settings/platform")
 def admin_get_platform_settings(
     admin: User = Depends(get_admin_user),
@@ -150,7 +134,6 @@ def admin_get_platform_settings(
         "min_payout_usdt": float(get_config(db, "min_payout_usdt", "10")),
         "payout_fee_ngn": float(get_config(db, "payout_fee_ngn", "1.5")),
         "payout_fee_usdt": float(get_config(db, "payout_fee_usdt", "2.0")),
-        "maintenance_mode": get_config(db, "maintenance_mode", "false") == "true",
         "registration_enabled": get_config(db, "registration_enabled", "true") == "true",
         "email_verification_required": get_config(db, "email_verification_required", "true") == "true",
         "max_referral_depth": int(get_config(db, "max_referral_depth", "15"))

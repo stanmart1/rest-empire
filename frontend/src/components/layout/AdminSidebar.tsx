@@ -10,6 +10,7 @@ import {
   HelpCircle,
   Settings,
   BookOpen,
+  Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,6 +36,7 @@ const AdminSidebar = () => {
     { to: '/admin/finance', icon: DollarSign, label: 'Finance' },
     { to: '/admin/bonuses', icon: Gift, label: 'Bonuses' },
     { to: '/admin/books', icon: BookOpen, label: 'Books' },
+    { to: '/admin/events', icon: Calendar, label: 'Events' },
     { to: '/admin/support', icon: HelpCircle, label: 'Support' },
     { to: '/admin/settings', icon: Settings, label: 'Settings' },
   ];
