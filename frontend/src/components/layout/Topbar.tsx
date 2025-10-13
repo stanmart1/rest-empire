@@ -60,6 +60,12 @@ const Topbar = () => {
             </DropdownMenuItem>
             <DropdownMenuItem 
               className="cursor-pointer"
+              onClick={() => navigate('/account-settings')}
+            >
+              Account Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="cursor-pointer"
               onClick={() => navigate('/team')}
             >
               Referral Link

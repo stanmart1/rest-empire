@@ -22,6 +22,7 @@ import Transactions from "./pages/Transactions";
 import Payouts from "./pages/Payouts";
 import Ranks from "./pages/Ranks";
 import Profile from "./pages/Profile";
+import AccountSettings from "./pages/AccountSettings";
 import Status from "./pages/Status";
 import Support from "./pages/Support";
 import Events from "./pages/Events";
@@ -72,6 +73,7 @@ const AnimatedRoutes = () => {
         <Route path="/payouts" element={<ProtectedRoute><DashboardLayout><PageWrapper><Payouts /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/ranks" element={<ProtectedRoute><DashboardLayout><PageWrapper><Ranks /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><DashboardLayout><PageWrapper><Profile /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/account-settings" element={<ProtectedRoute><DashboardLayout><PageWrapper><AccountSettings /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/status" element={<ProtectedRoute><DashboardLayout><PageWrapper><Status /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/events" element={<ProtectedRoute><DashboardLayout><PageWrapper><Events /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/promo-materials" element={<ProtectedRoute><DashboardLayout><PageWrapper><PromoMaterials /></PageWrapper></DashboardLayout></ProtectedRoute>} />

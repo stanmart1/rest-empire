@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,6 +19,16 @@ const Profile = () => {
   const [gender, setGender] = useState(user?.gender || '');
   const [dateOfBirth, setDateOfBirth] = useState(user?.date_of_birth ? new Date(user.date_of_birth).toISOString().split('T')[0] : '');
   const [occupation, setOccupation] = useState(user?.occupation || '');
+  
+  useEffect(() => {
+    if (user) {
+      setFullName(user.full_name || '');
+      setPhoneNumber(user.phone_number || '');
+      setGender(user.gender || '');
+      setDateOfBirth(user.date_of_birth ? new Date(user.date_of_birth).toISOString().split('T')[0] : '');
+      setOccupation(user.occupation || '');
+    }
+  }, [user]);
   
   const updateProfileMutation = useMutation({
     mutationFn: (data: { full_name?: string; phone_number?: string; gender?: string; date_of_birth?: string; occupation?: string }) =>

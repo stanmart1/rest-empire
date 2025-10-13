@@ -54,3 +54,4 @@ class User(Base):
     bonuses = relationship("Bonus", back_populates="user", foreign_keys="Bonus.user_id")
     payouts = relationship("Payout", back_populates="user", foreign_keys="Payout.user_id")
     support_tickets = relationship("SupportTicket", back_populates="user", foreign_keys="SupportTicket.user_id")
+    verifications = relationship("UserVerification", back_populates="user")
