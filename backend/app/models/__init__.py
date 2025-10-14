@@ -10,6 +10,7 @@ from app.models.legal import LegalDocument
 from app.models.notification import Notification, NotificationType
 from app.models.notification_preferences import NotificationPreferences
 from app.models.system_config import SystemConfig
+from app.models.crypto_signal import CryptoSignal, SignalType, SignalStatus
 
 __all__ = [
     "User", "UserRole",
@@ -23,5 +24,6 @@ __all__ = [
     "LegalDocument",
     "Notification", "NotificationType",
     "NotificationPreferences",
-    "SystemConfig"
+    "SystemConfig",
+    "CryptoSignal", "SignalType", "SignalStatus"
 ]

@@ -16,7 +16,8 @@ import {
   ChevronDown,
   ChevronRight,
   BookOpen,
-  Menu
+  Menu,
+  TrendingUp
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -42,6 +43,7 @@ const Sidebar = () => {
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/status', icon: Users, label: 'My Status' },
     { to: '/team', icon: Users, label: 'My Team' },
+    { to: '/crypto-signals', icon: TrendingUp, label: 'Crypto Signals' },
     { to: '/events', icon: Calendar, label: 'Our Events' },
     { to: '/promo-materials', icon: Megaphone, label: 'Promo Materials' },
     { to: '/books', icon: BookOpen, label: 'Books' },

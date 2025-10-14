@@ -34,6 +34,7 @@ import UnilevelBonus from "./pages/bonuses/UnilevelBonus";
 import InfinityBonus from "./pages/bonuses/InfinityBonus";
 import NotFound from "./pages/NotFound";
 import Books from "./pages/Books";
+import CryptoSignals from "./pages/CryptoSignals";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminTransactions from "./pages/admin/AdminTransactions";
@@ -41,6 +42,7 @@ import AdminVerifications from "./pages/admin/AdminVerifications";
 import AdminPayouts from "./pages/admin/AdminPayouts";
 import AdminFinance from "./pages/admin/AdminFinance";
 import AdminBonuses from "./pages/admin/AdminBonuses";
+import AdminCryptoSignals from "./pages/admin/AdminCryptoSignals";
 import AdminBooks from "./pages/admin/AdminBooks";
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminPromoMaterials from "./pages/admin/AdminPromoMaterials";
@@ -93,6 +95,7 @@ const AnimatedRoutes = () => {
         <Route path="/activation" element={<ProtectedRoute><DashboardLayout><PageWrapper><Activation /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/support" element={<ProtectedRoute><DashboardLayout><PageWrapper><Support /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/books" element={<ProtectedRoute><DashboardLayout><PageWrapper><Books /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/crypto-signals" element={<ProtectedRoute><DashboardLayout><PageWrapper><CryptoSignals /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/admin/dashboard" element={<AdminRoute><DashboardLayout><PageWrapper><AdminDashboard /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/users" element={<AdminRoute><DashboardLayout><PageWrapper><AdminUsers /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/transactions" element={<AdminRoute><DashboardLayout><PageWrapper><AdminTransactions /></PageWrapper></DashboardLayout></AdminRoute>} />
@@ -100,6 +103,7 @@ const AnimatedRoutes = () => {
         <Route path="/admin/payouts" element={<AdminRoute><DashboardLayout><PageWrapper><AdminPayouts /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/finance" element={<AdminRoute><DashboardLayout><PageWrapper><AdminFinance /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/bonuses" element={<AdminRoute><DashboardLayout><PageWrapper><AdminBonuses /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/crypto-signals" element={<AdminRoute><DashboardLayout><PageWrapper><AdminCryptoSignals /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/books" element={<AdminRoute><DashboardLayout><PageWrapper><AdminBooks /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/events" element={<AdminRoute><DashboardLayout><PageWrapper><AdminEvents /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/promo-materials" element={<AdminRoute><DashboardLayout><PageWrapper><AdminPromoMaterials /></PageWrapper></DashboardLayout></AdminRoute>} />
