@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,27 +9,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import api from '@/lib/api';
-
-interface CryptoSignal {
-  id: number;
-  coin: string;
-  signal_type: string;
-  entry_price: string;
-  target_price?: string;
-  stop_loss?: string;
-  current_price?: string;
-  status: string;
-  description?: string;
-  is_published: boolean;
-  created_at: string;
-}
+import { CryptoSignal } from '@/types/crypto-signals';
+import { useCryptoSignals, useCreateSignal, useUpdateSignal, useDeleteSignal } from '@/hooks/useCryptoSignals';
 
 const AdminCryptoSignals = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingSignal, setEditingSignal] = useState<CryptoSignal | null>(null);
-  const queryClient = useQueryClient();
+
+  const { data: signals = [], isLoading } = useCryptoSignals();
+  const createMutation = useCreateSignal();
+  const updateMutation = useUpdateSignal();
+  const deleteMutation = useDeleteSignal();
 
   const formatPrice = (price: string | undefined) => {
     if (!price) return '-';
@@ -38,65 +27,25 @@ const AdminCryptoSignals = () => {
     return num >= 1 ? `$${num.toFixed(2)}` : `$${num.toFixed(8)}`;
   };
 
-  const { data: signals = [], isLoading } = useQuery({
-    queryKey: ['admin-crypto-signals'],
-    queryFn: async () => {
-      const response = await api.get('/crypto/signals');
-      return response.data;
-    }
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await api.post('/crypto/signals', data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-crypto-signals'] });
-      setIsCreateOpen(false);
-      toast.success('Signal created successfully');
-    }
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      const response = await api.put(`/crypto/signals/${id}`, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-crypto-signals'] });
-      setEditingSignal(null);
-      toast.success('Signal updated successfully');
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await api.delete(`/crypto/signals/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-crypto-signals'] });
-      toast.success('Signal deleted successfully');
-    }
-  });
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const data = {
-      coin: formData.get('coin'),
-      signal_type: formData.get('signal_type'),
-      entry_price: formData.get('entry_price'),
-      target_price: formData.get('target_price') || null,
-      stop_loss: formData.get('stop_loss') || null,
-      description: formData.get('description') || null,
+      coin: formData.get('coin') as string,
+      signal_type: formData.get('signal_type') as string,
+      entry_price: formData.get('entry_price') as string,
+      target_price: (formData.get('target_price') as string) || undefined,
+      stop_loss: (formData.get('stop_loss') as string) || undefined,
+      description: (formData.get('description') as string) || undefined,
       is_published: formData.get('is_published') === 'true'
     };
 
     if (editingSignal) {
       updateMutation.mutate({ id: editingSignal.id, data });
+      setEditingSignal(null);
     } else {
       createMutation.mutate(data);
+      setIsCreateOpen(false);
     }
   };
 
@@ -112,7 +61,7 @@ const AdminCryptoSignals = () => {
             <DialogHeader>
               <DialogTitle>Create Crypto Signal</DialogTitle>
             </DialogHeader>
-            <SignalForm onSubmit={handleSubmit} />
+            <SignalForm onSubmit={handleSubmit} isLoading={createMutation.isPending} />
           </DialogContent>
         </Dialog>
       </div>
@@ -155,7 +104,7 @@ const AdminCryptoSignals = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {signals.map((signal: CryptoSignal) => (
+                {signals.map((signal) => (
                   <TableRow key={signal.id}>
                     <TableCell className="font-medium">{signal.coin}</TableCell>
                     <TableCell>
@@ -193,7 +142,7 @@ const AdminCryptoSignals = () => {
             <DialogHeader>
               <DialogTitle>Edit Signal</DialogTitle>
             </DialogHeader>
-            <SignalForm onSubmit={handleSubmit} signal={editingSignal} />
+            <SignalForm onSubmit={handleSubmit} signal={editingSignal} isLoading={updateMutation.isPending} />
           </DialogContent>
         </Dialog>
       )}
@@ -201,28 +150,24 @@ const AdminCryptoSignals = () => {
   );
 };
 
-const SignalForm = ({ onSubmit, signal }: { onSubmit: (e: React.FormEvent<HTMLFormElement>) => void; signal?: CryptoSignal | null }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      await onSubmit(e);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
+const SignalForm = ({ 
+  onSubmit, 
+  signal, 
+  isLoading 
+}: { 
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void; 
+  signal?: CryptoSignal | null;
+  isLoading: boolean;
+}) => {
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-4">
       <div>
         <Label>Coin</Label>
-        <Input name="coin" defaultValue={signal?.coin} placeholder="USDT" required disabled={isSubmitting} />
+        <Input name="coin" defaultValue={signal?.coin} placeholder="BTC/USDT" required disabled={isLoading} />
       </div>
       <div>
         <Label>Signal Type</Label>
-        <Select name="signal_type" defaultValue={signal?.signal_type || 'buy'} disabled={isSubmitting}>
+        <Select name="signal_type" defaultValue={signal?.signal_type || 'buy'} disabled={isLoading}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -235,23 +180,23 @@ const SignalForm = ({ onSubmit, signal }: { onSubmit: (e: React.FormEvent<HTMLFo
       </div>
       <div>
         <Label>Entry Price</Label>
-        <Input name="entry_price" type="number" step="0.00000001" defaultValue={signal?.entry_price} required disabled={isSubmitting} />
+        <Input name="entry_price" type="number" step="0.00000001" defaultValue={signal?.entry_price} required disabled={isLoading} />
       </div>
       <div>
         <Label>Target Price</Label>
-        <Input name="target_price" type="number" step="0.00000001" defaultValue={signal?.target_price} disabled={isSubmitting} />
+        <Input name="target_price" type="number" step="0.00000001" defaultValue={signal?.target_price} disabled={isLoading} />
       </div>
       <div>
         <Label>Stop Loss</Label>
-        <Input name="stop_loss" type="number" step="0.00000001" defaultValue={signal?.stop_loss} disabled={isSubmitting} />
+        <Input name="stop_loss" type="number" step="0.00000001" defaultValue={signal?.stop_loss} disabled={isLoading} />
       </div>
       <div>
         <Label>Description</Label>
-        <Textarea name="description" defaultValue={signal?.description} disabled={isSubmitting} />
+        <Textarea name="description" defaultValue={signal?.description} disabled={isLoading} />
       </div>
       <div>
         <Label>Publish</Label>
-        <Select name="is_published" defaultValue={signal?.is_published ? 'true' : 'false'} disabled={isSubmitting}>
+        <Select name="is_published" defaultValue={signal?.is_published ? 'true' : 'false'} disabled={isLoading}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -261,9 +206,9 @@ const SignalForm = ({ onSubmit, signal }: { onSubmit: (e: React.FormEvent<HTMLFo
           </SelectContent>
         </Select>
       </div>
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-        {isSubmitting ? 'Saving...' : 'Save Signal'}
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+        {isLoading ? 'Saving...' : 'Save Signal'}
       </Button>
     </form>
   );

@@ -1,36 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Target, AlertTriangle, TrendingUpIcon } from 'lucide-react';
-import api from '@/lib/api';
-
-interface CryptoSignal {
-  id: number;
-  coin: string;
-  signal_type: string;
-  entry_price: string;
-  target_price?: string;
-  stop_loss?: string;
-  current_price?: string;
-  status: string;
-  description?: string;
-  created_at: string;
-}
+import { CryptoSignal } from '@/types/crypto-signals';
+import { usePublishedSignals } from '@/hooks/useCryptoSignals';
 
 const CryptoSignals = () => {
+  const { data: signals = [], isLoading } = usePublishedSignals();
+
   const formatPrice = (price: string | undefined) => {
     if (!price) return '-';
     const num = parseFloat(price);
     return num >= 1 ? `$${num.toFixed(2)}` : `$${num.toFixed(8)}`;
   };
-
-  const { data: signals = [], isLoading } = useQuery({
-    queryKey: ['crypto-signals'],
-    queryFn: async () => {
-      const response = await api.get('/crypto/signals/published');
-      return response.data;
-    }
-  });
 
   return (
     <div className="space-y-6">
