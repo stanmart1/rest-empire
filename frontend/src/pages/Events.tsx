@@ -11,14 +11,26 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiService from '@/services/api';
 import { Event } from '@/types/events';
 import EventDetailModal from '@/components/events/EventDetailModal';
+import EventRegistrationModal from '@/components/events/EventRegistrationModal';
+import EventQRCodeModal from '@/components/events/EventQRCodeModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Events = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [eventTypeFilter, setEventTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [isQRCodeModalOpen, setIsQRCodeModalOpen] = useState(false);
+  const [registeringEvent, setRegisteringEvent] = useState<Event | null>(null);
+  const [registrationData, setRegistrationData] = useState({
+    full_name: '',
+    email: '',
+    phone: '',
+  });
 
   const { data: allEvents, isLoading: allEventsLoading } = useEvents({
     event_type: eventTypeFilter !== 'all' ? eventTypeFilter : undefined,
@@ -33,6 +45,13 @@ const Events = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       queryClient.invalidateQueries({ queryKey: ['my-events'] });
+      queryClient.invalidateQueries({ queryKey: ['event-stats'] });
+      setIsRegisterModalOpen(false);
+      setRegistrationData({ full_name: '', email: '', phone: '' });
+      
+      // Show QR code modal
+      setIsQRCodeModalOpen(true);
+      
       toast({
         title: "Success",
         description: "Successfully registered for event",
@@ -47,11 +66,22 @@ const Events = () => {
     },
   });
 
+  const handleRegisterClick = (event: Event) => {
+    setRegisteringEvent(event);
+    setRegistrationData({
+      full_name: user?.full_name || '',
+      email: user?.email || '',
+      phone: user?.phone_number || '',
+    });
+    setIsRegisterModalOpen(true);
+  };
+
   const unregisterMutation = useMutation({
     mutationFn: (eventId: number) => apiService.events.unregisterFromEvent(eventId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       queryClient.invalidateQueries({ queryKey: ['my-events'] });
+      queryClient.invalidateQueries({ queryKey: ['event-stats'] });
       toast({
         title: "Success",
         description: "Successfully unregistered from event",
@@ -192,7 +222,7 @@ const Events = () => {
             View Details
           </Button>
           
-          {event.registration_required && event.status === 'upcoming' && (
+          {event.registration_required && (event.status === 'upcoming' || event.status === 'ongoing') && (
             <>
               {event.is_registered ? (
                 <Button
@@ -210,14 +240,10 @@ const Events = () => {
               ) : (
                 <Button
                   size="sm"
-                  onClick={() => registerMutation.mutate(event.id)}
+                  onClick={() => handleRegisterClick(event)}
                   disabled={registerMutation.isPending}
                 >
-                  {registerMutation.isPending ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    'Register'
-                  )}
+                  Register
                 </Button>
               )}
               
@@ -242,10 +268,31 @@ const Events = () => {
         event={selectedEvent}
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
-        onRegister={(eventId) => registerMutation.mutate(eventId)}
+        onRegister={handleRegisterClick}
         onUnregister={(eventId) => unregisterMutation.mutate(eventId)}
         isRegistering={registerMutation.isPending}
         isUnregistering={unregisterMutation.isPending}
+      />
+
+      <EventRegistrationModal
+        event={registeringEvent}
+        isOpen={isRegisterModalOpen}
+        onClose={() => {
+          setIsRegisterModalOpen(false);
+          setRegisteringEvent(null);
+        }}
+        onSubmit={(eventId) => registerMutation.mutate(eventId)}
+        isSubmitting={registerMutation.isPending}
+        defaultData={registrationData}
+      />
+
+      <EventQRCodeModal
+        event={registeringEvent}
+        isOpen={isQRCodeModalOpen}
+        onClose={() => {
+          setIsQRCodeModalOpen(false);
+          setRegisteringEvent(null);
+        }}
       />
       
       <div className="space-y-6">

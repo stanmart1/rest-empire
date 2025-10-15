@@ -1,14 +1,15 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, MapPin, Users, Video, ExternalLink, Loader2 } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, Video, ExternalLink, Loader2, Download } from 'lucide-react';
 import { Event } from '@/types/events';
+import { useEventQRCode } from '@/hooks/useEventQRCode';
 
 interface EventDetailModalProps {
   event: Event | null;
   isOpen: boolean;
   onClose: () => void;
-  onRegister?: (eventId: number) => void;
+  onRegister?: (event: Event) => void;
   onUnregister?: (eventId: number) => void;
   isRegistering?: boolean;
   isUnregistering?: boolean;
@@ -23,7 +24,13 @@ const EventDetailModal = ({
   isRegistering,
   isUnregistering,
 }: EventDetailModalProps) => {
+  const { qrCodeDataUrl, isLoading: qrLoading, downloadQRCode } = useEventQRCode(event, isOpen && event?.is_registered);
+  
   if (!event) return null;
+
+  const isExpired = event.end_date 
+    ? new Date(event.end_date) < new Date() 
+    : new Date(event.start_date) < new Date();
 
   const getEventTypeColor = (type: string) => {
     const colors = {
@@ -172,7 +179,67 @@ const EventDetailModal = ({
             )}
           </div>
 
-          {event.registration_required && event.status === 'upcoming' && (
+          {event.is_registered && (
+            <div className="pt-4 border-t">
+              <h3 className="font-semibold mb-3">Your QR Code</h3>
+              <div className="flex flex-col items-center gap-3">
+                <div className="relative">
+                  <div className="flex justify-center p-4 bg-white rounded-lg border">
+                    {qrCodeDataUrl ? (
+                      <img 
+                        src={qrCodeDataUrl} 
+                        alt="Event QR Code"
+                        className="w-48 h-48"
+                      />
+                    ) : (
+                      <div className="w-48 h-48 flex items-center justify-center">
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                      </div>
+                    )}
+                  </div>
+                  {isExpired && qrCodeDataUrl && (
+                    <div className="absolute inset-0 bg-red-500/80 rounded-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-lg">QR Code Expired</span>
+                    </div>
+                  )}
+                </div>
+                
+                {!isExpired && qrCodeDataUrl && (
+                  <div className="flex gap-2 w-full">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => downloadQRCode('png')}
+                      disabled={qrLoading}
+                    >
+                      {qrLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+                      PNG
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => downloadQRCode('svg')}
+                      disabled={qrLoading}
+                    >
+                      {qrLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+                      SVG
+                    </Button>
+                  </div>
+                )}
+                
+                <p className="text-xs text-muted-foreground text-center">
+                  {isExpired 
+                    ? 'This QR code has expired' 
+                    : `Valid until: ${event.end_date ? new Date(event.end_date).toLocaleDateString() : new Date(event.start_date).toLocaleDateString()}`
+                  }
+                </p>
+              </div>
+            </div>
+          )}
+
+          {event.registration_required && (event.status === 'upcoming' || event.status === 'ongoing') && (
             <div className="flex gap-2 pt-4 border-t">
               {event.is_registered ? (
                 <Button
@@ -188,7 +255,7 @@ const EventDetailModal = ({
                 </Button>
               ) : (
                 <Button
-                  onClick={() => onRegister?.(event.id)}
+                  onClick={() => onRegister?.(event)}
                   disabled={isRegistering}
                   className="flex-1"
                 >

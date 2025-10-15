@@ -397,6 +397,14 @@ const AdminEvents = () => {
                           <Button
                             variant="ghost"
                             size="icon"
+                            onClick={() => handleViewAttendees(event)}
+                            title="View Registrations"
+                          >
+                            <UserCheck className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => handleEdit(event)}
                           >
                             <Edit className="h-4 w-4" />
@@ -454,21 +462,30 @@ const AdminEvents = () => {
                       variant="outline"
                       size="sm"
                       className="flex-1"
+                      onClick={() => handleViewAttendees(event)}
+                    >
+                      <UserCheck className="h-4 w-4 mr-2" />
+                      Registrations
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
                       onClick={() => handleEdit(event)}
                     >
                       <Edit className="h-4 w-4 mr-2" />
                       Edit
                     </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => deleteMutation.mutate(event.id)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
-                    </Button>
                   </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => deleteMutation.mutate(event.id)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
                 </div>
               ))
             )}
@@ -602,6 +619,58 @@ const AdminEvents = () => {
               {updateMutation.isPending ? 'Updating...' : 'Update Event'}
             </Button>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Attendees Dialog */}
+      <Dialog open={attendeesDialogOpen} onOpenChange={(open) => {
+        setAttendeesDialogOpen(open);
+        if (!open) setSelectedEvent(null);
+      }}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Event Registrations - {selectedEvent?.title}</DialogTitle>
+            <DialogDescription>
+              {selectedEvent?.current_attendees || 0} registered attendees
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto">
+            {attendeesLoading ? (
+              <div className="py-8 text-center">
+                <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+                <p className="text-muted-foreground">Loading attendees...</p>
+              </div>
+            ) : attendees.length === 0 ? (
+              <div className="py-8 text-center text-muted-foreground">
+                No registrations yet
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Registered</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {attendees.map((attendee) => (
+                    <TableRow key={attendee.id}>
+                      <TableCell>{attendee.user?.full_name || 'N/A'}</TableCell>
+                      <TableCell>{attendee.user?.email || 'N/A'}</TableCell>
+                      <TableCell>{new Date(attendee.registered_at).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <Badge variant={attendee.attendance_status === 'attended' ? 'default' : 'outline'}>
+                          {attendee.attendance_status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

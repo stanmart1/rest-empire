@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   TrendingUp,
+  Package,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -43,6 +44,7 @@ const AdminSidebar = () => {
     { to: '/admin/payouts', icon: CreditCard, label: 'Payouts' },
     { to: '/admin/finance', icon: DollarSign, label: 'Finance' },
     { to: '/admin/bonuses', icon: Gift, label: 'Bonuses' },
+    { to: '/admin/activation-packages', icon: Package, label: 'Activation Packages' },
     { to: '/admin/crypto-signals', icon: TrendingUp, label: 'Crypto Signals' },
     { to: '/admin/books', icon: BookOpen, label: 'Books' },
     { to: '/admin/events', icon: Calendar, label: 'Events' },

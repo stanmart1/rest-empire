@@ -160,7 +160,8 @@ def get_user_events(db: Session, user_id: int, upcoming_only: bool = False) -> L
     )
     
     if upcoming_only:
-        query = query.filter(Event.start_date > datetime.utcnow())
+        # Include both upcoming and ongoing events, exclude completed and cancelled
+        query = query.filter(Event.status.in_(['upcoming', 'ongoing']))
     
     return query.order_by(Event.start_date.asc()).all()
 

@@ -48,6 +48,7 @@ import AdminEvents from "./pages/admin/AdminEvents";
 import AdminPromoMaterials from "./pages/admin/AdminPromoMaterials";
 import AdminSupport from "./pages/admin/AdminSupport";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminActivationPackages from "./pages/admin/AdminActivationPackages";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -104,6 +105,7 @@ const AnimatedRoutes = () => {
         <Route path="/admin/finance" element={<AdminRoute><DashboardLayout><PageWrapper><AdminFinance /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/bonuses" element={<AdminRoute><DashboardLayout><PageWrapper><AdminBonuses /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/crypto-signals" element={<AdminRoute><DashboardLayout><PageWrapper><AdminCryptoSignals /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/activation-packages" element={<AdminRoute><DashboardLayout><PageWrapper><AdminActivationPackages /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/books" element={<AdminRoute><DashboardLayout><PageWrapper><AdminBooks /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/events" element={<AdminRoute><DashboardLayout><PageWrapper><AdminEvents /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/promo-materials" element={<AdminRoute><DashboardLayout><PageWrapper><AdminPromoMaterials /></PageWrapper></DashboardLayout></AdminRoute>} />

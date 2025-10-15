@@ -36,3 +36,6 @@ httpx==0.28.1
 # Additional
 python-dotenv==1.0.1
 requests==2.32.3
+qrcode[pil]==7.4.2
+pillow==10.4.0
+python-slugify==8.0.1

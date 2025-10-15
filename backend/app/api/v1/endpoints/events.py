@@ -1,6 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from io import BytesIO
+import qrcode
+import qrcode.image.svg
+import json
+from datetime import datetime
 from app.core.database import get_db
 from app.api.deps import get_current_user
 from app.models.user import User
@@ -174,3 +180,62 @@ def update_user_attendance(
         raise HTTPException(status_code=404, detail="Registration not found")
     
     return {"message": "Attendance status updated successfully"}
+
+@router.get("/{event_id}/qrcode")
+def get_event_qrcode(
+    event_id: int,
+    format: str = Query("png", regex="^(png|svg)$"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Generate QR code for event registration"""
+    # Check if user is registered
+    event = get_event_by_id(db, event_id, current_user.id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    if not event.is_registered:
+        raise HTTPException(status_code=403, detail="You must be registered for this event")
+    
+    # Create QR code data
+    qr_data = {
+        "event_id": event_id,
+        "user_id": current_user.id,
+        "user_name": current_user.full_name,
+        "event_title": event.title,
+        "registration_code": f"EVT-{event_id}-USR-{current_user.id}",
+        "expires_at": event.end_date.isoformat() if event.end_date else event.start_date.isoformat()
+    }
+    
+    # Generate QR code
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(json.dumps(qr_data))
+    qr.make(fit=True)
+    
+    # Create filename from event title
+    safe_title = "".join(c for c in event.title if c.isalnum() or c in (' ', '-', '_')).strip()
+    safe_title = safe_title.replace(' ', '-')
+    filename = f"{safe_title}{event_id}.{format}"
+    
+    # Create image based on format
+    if format == "svg":
+        factory = qrcode.image.svg.SvgPathImage
+        img = qr.make_image(image_factory=factory)
+        buffer = BytesIO()
+        img.save(buffer)
+        buffer.seek(0)
+        return StreamingResponse(
+            buffer, 
+            media_type="image/svg+xml",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+        )
+    else:
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        buffer.seek(0)
+        return StreamingResponse(
+            buffer, 
+            media_type="image/png",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+        )
