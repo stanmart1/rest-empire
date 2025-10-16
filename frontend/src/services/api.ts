@@ -260,6 +260,11 @@ export const activationAPI = {
   requestActivation: async (data: { package_id: number; payment_method: string }) => {
     const response = await api.post('/activation/request', data);
     return response.data;
+  },
+
+  linkTransaction: async (transactionId: number) => {
+    const response = await api.post(`/activation/link-transaction/${transactionId}`);
+    return response.data;
   }
 };
 
@@ -281,6 +286,41 @@ export const supportAPI = {
   }
 };
 
+// Payment API
+export const paymentAPI = {
+  getMethods: async () => {
+    const response = await api.get('/payments/methods');
+    return response.data;
+  },
+
+  initiatePayment: async (data: {
+    amount: number;
+    currency: string;
+    payment_method: string;
+  }) => {
+    const response = await api.post('/payments/initiate', data);
+    return response.data;
+  },
+
+  uploadProof: async (transactionId: number, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post(`/payments/upload-proof/${transactionId}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
+  verifyPayment: async (data: {
+    transaction_id: number;
+    payment_reference?: string;
+    transaction_hash?: string;
+  }) => {
+    const response = await api.post('/payments/verify', data);
+    return response.data;
+  }
+};
+
 export default {
   auth: authAPI,
   user: userAPI,
@@ -293,5 +333,7 @@ export default {
   promoMaterials: promoMaterialsAPI,
   books: booksAPI,
   activation: activationAPI,
-  support: supportAPI
+  support: supportAPI,
+  payment: paymentAPI,
+  activation: activationAPI
 };

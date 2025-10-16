@@ -8,40 +8,96 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiService from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 import { ActivationPackage, UserActivation } from '@/types/activation';
+import PaymentMethodModal from '@/components/activation/PaymentMethodModal';
+import BankTransferModal from '@/components/activation/BankTransferModal';
 
 const Activation = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<ActivationPackage | null>(null);
+  const [paymentMethodModalOpen, setPaymentMethodModalOpen] = useState(false);
+  const [bankTransferModalOpen, setBankTransferModalOpen] = useState(false);
+  const [paymentData, setPaymentData] = useState<any>(null);
 
   const { data: packages, isLoading: packagesLoading } = useActivationPackages();
   const { data: status, isLoading: statusLoading } = useActivationStatus();
 
-  const activationMutation = useMutation({
-    mutationFn: (data: { package_id: number; payment_method: string }) =>
-      apiService.activation.requestActivation(data),
-    onSuccess: (data) => {
-      toast({
-        title: "Activation Requested",
-        description: data.message,
+  const handlePackageSelect = (pkg: ActivationPackage) => {
+    setSelectedPackage(pkg);
+    setPaymentMethodModalOpen(true);
+  };
+
+  const handlePaymentMethodSelected = async (method: string, data: any) => {
+    setPaymentData(data);
+    setPaymentMethodModalOpen(false);
+
+    // Create activation request
+    try {
+      await apiService.activation.requestActivation({
+        package_id: selectedPackage!.id,
+        payment_method: method
       });
-      queryClient.invalidateQueries({ queryKey: ['activation-status'] });
-      setSelectedPackage(null);
-    },
-    onError: (error: any) => {
+      
+      // Link transaction to activation
+      if (data.transaction_id) {
+        await apiService.activation.linkTransaction(data.transaction_id);
+      }
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: error.response?.data?.detail || "Failed to request activation",
+        description: error.response?.data?.detail || "Failed to create activation request",
         variant: "destructive",
       });
-    },
-  });
+      return;
+    }
 
-  const handleActivationRequest = (packageId: number) => {
-    activationMutation.mutate({
-      package_id: packageId,
-      payment_method: 'manual'
+    if (method === 'bank_transfer') {
+      setBankTransferModalOpen(true);
+    } else if (method === 'gtpay') {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = data.payment_data.gateway_url;
+      form.target = '_blank';
+      
+      Object.keys(data.payment_data).forEach(key => {
+        if (key !== 'gateway_url') {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = data.payment_data[key];
+          form.appendChild(input);
+        }
+      });
+      
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+      
+      toast({
+        title: "Redirecting",
+        description: "Opening payment gateway...",
+      });
+    } else if (method === 'providus') {
+      toast({
+        title: "Account Generated",
+        description: `Transfer to ${data.payment_data.account_number}`,
+      });
+    } else if (method === 'crypto') {
+      toast({
+        title: "Crypto Address",
+        description: data.payment_data.wallet_address,
+      });
+    }
+  };
+
+  const handlePaymentSuccess = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['activation-status'] });
+    toast({
+      title: "Success",
+      description: "Payment proof submitted. Awaiting admin confirmation.",
     });
+    setSelectedPackage(null);
+    setPaymentData(null);
   };
 
   const getStatusIcon = (status?: string) => {
@@ -187,12 +243,9 @@ const Activation = () => {
                   <Button 
                     className="w-full"
                     variant={pkg.slug === 'professional' ? 'default' : 'outline'}
-                    onClick={() => handleActivationRequest(pkg.id)}
-                    disabled={activationMutation.isPending || status?.status === 'pending_payment'}
+                    onClick={() => handlePackageSelect(pkg)}
+                    disabled={status?.status === 'pending_payment'}
                   >
-                    {activationMutation.isPending ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : null}
                     {status?.status === 'pending_payment' ? 'Payment Pending' : 'Select Package'}
                   </Button>
                 </CardContent>
@@ -261,6 +314,31 @@ const Activation = () => {
             </ul>
           </CardContent>
         </Card>
+      )}
+
+      {/* Payment Method Modal */}
+      {selectedPackage && (
+        <PaymentMethodModal
+          open={paymentMethodModalOpen}
+          onClose={() => {
+            setPaymentMethodModalOpen(false);
+            setSelectedPackage(null);
+          }}
+          packageId={selectedPackage.id}
+          amount={selectedPackage.price}
+          currency={selectedPackage.currency}
+          onMethodSelected={handlePaymentMethodSelected}
+        />
+      )}
+
+      {/* Bank Transfer Modal */}
+      {paymentData && (
+        <BankTransferModal
+          open={bankTransferModalOpen}
+          onClose={() => setBankTransferModalOpen(false)}
+          paymentData={paymentData}
+          onSuccess={handlePaymentSuccess}
+        />
       )}
     </div>
   );

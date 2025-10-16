@@ -62,7 +62,7 @@ def request_activation(
     # Get package info
     package = db.query(ActivationPackage).filter(
         ActivationPackage.id == request.package_id,
-        ActivationPackage.is_active == True
+        ActivationPackage.is_active.is_(True)
     ).first()
     
     if not package:
@@ -90,6 +90,37 @@ def request_activation(
         "message": "Activation request created. Please complete payment to activate your account.",
         "package": package.name,
         "amount": package.price,
-        "currency": package.currency,
-        "payment_instructions": "Please contact support to complete your payment and activate your account."
+        "currency": package.currency
     }
+
+@router.post("/link-transaction/{transaction_id}")
+def link_transaction_to_activation(
+    transaction_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Link payment transaction to activation record"""
+    from app.models.transaction import Transaction
+    
+    # Verify transaction belongs to user
+    transaction = db.query(Transaction).filter(
+        Transaction.id == transaction_id,
+        Transaction.user_id == current_user.id
+    ).first()
+    
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    # Get user's activation record
+    activation = db.query(UserActivation).filter(
+        UserActivation.user_id == current_user.id
+    ).first()
+    
+    if not activation:
+        raise HTTPException(status_code=404, detail="Activation record not found")
+    
+    # Link transaction to activation
+    activation.payment_transaction_id = transaction_id
+    db.commit()
+    
+    return {"message": "Transaction linked successfully"}

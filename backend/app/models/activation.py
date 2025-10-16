@@ -23,7 +23,7 @@ class UserActivation(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
-    package_id = Column(Integer, ForeignKey("activation_packages.id"), nullable=True)
+    package_id = Column(Integer, ForeignKey("activation_packages.id", ondelete="SET NULL"), nullable=True)
     status = Column(String(20), default="inactive", index=True)
     activation_fee = Column(Float, nullable=True)
     payment_transaction_id = Column(Integer, ForeignKey("transactions.id"), nullable=True)
