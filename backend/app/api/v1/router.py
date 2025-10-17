@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from app.api.v1.endpoints import (
     auth, users, transactions, team, ranks, bonuses, 
-    admin, admin_users, admin_bonuses, admin_support, admin_analytics, admin_config, admin_books, admin_promo_materials, admin_activation, admin_bonus, admin_email,
-    payments, payouts, notifications, events, promo_materials, books, activation, support, verification, crypto_signals, dashboard
+    admin, admin_users, admin_bonuses, admin_support, admin_analytics, admin_config, admin_books, admin_promo_materials, admin_activation, admin_bonus, admin_email, admin_videos,
+    payments, payouts, notifications, events, promo_materials, books, activation, support, verification, crypto_signals, dashboard, videos
 )
 
 api_router = APIRouter()
@@ -23,15 +23,18 @@ api_router.include_router(activation.router, prefix="/activation", tags=["Activa
 api_router.include_router(support.router, prefix="/support", tags=["Support"])
 api_router.include_router(verification.router, prefix="/verification", tags=["Verification"])
 api_router.include_router(crypto_signals.router, prefix="/crypto", tags=["Crypto Signals"])
+api_router.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard"])
+api_router.include_router(videos.router, prefix="/videos", tags=["Videos"])
+api_router.include_router(admin_videos.router, prefix="/admin/videos", tags=["Admin - Videos"])
+api_router.include_router(admin_config.router, prefix="/admin/config", tags=["Admin - Configuration"])
+api_router.include_router(admin_bonus.router, prefix="/admin/config", tags=["Admin - Bonus Configuration"])
+api_router.include_router(admin_email.router, prefix="/admin/config", tags=["Admin - Email Configuration"])
+api_router.include_router(admin_activation.router, prefix="/admin/activation-packages", tags=["Admin - Activation Packages"])
 api_router.include_router(admin.router, prefix="/admin", tags=["Admin - Finance"])
 api_router.include_router(admin_users.router, prefix="/admin", tags=["Admin - Users"])
 api_router.include_router(admin_bonuses.router, prefix="/admin", tags=["Admin - Bonuses"])
 api_router.include_router(admin_support.router, prefix="/admin", tags=["Admin - Support"])
 api_router.include_router(admin_analytics.router, prefix="/admin", tags=["Admin - Analytics"])
-api_router.include_router(admin_config.router, prefix="/admin/config", tags=["Admin - Configuration"])
-api_router.include_router(admin_bonus.router, prefix="/admin/config", tags=["Admin - Bonus Configuration"])
-api_router.include_router(admin_email.router, prefix="/admin/config", tags=["Admin - Email Configuration"])
 api_router.include_router(admin_books.router, prefix="/admin", tags=["Admin - Books"])
 api_router.include_router(admin_promo_materials.router, prefix="/admin", tags=["Admin - Promo Materials"])
-api_router.include_router(admin_activation.router, prefix="/admin/activation-packages", tags=["Admin - Activation Packages"])
 api_router.include_router(admin_activation.router, prefix="/admin", tags=["Admin - Activation Payments"])

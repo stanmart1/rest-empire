@@ -63,6 +63,7 @@ const Sidebar = () => {
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/status', icon: Users, label: 'My Status', enabled: bonusConfig?.rank_bonus_enabled },
     { to: '/team', icon: Users, label: 'My Team' },
+    { to: '/video-gallery', icon: TrendingUp, label: 'Video Gallery' },
     { to: '/crypto-signals', icon: TrendingUp, label: 'Crypto Signals' },
     { to: '/events', icon: Calendar, label: 'Our Events' },
     { to: '/promo-materials', icon: Megaphone, label: 'Promo Materials' },

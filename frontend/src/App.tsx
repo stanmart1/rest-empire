@@ -35,6 +35,7 @@ import InfinityBonus from "./pages/bonuses/InfinityBonus";
 import NotFound from "./pages/NotFound";
 import Books from "./pages/Books";
 import CryptoSignals from "./pages/CryptoSignals";
+import VideoGallery from "./pages/VideoGallery";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminTransactions from "./pages/admin/AdminTransactions";
@@ -49,6 +50,7 @@ import AdminPromoMaterials from "./pages/admin/AdminPromoMaterials";
 import AdminSupport from "./pages/admin/AdminSupport";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminActivationPackages from "./pages/admin/AdminActivationPackages";
+import AdminVideoGallery from "./pages/admin/AdminVideoGallery";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -97,6 +99,7 @@ const AnimatedRoutes = () => {
         <Route path="/support" element={<ProtectedRoute><DashboardLayout><PageWrapper><Support /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/books" element={<ProtectedRoute><DashboardLayout><PageWrapper><Books /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/crypto-signals" element={<ProtectedRoute><DashboardLayout><PageWrapper><CryptoSignals /></PageWrapper></DashboardLayout></ProtectedRoute>} />
+        <Route path="/video-gallery" element={<ProtectedRoute><DashboardLayout><PageWrapper><VideoGallery /></PageWrapper></DashboardLayout></ProtectedRoute>} />
         <Route path="/admin/dashboard" element={<AdminRoute><DashboardLayout><PageWrapper><AdminDashboard /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/users" element={<AdminRoute><DashboardLayout><PageWrapper><AdminUsers /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/transactions" element={<AdminRoute><DashboardLayout><PageWrapper><AdminTransactions /></PageWrapper></DashboardLayout></AdminRoute>} />
@@ -111,6 +114,7 @@ const AnimatedRoutes = () => {
         <Route path="/admin/promo-materials" element={<AdminRoute><DashboardLayout><PageWrapper><AdminPromoMaterials /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/support" element={<AdminRoute><DashboardLayout><PageWrapper><AdminSupport /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><DashboardLayout><PageWrapper><AdminSettings /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/video-gallery" element={<AdminRoute><DashboardLayout><PageWrapper><AdminVideoGallery /></PageWrapper></DashboardLayout></AdminRoute>} />
 
         {/* Catch-all */}
         <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
