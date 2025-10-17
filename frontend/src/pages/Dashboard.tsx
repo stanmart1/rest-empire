@@ -8,12 +8,24 @@ import RankBadge from '@/components/common/RankBadge';
 import { useDashboardStats } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 
 const Dashboard = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data: dashboardStats, isLoading: statsLoading, error: statsError } = useDashboardStats();
+  
+  const { data: bonusConfig } = useQuery({
+    queryKey: ['bonusConfig'],
+    queryFn: async () => {
+      const response = await api.get('/admin/config/config/public/payout-settings');
+      return response.data;
+    },
+  });
+  
+  const rankBonusEnabled = bonusConfig?.rank_bonus_enabled;
 
   const referralLink = user?.referral_code 
     ? `${window.location.origin}/register?ref=${user.referral_code}`
@@ -125,56 +137,58 @@ const Dashboard = () => {
       </div>
 
       {/* Rank Status */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <RankBadge rank={dashboardStats?.current_rank || 'Amber'} />
-              <div>
-                <h3 className="font-semibold">{dashboardStats?.current_rank || 'Amber'}</h3>
-                <p className="text-sm text-muted-foreground">Current Rank</p>
+      {rankBonusEnabled && (
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <RankBadge rank={dashboardStats?.current_rank || 'Amber'} />
+                <div>
+                  <h3 className="font-semibold">{dashboardStats?.current_rank || 'Amber'}</h3>
+                  <p className="text-sm text-muted-foreground">Current Rank</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <Badge variant={dashboardStats?.is_active ? "default" : "secondary"}>
+                  <CircleDot className="w-3 h-3 mr-1" />
+                  {dashboardStats?.is_active ? 'Active' : 'Inactive'}
+                </Badge>
+                {dashboardStats?.is_active && dashboardStats?.activated_at && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    since {new Date(dashboardStats.activated_at).toLocaleDateString()}
+                  </p>
+                )}
+                {!dashboardStats?.is_active && dashboardStats?.deactivated_at && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    since {new Date(dashboardStats.deactivated_at).toLocaleDateString()}
+                  </p>
+                )}
               </div>
             </div>
-            <div className="text-right">
-              <Badge variant={dashboardStats?.is_active ? "default" : "secondary"}>
-                <CircleDot className="w-3 h-3 mr-1" />
-                {dashboardStats?.is_active ? 'Active' : 'Inactive'}
-              </Badge>
-              {dashboardStats?.is_active && dashboardStats?.activated_at && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  since {new Date(dashboardStats.activated_at).toLocaleDateString()}
-                </p>
-              )}
-              {!dashboardStats?.is_active && dashboardStats?.deactivated_at && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  since {new Date(dashboardStats.deactivated_at).toLocaleDateString()}
-                </p>
-              )}
-            </div>
-          </div>
 
-          {/* Rank Progress */}
-          {nextRank && nextRequirement && (
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span>Progress to next rank</span>
-                <span>{progressPercentage.toFixed(0)}%</span>
+            {/* Rank Progress */}
+            {nextRank && nextRequirement && (
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span>Progress to next rank</span>
+                  <span>{progressPercentage.toFixed(0)}%</span>
+                </div>
+                <Progress value={progressPercentage} className="h-2" />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>₦{currentTurnover.toLocaleString()} / ₦{nextRequirement.toLocaleString()}</span>
+                  <span>Next: {nextRank}</span>
+                </div>
               </div>
-              <Progress value={progressPercentage} className="h-2" />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>₦{currentTurnover.toLocaleString()} / ₦{nextRequirement.toLocaleString()}</span>
-                <span>Next: {nextRank}</span>
+            )}
+            
+            {!nextRank && (
+              <div className="text-center py-4">
+                <p className="text-sm text-muted-foreground">🎉 Maximum rank achieved!</p>
               </div>
-            </div>
-          )}
-          
-          {!nextRank && (
-            <div className="text-center py-4">
-              <p className="text-sm text-muted-foreground">🎉 Maximum rank achieved!</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Team Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

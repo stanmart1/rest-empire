@@ -7,6 +7,7 @@ from app.api.deps import get_admin_user
 from app.models.user import User
 from app.models.transaction import Transaction, TransactionType, TransactionStatus
 from app.models.payout import Payout, PayoutStatus
+from app.models.verification import UserVerification, VerificationStatus
 from app.schemas.transaction import TransactionResponse
 from app.schemas.payout import PayoutResponse
 from app.schemas.admin import AdminStatsResponse, ManualTransaction, RefundRequest, PayoutApproval, PayoutRejection
@@ -229,3 +230,85 @@ def admin_reject_payout(
         raise HTTPException(status_code=400, detail="Cannot reject payout")
     
     return {"message": "Payout rejected successfully"}
+
+@router.get("/verifications")
+def admin_get_verifications(
+    status: Optional[str] = None,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Admin: Get all KYC verifications"""
+    query = db.query(UserVerification)
+    
+    if status:
+        query = query.filter(UserVerification.status == status)
+    
+    verifications = query.order_by(UserVerification.created_at.desc()).offset(skip).limit(limit).all()
+    
+    return verifications
+
+@router.post("/verifications/{verification_id}/approve")
+def admin_approve_verification(
+    verification_id: int,
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Admin: Approve KYC verification"""
+    verification = db.query(UserVerification).filter(UserVerification.id == verification_id).first()
+    
+    if not verification:
+        raise HTTPException(status_code=404, detail="Verification not found")
+    
+    if verification.status != VerificationStatus.pending:
+        raise HTTPException(status_code=400, detail="Verification already processed")
+    
+    verification.status = VerificationStatus.approved
+    verification.reviewed_at = datetime.utcnow()
+    verification.reviewed_by = admin.id
+    
+    # Update user KYC status
+    user = db.query(User).filter(User.id == verification.user_id).first()
+    if user:
+        user.kyc_verified = True
+        user.kyc_verified_at = datetime.utcnow()
+    
+    db.commit()
+    
+    log_activity(
+        db, verification.user_id, "kyc_approved",
+        details={"admin_id": admin.id}
+    )
+    
+    return {"message": "Verification approved successfully"}
+
+@router.post("/verifications/{verification_id}/reject")
+def admin_reject_verification(
+    verification_id: int,
+    reason: str,
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Admin: Reject KYC verification"""
+    verification = db.query(UserVerification).filter(UserVerification.id == verification_id).first()
+    
+    if not verification:
+        raise HTTPException(status_code=404, detail="Verification not found")
+    
+    if verification.status != VerificationStatus.pending:
+        raise HTTPException(status_code=400, detail="Verification already processed")
+    
+    verification.status = VerificationStatus.rejected
+    verification.rejection_reason = reason
+    verification.reviewed_at = datetime.utcnow()
+    verification.reviewed_by = admin.id
+    
+    db.commit()
+    
+    log_activity(
+        db, verification.user_id, "kyc_rejected",
+        details={"admin_id": admin.id, "reason": reason}
+    )
+    
+    return {"message": "Verification rejected successfully"}

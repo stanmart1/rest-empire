@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -44,6 +46,21 @@ const Register = () => {
   const [step, setStep] = useState(1);
 
   const referralCode = searchParams.get('ref');
+  
+  const { data: settings } = useQuery({
+    queryKey: ['systemSettings'],
+    queryFn: async () => {
+      const response = await api.get('/admin/config/config/public/system-settings');
+      return response.data;
+    },
+  });
+  
+  useEffect(() => {
+    if (settings && settings.registration_enabled === false) {
+      toast.error('Registration is currently disabled');
+      navigate('/');
+    }
+  }, [settings, navigate]);
 
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -68,7 +85,7 @@ const Register = () => {
         phone_number: data.phone,
         referral_code: referralCode || undefined,
       });
-      toast.success('Registration successful! Please check your email to verify your account.');
+      toast.success('Registration successful!');
       navigate('/login');
     } catch (error: any) {
       toast.error(error.response?.data?.detail || 'Registration failed. Please try again.');

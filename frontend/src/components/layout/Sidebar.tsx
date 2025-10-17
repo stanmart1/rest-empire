@@ -61,13 +61,13 @@ const Sidebar = () => {
 
   const mainLinks = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/status', icon: Users, label: 'My Status' },
+    { to: '/status', icon: Users, label: 'My Status', enabled: bonusConfig?.rank_bonus_enabled },
     { to: '/team', icon: Users, label: 'My Team' },
     { to: '/crypto-signals', icon: TrendingUp, label: 'Crypto Signals' },
     { to: '/events', icon: Calendar, label: 'Our Events' },
     { to: '/promo-materials', icon: Megaphone, label: 'Promo Materials' },
     { to: '/books', icon: BookOpen, label: 'Books' },
-  ];
+  ].filter(link => link.enabled !== false);
 
   const bonusSubLinks = [
     { to: '/bonuses/rank', icon: Star, label: 'Rank bonus', enabled: bonusConfig?.rank_bonus_enabled },
@@ -148,7 +148,7 @@ const Sidebar = () => {
           }}
           className="p-3 space-y-1 bg-sidebar"
         >
-          {mainLinks.map((link, index) => (
+          {mainLinks.map((link) => (
             <motion.div
               key={link.to}
               variants={{

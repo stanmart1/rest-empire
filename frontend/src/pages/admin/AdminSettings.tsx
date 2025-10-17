@@ -13,14 +13,13 @@ import api from '@/lib/api';
 import PaymentGatewayModal from '@/components/admin/PaymentGatewayModal';
 import BonusConfiguration from '@/components/admin/BonusConfiguration';
 import EmailConfiguration from '@/components/admin/EmailConfiguration';
+import SystemConfiguration from '@/components/admin/SystemConfiguration';
 
 const AdminSettings = () => {
   const [minPayoutNGN, setMinPayoutNGN] = useState('5000');
   const [minPayoutUSDT, setMinPayoutUSDT] = useState('10');
   const [payoutFeeNGN, setPayoutFeeNGN] = useState('1.5');
   const [payoutFeeUSDT, setPayoutFeeUSDT] = useState('2.0');
-  const [registrationEnabled, setRegistrationEnabled] = useState(true);
-  const [emailVerificationRequired, setEmailVerificationRequired] = useState(true);
   const [maxReferralDepth, setMaxReferralDepth] = useState('15');
   
   // Payment Gateway States
@@ -75,8 +74,6 @@ const AdminSettings = () => {
       setMinPayoutUSDT(settings.min_payout_usdt?.toString() || '10');
       setPayoutFeeNGN(settings.payout_fee_ngn?.toString() || '1.5');
       setPayoutFeeUSDT(settings.payout_fee_usdt?.toString() || '2.0');
-      setRegistrationEnabled(settings.registration_enabled !== false);
-      setEmailVerificationRequired(settings.email_verification_required !== false);
       setMaxReferralDepth(settings.max_referral_depth?.toString() || '15');
     }
   }, [settings]);
@@ -105,10 +102,8 @@ const AdminSettings = () => {
     });
   };
 
-  const handleSaveSystemSettings = () => {
+  const handleSaveReferralSettings = () => {
     updateMutation.mutate({
-      registration_enabled: registrationEnabled.toString(),
-      email_verification_required: emailVerificationRequired.toString(),
       max_referral_depth: maxReferralDepth,
     });
   };
@@ -334,45 +329,7 @@ const AdminSettings = () => {
         </TabsContent>
 
         <TabsContent value="system" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>System Configuration</CardTitle>
-              <CardDescription>Control platform features and access</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Registration Enabled</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Allow new user registrations
-                  </p>
-                </div>
-                <Switch
-                  checked={registrationEnabled}
-                  onCheckedChange={setRegistrationEnabled}
-                />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Email Verification Required</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Require email verification for new accounts
-                  </p>
-                </div>
-                <Switch
-                  checked={emailVerificationRequired}
-                  onCheckedChange={setEmailVerificationRequired}
-                />
-              </div>
-
-              <Button onClick={handleSaveSystemSettings} disabled={updateMutation.isPending}>
-                {updateMutation.isPending ? 'Saving...' : 'Save System Settings'}
-              </Button>
-            </CardContent>
-          </Card>
+          <SystemConfiguration settings={settings} />
         </TabsContent>
 
         <TabsContent value="referral" className="space-y-4">
@@ -396,7 +353,7 @@ const AdminSettings = () => {
                 </p>
               </div>
 
-              <Button onClick={handleSaveSystemSettings} disabled={updateMutation.isPending}>
+              <Button onClick={handleSaveReferralSettings} disabled={updateMutation.isPending}>
                 {updateMutation.isPending ? 'Saving...' : 'Save Referral Settings'}
               </Button>
             </CardContent>

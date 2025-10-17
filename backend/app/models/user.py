@@ -22,6 +22,8 @@ class User(Base):
     
     is_verified = Column(Boolean, default=False)
     verification_token = Column(String, nullable=True)
+    kyc_verified = Column(Boolean, default=False)
+    kyc_verified_at = Column(DateTime, nullable=True)
     is_active = Column(Boolean, default=True)
     is_inactive = Column(Boolean, default=False)
     deactivated_at = Column(DateTime, nullable=True)

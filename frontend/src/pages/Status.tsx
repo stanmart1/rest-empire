@@ -6,10 +6,35 @@ import { Info, Loader2 } from 'lucide-react';
 import RankBadge from '@/components/common/RankBadge';
 import { useRanks, useRankProgress } from '@/hooks/useApi';
 import { RankResponse, RankProgress } from '@/types/rank';
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import api from '@/lib/api';
 
 const Status = () => {
+  const navigate = useNavigate();
   const { data: ranks, isLoading: ranksLoading } = useRanks();
   const { data: progress, isLoading: progressLoading } = useRankProgress();
+  
+  const { data: bonusConfig, isLoading: configLoading } = useQuery({
+    queryKey: ['bonusConfig'],
+    queryFn: async () => {
+      const response = await api.get('/admin/config/config/public/payout-settings');
+      return response.data;
+    },
+  });
+  
+  if (configLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+  
+  if (!bonusConfig?.rank_bonus_enabled) {
+    navigate('/dashboard');
+    return null;
+  }
 
   if (ranksLoading || progressLoading) {
     return (

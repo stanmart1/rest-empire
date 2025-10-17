@@ -142,6 +142,14 @@ def get_public_payout_settings(db: Session = Depends(get_db)):
         "infinity_enabled": infinity_enabled == "true" if infinity_enabled else False
     }
 
+@router.get("/config/public/system-settings")
+def get_public_system_settings(db: Session = Depends(get_db)):
+    """Public: Get system settings (no auth required)"""
+    return {
+        "registration_enabled": (get_config(db, "registration_enabled") or "true") == "true",
+        "activation_packages_enabled": (get_config(db, "activation_packages_enabled") or "true") == "true"
+    }
+
 @router.get("/config/settings/platform")
 def admin_get_platform_settings(
     admin: User = Depends(get_admin_user),
@@ -154,7 +162,11 @@ def admin_get_platform_settings(
         "payout_fee_ngn": float(get_config(db, "payout_fee_ngn") or 1.5),
         "payout_fee_usdt": float(get_config(db, "payout_fee_usdt") or 2.0),
         "registration_enabled": (get_config(db, "registration_enabled") or "true") == "true",
-        "email_verification_required": (get_config(db, "email_verification_required") or "true") == "true",
+        "activation_packages_enabled": (get_config(db, "activation_packages_enabled") or "true") == "true",
+        "kyc_required": (get_config(db, "kyc_required") or "false") == "true",
+        "daily_withdrawal_limit": float(get_config(db, "daily_withdrawal_limit") or 0),
+        "weekly_withdrawal_limit": float(get_config(db, "weekly_withdrawal_limit") or 0),
+        "monthly_withdrawal_limit": float(get_config(db, "monthly_withdrawal_limit") or 0),
         "max_referral_depth": int(get_config(db, "max_referral_depth") or 15)
     }
 

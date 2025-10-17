@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +18,25 @@ import { formatCurrency } from '@/utils/formatters';
 const Activation = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  
+  const { data: settings } = useQuery({
+    queryKey: ['systemSettings'],
+    queryFn: async () => {
+      const response = await api.get('/admin/config/config/public/system-settings');
+      return response.data;
+    },
+  });
+  
+  useEffect(() => {
+    if (settings && settings.activation_packages_enabled === false) {
+      toast({
+        title: "Notice",
+        description: "Activation packages are not required. Your account is already active.",
+      });
+      navigate('/dashboard');
+    }
+  }, [settings, navigate, toast]);
   const [selectedPackage, setSelectedPackage] = useState<ActivationPackage | null>(null);
   const [paymentMethodModalOpen, setPaymentMethodModalOpen] = useState(false);
   const [bankTransferModalOpen, setBankTransferModalOpen] = useState(false);

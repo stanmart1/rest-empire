@@ -14,6 +14,7 @@ from app.schemas.user import (
 )
 from app.services.email_service import send_verification_email, send_password_reset_email, send_welcome_email
 from app.utils.activity import log_activity
+from app.services.config_service import get_config
 from jose import jwt, JWTError
 from app.core.config import settings
 import secrets
@@ -22,6 +23,11 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserResponse)
 async def register(user_data: UserCreate, request: Request, db: Session = Depends(get_db)):
+    # Check if registration is enabled
+    registration_enabled = (get_config(db, "registration_enabled") or "true") == "true"
+    if not registration_enabled:
+        raise HTTPException(status_code=403, detail="Registration is currently disabled")
+    
     # Check email exists
     if db.query(User).filter(User.email == user_data.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -35,6 +41,9 @@ async def register(user_data: UserCreate, request: Request, db: Session = Depend
         if not sponsor.is_active:
             raise HTTPException(status_code=400, detail="Sponsor account is not active")
     
+    # Check if activation packages are required
+    activation_packages_enabled = (get_config(db, "activation_packages_enabled") or "true") == "true"
+    
     # Create user
     user = User(
         email=user_data.email,
@@ -43,7 +52,7 @@ async def register(user_data: UserCreate, request: Request, db: Session = Depend
         phone_number=user_data.phone_number,
         referral_code=secrets.token_urlsafe(8),
         is_verified=True,
-        is_active=False,
+        is_active=not activation_packages_enabled,  # Auto-activate if packages disabled
         sponsor_id=sponsor.id if sponsor else None
     )
     

@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timedelta
+from sqlalchemy import func
 from app.models.user import User
 from app.models.payout import Payout, PayoutStatus
 from app.models.transaction import Transaction, TransactionType, TransactionStatus
@@ -40,6 +41,49 @@ def create_payout_request(
     
     if not user:
         raise ValueError("User not found")
+    
+    # Check KYC requirement
+    kyc_required = (get_config(db, "kyc_required") or "false") == "true"
+    if kyc_required and not user.kyc_verified:
+        raise ValueError("KYC verification required before withdrawal")
+    
+    # Check withdrawal limits
+    if currency == "NGN":
+        daily_limit = float(get_config(db, "daily_withdrawal_limit") or 0)
+        weekly_limit = float(get_config(db, "weekly_withdrawal_limit") or 0)
+        monthly_limit = float(get_config(db, "monthly_withdrawal_limit") or 0)
+        
+        now = datetime.utcnow()
+        
+        if daily_limit > 0:
+            daily_total = db.query(func.sum(Payout.amount)).filter(
+                Payout.user_id == user_id,
+                Payout.currency == "NGN",
+                Payout.status.in_([PayoutStatus.pending, PayoutStatus.approved, PayoutStatus.completed]),
+                Payout.created_at >= now - timedelta(days=1)
+            ).scalar() or 0
+            if daily_total + amount > daily_limit:
+                raise ValueError(f"Daily withdrawal limit of ₦{daily_limit:,.2f} exceeded")
+        
+        if weekly_limit > 0:
+            weekly_total = db.query(func.sum(Payout.amount)).filter(
+                Payout.user_id == user_id,
+                Payout.currency == "NGN",
+                Payout.status.in_([PayoutStatus.pending, PayoutStatus.approved, PayoutStatus.completed]),
+                Payout.created_at >= now - timedelta(days=7)
+            ).scalar() or 0
+            if weekly_total + amount > weekly_limit:
+                raise ValueError(f"Weekly withdrawal limit of ₦{weekly_limit:,.2f} exceeded")
+        
+        if monthly_limit > 0:
+            monthly_total = db.query(func.sum(Payout.amount)).filter(
+                Payout.user_id == user_id,
+                Payout.currency == "NGN",
+                Payout.status.in_([PayoutStatus.pending, PayoutStatus.approved, PayoutStatus.completed]),
+                Payout.created_at >= now - timedelta(days=30)
+            ).scalar() or 0
+            if monthly_total + amount > monthly_limit:
+                raise ValueError(f"Monthly withdrawal limit of ₦{monthly_limit:,.2f} exceeded")
     
     # Validate minimum amount
     min_payout = get_minimum_payout(db, currency)
