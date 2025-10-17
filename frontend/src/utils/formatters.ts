@@ -1,7 +1,8 @@
-export const formatCurrency = (amount: number | undefined | null, currency: string = 'EUR'): string => {
+export const formatCurrency = (amount: number | undefined | null, currency: string = 'NGN'): string => {
   const safeAmount = amount ?? 0;
   
   const currencySymbols: Record<string, string> = {
+    NGN: '₦',
     EUR: '€',
     USD: '$',
     USDT: 'USDT',

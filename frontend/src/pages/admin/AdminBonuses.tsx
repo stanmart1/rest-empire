@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import api from '@/lib/api';
+import { formatCurrency } from '@/utils/formatters';
 
 const AdminBonuses = () => {
   const { data: bonuses, isLoading } = useQuery({
@@ -48,7 +49,7 @@ const AdminBonuses = () => {
                     <TableRow key={bonus.id}>
                       <TableCell>{bonus.user_id}</TableCell>
                       <TableCell className="capitalize">{bonus.bonus_type}</TableCell>
-                      <TableCell>₦{bonus.amount.toLocaleString()}</TableCell>
+                      <TableCell>{formatCurrency(bonus.amount, 'NGN')}</TableCell>
                       <TableCell>
                         <Badge variant={bonus.status === 'paid' ? 'default' : 'secondary'}>{bonus.status}</Badge>
                       </TableCell>
@@ -76,7 +77,7 @@ const AdminBonuses = () => {
                     </div>
                     <Badge variant={bonus.status === 'paid' ? 'default' : 'secondary'}>{bonus.status}</Badge>
                   </div>
-                  <p className="text-lg font-semibold">₦{bonus.amount.toLocaleString()}</p>
+                  <p className="text-lg font-semibold">{formatCurrency(bonus.amount, 'NGN')}</p>
                   <p className="text-sm text-muted-foreground">{new Date(bonus.created_at).toLocaleDateString()}</p>
                 </div>
               ))

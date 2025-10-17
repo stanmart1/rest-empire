@@ -10,7 +10,10 @@ const CryptoSignals = () => {
   const formatPrice = (price: string | undefined) => {
     if (!price) return '-';
     const num = parseFloat(price);
-    return num >= 1 ? `$${num.toFixed(2)}` : `$${num.toFixed(8)}`;
+    if (num >= 1) {
+      return `$${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    return `$${num.toFixed(8)}`;
   };
 
   return (

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import api from '@/lib/api';
+import { formatCurrency } from '@/utils/formatters';
 
 const AdminFinance = () => {
   const { data: transactions, isLoading: transactionsLoading } = useQuery({
@@ -56,7 +57,7 @@ const AdminFinance = () => {
                     <TableRow key={tx.id}>
                       <TableCell>{tx.user_id}</TableCell>
                       <TableCell className="capitalize">{tx.transaction_type}</TableCell>
-                      <TableCell>₦{tx.amount.toLocaleString()}</TableCell>
+                      <TableCell>{formatCurrency(tx.amount, 'NGN')}</TableCell>
                       <TableCell>
                         <Badge variant={tx.status === 'completed' ? 'default' : 'secondary'}>{tx.status}</Badge>
                       </TableCell>
@@ -84,7 +85,7 @@ const AdminFinance = () => {
                     </div>
                     <Badge variant={tx.status === 'completed' ? 'default' : 'secondary'}>{tx.status}</Badge>
                   </div>
-                  <p className="text-lg font-semibold">₦{tx.amount.toLocaleString()}</p>
+                  <p className="text-lg font-semibold">{formatCurrency(tx.amount, 'NGN')}</p>
                   <p className="text-sm text-muted-foreground">{new Date(tx.created_at).toLocaleDateString()}</p>
                 </div>
               ))
@@ -123,7 +124,7 @@ const AdminFinance = () => {
                   payouts.slice(0, 10).map((payout: any) => (
                     <TableRow key={payout.id}>
                       <TableCell>{payout.user_id}</TableCell>
-                      <TableCell>₦{payout.amount.toLocaleString()}</TableCell>
+                      <TableCell>{formatCurrency(payout.amount, 'NGN')}</TableCell>
                       <TableCell className="capitalize">{payout.payout_method?.replace('_', ' ')}</TableCell>
                       <TableCell>
                         <Badge variant={payout.status === 'completed' ? 'default' : 'secondary'}>{payout.status}</Badge>
@@ -149,7 +150,7 @@ const AdminFinance = () => {
                     <p className="font-medium">User ID: {payout.user_id}</p>
                     <Badge variant={payout.status === 'completed' ? 'default' : 'secondary'}>{payout.status}</Badge>
                   </div>
-                  <p className="text-lg font-semibold">₦{payout.amount.toLocaleString()}</p>
+                  <p className="text-lg font-semibold">{formatCurrency(payout.amount, 'NGN')}</p>
                   <p className="text-sm text-muted-foreground capitalize">{payout.payout_method?.replace('_', ' ')}</p>
                   <p className="text-sm text-muted-foreground">{new Date(payout.requested_at).toLocaleDateString()}</p>
                 </div>

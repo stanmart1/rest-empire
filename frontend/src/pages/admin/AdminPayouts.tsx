@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Loader2, Eye, CheckCircle, XCircle } from 'lucide-react';
 import { AdminPayout } from '@/types/admin-payouts';
 import { usePayouts, useApprovePayout, useRejectPayout } from '@/hooks/useAdminPayouts';
+import { formatCurrency } from '@/utils/formatters';
 
 const AdminPayouts = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -67,7 +68,7 @@ const AdminPayouts = () => {
                           <div className="text-sm text-muted-foreground">{payout.user_email}</div>
                         </div>
                       </TableCell>
-                      <TableCell>₦{payout.amount.toLocaleString()}</TableCell>
+                      <TableCell>{formatCurrency(payout.amount, 'NGN')}</TableCell>
                       <TableCell>{payout.currency}</TableCell>
                       <TableCell className="capitalize">{payout.payout_method.replace('_', ' ')}</TableCell>
                       <TableCell>
@@ -109,7 +110,7 @@ const AdminPayouts = () => {
                   </div>
                   <div>
                     <p className="text-lg font-semibold">
-                      ₦{payout.amount.toLocaleString()}
+                      {formatCurrency(payout.amount, 'NGN')}
                     </p>
                     <p className="text-sm text-muted-foreground capitalize">{payout.payout_method.replace('_', ' ')}</p>
                   </div>
@@ -151,7 +152,7 @@ const AdminPayouts = () => {
               <div>
                 <Label className="text-muted-foreground">Amount</Label>
                 <p className="font-medium">
-                  ₦{selectedPayout.amount.toLocaleString()}
+                  {formatCurrency(selectedPayout.amount, 'NGN')}
                 </p>
               </div>
               <div>

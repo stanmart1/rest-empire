@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Edit, Trash2, Loader2, Package, Eye, CheckCircle, XCircle } from 'lucide-react';
 import { ActivationPackage, ActivationPayment, PackageFormData } from '@/types/admin-activation';
+import { formatCurrency } from '@/utils/formatters';
 import {
   useActivationPackages,
   useActivationPayments,
@@ -246,7 +247,7 @@ const AdminActivationPackages = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      ₦{pkg.price.toLocaleString()}
+                      {formatCurrency(pkg.price, 'NGN')}
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
@@ -329,7 +330,7 @@ const AdminActivationPackages = () => {
                       </TableCell>
                       <TableCell>{payment.package_name}</TableCell>
                       <TableCell>
-                        ₦{payment.amount.toLocaleString()}
+                        {formatCurrency(payment.amount, 'NGN')}
                       </TableCell>
                       <TableCell className="capitalize">{payment.payment_method?.replace('_', ' ')}</TableCell>
                       <TableCell>
@@ -474,7 +475,7 @@ const AdminActivationPackages = () => {
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Amount</Label>
-                  <p className="font-medium">₦{selectedPayment.amount.toLocaleString()}</p>
+                  <p className="font-medium">{formatCurrency(selectedPayment.amount, 'NGN')}</p>
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Payment Method</Label>
