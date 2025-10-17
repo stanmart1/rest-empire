@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { useEmailSettings, useUpdateEmailSettings, useSendTestEmail } from '@/hooks/useAdminEmail';
 
 const EmailConfiguration = () => {
@@ -22,6 +22,7 @@ const EmailConfiguration = () => {
   const [resendApiKey, setResendApiKey] = useState('');
   const [showTestDialog, setShowTestDialog] = useState(false);
   const [testEmail, setTestEmail] = useState('');
+  const [showApiKey, setShowApiKey] = useState(false);
 
   useEffect(() => {
     if (settings) {
@@ -123,13 +124,22 @@ const EmailConfiguration = () => {
         <CardContent className="space-y-4">
           <div>
             <Label>Resend API Key</Label>
-            <Input
-              type="password"
-              value={resendApiKey}
-              onChange={(e) => setResendApiKey(e.target.value)}
-              placeholder="re_••••••••"
-              className="mt-2"
-            />
+            <div className="relative mt-2">
+              <Input
+                type={showApiKey ? "text" : "password"}
+                value={resendApiKey}
+                onChange={(e) => setResendApiKey(e.target.value)}
+                placeholder="re_••••••••"
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowApiKey(!showApiKey)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
           <Separator />
           <div className="grid grid-cols-2 gap-4">
