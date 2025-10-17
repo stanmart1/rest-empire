@@ -167,7 +167,7 @@ const Index = () => {
           {/* Additional Hero Content */}
           <div className="mt-20 max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-primary-foreground">
-              Why Thousands Choose Rest Empire
+              Why Thousands Choose Opened Seal and Rest Empire
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

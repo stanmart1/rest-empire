@@ -28,11 +28,11 @@ const Topbar = () => {
       {/* Left: Logo */}
       <div className="flex items-center gap-2">
         <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-          <span className="text-primary-foreground font-bold text-sm">RE</span>
+          <span className="text-primary-foreground font-bold text-sm">OS</span>
         </div>
         <span className="font-bold text-lg hidden sm:block text-foreground">
-          <span className="text-primary">REST</span>
-          <span className="font-normal"> EMPIRE</span>
+          <span className="text-primary">Opened Seal</span>
+          <span className="font-normal"> and Rest Empire</span>
         </span>
       </div>
 

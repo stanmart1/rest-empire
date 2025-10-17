@@ -60,6 +60,7 @@ def create_package(
         slug=slug,
         description=package_data.description,
         price=package_data.price,
+        currency="NGN",
         features=package_data.features or [],
         is_active=package_data.is_active,
         sort_order=max_order + 1

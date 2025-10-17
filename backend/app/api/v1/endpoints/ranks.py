@@ -18,7 +18,7 @@ def get_ranks(db: Session = Depends(get_db)):
     ranks = get_all_ranks(db)
     return ranks
 
-@router.get("/progress", response_model=RankProgress)
+@router.get("/progress/", response_model=RankProgress)
 def get_user_rank_progress(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)

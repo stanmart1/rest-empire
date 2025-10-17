@@ -11,7 +11,7 @@ class ActivationPackage(Base):
     slug = Column(String(100), nullable=False, unique=True, index=True)
     description = Column(Text)
     price = Column(Float, nullable=False)
-    currency = Column(String(10), default="EUR")
+    currency = Column(String(10), default="NGN")
     features = Column(JSON)  # Store features as JSON array
     is_active = Column(Boolean, default=True)
     sort_order = Column(Integer, default=0)

@@ -97,8 +97,7 @@ const PaymentMethodModal = ({
           <div className="text-center mb-4">
             <p className="text-sm text-muted-foreground">Amount to pay</p>
             <p className="text-2xl font-bold">
-              {currency === 'NGN' ? '₦' : currency === 'USDT' ? '$' : '€'}
-              {amount.toLocaleString()}
+              ₦{amount.toLocaleString()}
             </p>
           </div>
 

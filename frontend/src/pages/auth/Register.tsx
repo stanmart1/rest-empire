@@ -233,6 +233,7 @@ const Register = () => {
                   <SelectValue placeholder="Place of residence" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="nigeria">Nigeria</SelectItem>
                   <SelectItem value="us">United States</SelectItem>
                   <SelectItem value="uk">United Kingdom</SelectItem>
                   <SelectItem value="ca">Canada</SelectItem>
@@ -293,7 +294,7 @@ const Register = () => {
                   htmlFor="terms3"
                   className="text-sm text-foreground leading-tight peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  I confirm that all information I provided is correct and will notify Rest Empire of any changes.
+                  I confirm that all information I provided is correct and will notify Opened Seal and Rest Empire of any changes.
                 </label>
               </div>
               {errors.terms3 && (
@@ -357,7 +358,7 @@ const Register = () => {
             <div className="space-y-4">
               <h2 className="text-4xl font-bold">Build Your Empire</h2>
               <p className="text-lg text-foreground">
-                Join Rest Empire and access powerful tools to grow your network marketing business.
+                Join Opened Seal and Rest Empire and access powerful tools to grow your network marketing business.
               </p>
             </div>
             <div className="space-y-4">

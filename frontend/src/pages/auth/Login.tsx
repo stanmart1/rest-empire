@@ -73,7 +73,7 @@ const Login = () => {
                 <span className="text-xl font-bold text-primary-foreground">RE</span>
               </div>
               <div>
-                <CardTitle className="text-2xl font-bold">Rest Empire</CardTitle>
+                <CardTitle className="text-2xl font-bold">Opened Seal and Rest Empire</CardTitle>
                 <CardDescription className="text-sm text-foreground">Welcome back</CardDescription>
               </div>
             </div>
@@ -165,9 +165,9 @@ const Login = () => {
         {/* Right side - Info Section */}
         <div className="space-y-6">
           <div className="space-y-4">
-            <h2 className="text-4xl font-bold">Build Your Empire</h2>
+            <h2 className="text-4xl font-bold">Build Your Future</h2>
             <p className="text-lg text-foreground">
-              Join Rest Empire and access powerful tools to grow your network marketing business.
+              Join Opened Seal and Rest Empire and access powerful tools to grow your network marketing business.
             </p>
           </div>
           <div className="space-y-4">

@@ -56,7 +56,7 @@ const AdminFinance = () => {
                     <TableRow key={tx.id}>
                       <TableCell>{tx.user_id}</TableCell>
                       <TableCell className="capitalize">{tx.transaction_type}</TableCell>
-                      <TableCell>{tx.currency === 'NGN' ? '₦' : '$'}{tx.amount.toLocaleString()}</TableCell>
+                      <TableCell>₦{tx.amount.toLocaleString()}</TableCell>
                       <TableCell>
                         <Badge variant={tx.status === 'completed' ? 'default' : 'secondary'}>{tx.status}</Badge>
                       </TableCell>
@@ -84,7 +84,7 @@ const AdminFinance = () => {
                     </div>
                     <Badge variant={tx.status === 'completed' ? 'default' : 'secondary'}>{tx.status}</Badge>
                   </div>
-                  <p className="text-lg font-semibold">{tx.currency === 'NGN' ? '₦' : '$'}{tx.amount.toLocaleString()}</p>
+                  <p className="text-lg font-semibold">₦{tx.amount.toLocaleString()}</p>
                   <p className="text-sm text-muted-foreground">{new Date(tx.created_at).toLocaleDateString()}</p>
                 </div>
               ))
@@ -123,7 +123,7 @@ const AdminFinance = () => {
                   payouts.slice(0, 10).map((payout: any) => (
                     <TableRow key={payout.id}>
                       <TableCell>{payout.user_id}</TableCell>
-                      <TableCell>{payout.currency === 'NGN' ? '₦' : '$'}{payout.amount.toLocaleString()}</TableCell>
+                      <TableCell>₦{payout.amount.toLocaleString()}</TableCell>
                       <TableCell className="capitalize">{payout.payout_method?.replace('_', ' ')}</TableCell>
                       <TableCell>
                         <Badge variant={payout.status === 'completed' ? 'default' : 'secondary'}>{payout.status}</Badge>
@@ -149,7 +149,7 @@ const AdminFinance = () => {
                     <p className="font-medium">User ID: {payout.user_id}</p>
                     <Badge variant={payout.status === 'completed' ? 'default' : 'secondary'}>{payout.status}</Badge>
                   </div>
-                  <p className="text-lg font-semibold">{payout.currency === 'NGN' ? '₦' : '$'}{payout.amount.toLocaleString()}</p>
+                  <p className="text-lg font-semibold">₦{payout.amount.toLocaleString()}</p>
                   <p className="text-sm text-muted-foreground capitalize">{payout.payout_method?.replace('_', ' ')}</p>
                   <p className="text-sm text-muted-foreground">{new Date(payout.requested_at).toLocaleDateString()}</p>
                 </div>

@@ -161,7 +161,7 @@ const AdminActivationPackages = () => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="price">Price ($)</Label>
+                  <Label htmlFor="price">Price (₦)</Label>
                   <Input
                     id="price"
                     type="number"
@@ -246,7 +246,7 @@ const AdminActivationPackages = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {pkg.currency} {pkg.price.toFixed(2)}
+                      ₦{pkg.price.toLocaleString()}
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
@@ -329,7 +329,7 @@ const AdminActivationPackages = () => {
                       </TableCell>
                       <TableCell>{payment.package_name}</TableCell>
                       <TableCell>
-                        {payment.currency} {payment.amount.toFixed(2)}
+                        ₦{payment.amount.toLocaleString()}
                       </TableCell>
                       <TableCell className="capitalize">{payment.payment_method?.replace('_', ' ')}</TableCell>
                       <TableCell>
@@ -380,7 +380,7 @@ const AdminActivationPackages = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="edit-price">Price ($)</Label>
+                <Label htmlFor="edit-price">Price (₦)</Label>
                 <Input
                   id="edit-price"
                   type="number"
@@ -474,7 +474,7 @@ const AdminActivationPackages = () => {
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Amount</Label>
-                  <p className="font-medium">{selectedPayment.currency} {selectedPayment.amount.toFixed(2)}</p>
+                  <p className="font-medium">₦{selectedPayment.amount.toLocaleString()}</p>
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Payment Method</Label>

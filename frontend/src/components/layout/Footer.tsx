@@ -8,10 +8,10 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">RE</span>
+                <span className="text-primary-foreground font-bold text-sm">OS</span>
               </div>
               <span className="font-bold text-xl text-white">
-                <span className="text-white">REST</span> EMPIRE
+                Opened Seal and Rest Empire
               </span>
             </div>
             <p className="text-gray-300 mb-4">
@@ -96,7 +96,7 @@ const Footer = () => {
         <div className="border-t border-gray-800 pt-8 mt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm mb-4 md:mb-0">
-              © {new Date().getFullYear()} Rest Empire. All rights reserved.
+              © {new Date().getFullYear()} Opened Seal and Rest Empire. All rights reserved.
             </p>
             <div className="flex space-x-6">
               <a href="#" className="text-gray-400 hover:text-primary text-sm">Privacy Policy</a>

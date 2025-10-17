@@ -79,7 +79,7 @@ const Payouts = () => {
     if (data.amount < minAmount) {
       toast({
         title: "Error",
-        description: `Minimum payout is ${data.currency === 'NGN' ? '₦' + minAmount.toLocaleString() : '$' + minAmount}`,
+        description: `Minimum payout is ₦${minAmount.toLocaleString()}`,
         variant: "destructive",
       });
       return;
@@ -132,7 +132,7 @@ const Payouts = () => {
                   id="amount"
                   type="number"
                   step="0.01"
-                  placeholder={`Min: ${watchCurrency === 'NGN' ? '₦5,000' : '$10'}`}
+                  placeholder="Min: ₦5,000"
                   {...register('amount')}
                 />
                 {errors.amount && (

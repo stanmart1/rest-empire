@@ -67,7 +67,7 @@ const AdminPayouts = () => {
                           <div className="text-sm text-muted-foreground">{payout.user_email}</div>
                         </div>
                       </TableCell>
-                      <TableCell>{payout.currency === 'NGN' ? '₦' : '$'}{payout.amount.toLocaleString()}</TableCell>
+                      <TableCell>₦{payout.amount.toLocaleString()}</TableCell>
                       <TableCell>{payout.currency}</TableCell>
                       <TableCell className="capitalize">{payout.payout_method.replace('_', ' ')}</TableCell>
                       <TableCell>
@@ -109,7 +109,7 @@ const AdminPayouts = () => {
                   </div>
                   <div>
                     <p className="text-lg font-semibold">
-                      {payout.currency === 'NGN' ? '₦' : '$'}{payout.amount.toLocaleString()} {payout.currency}
+                      ₦{payout.amount.toLocaleString()}
                     </p>
                     <p className="text-sm text-muted-foreground capitalize">{payout.payout_method.replace('_', ' ')}</p>
                   </div>
@@ -151,7 +151,7 @@ const AdminPayouts = () => {
               <div>
                 <Label className="text-muted-foreground">Amount</Label>
                 <p className="font-medium">
-                  {selectedPayout.currency === 'NGN' ? '₦' : '$'}{selectedPayout.amount.toLocaleString()} {selectedPayout.currency}
+                  ₦{selectedPayout.amount.toLocaleString()}
                 </p>
               </div>
               <div>

@@ -79,12 +79,12 @@ const Activation = () => {
       } else if (method === 'providus') {
         toast({
           title: "Account Generated",
-          description: `Transfer ${selectedPackage?.currency} ${selectedPackage?.price.toLocaleString()} to account ${data.payment_data.account_number}. Your account will be activated after payment confirmation.`,
+          description: `Transfer ₦${selectedPackage?.price.toLocaleString()} to account ${data.payment_data.account_number}. Your account will be activated after payment confirmation.`,
         });
       } else if (method === 'crypto') {
         toast({
           title: "Crypto Payment",
-          description: `Send ${selectedPackage?.price} USDT to ${data.payment_data.wallet_address}. Your account will be activated after blockchain confirmation.`,
+          description: `Send ₦${selectedPackage?.price.toLocaleString()} equivalent in USDT to ${data.payment_data.wallet_address}. Your account will be activated after blockchain confirmation.`,
         });
       }
 
@@ -194,8 +194,7 @@ const Activation = () => {
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Amount Due</p>
                 <p className="text-xl font-bold">
-                  {status.package.currency === 'NGN' ? '₦' : status.package.currency === 'USDT' ? '$' : '€'}
-                  {status.activation_fee?.toLocaleString()}
+                  ₦{status.activation_fee?.toLocaleString()}
                 </p>
                 <p className="text-xs text-muted-foreground">Contact support to complete payment</p>
               </div>
@@ -228,8 +227,7 @@ const Activation = () => {
                   </CardTitle>
                   <div className="text-center">
                     <span className="text-3xl font-bold">
-                      {pkg.currency === 'NGN' ? '₦' : pkg.currency === 'USDT' ? '$' : '€'}
-                      {pkg.price.toLocaleString()}
+                      ₦{pkg.price.toLocaleString()}
                     </span>
                     <span className="text-muted-foreground"> one-time</span>
                   </div>
@@ -289,7 +287,7 @@ const Activation = () => {
               </p>
               <ol className="list-decimal list-inside space-y-1 text-sm text-yellow-600">
                 <li>Contact our support team</li>
-                <li>Complete payment of {status.package?.currency === 'NGN' ? '₦' : status.package?.currency === 'USDT' ? '$' : '€'}{status.activation_fee?.toLocaleString()}</li>
+                <li>Complete payment of ₦{status.activation_fee?.toLocaleString()}</li>
                 <li>Your account will be activated within 24 hours</li>
               </ol>
               <div className="mt-4 p-3 bg-white rounded border">
