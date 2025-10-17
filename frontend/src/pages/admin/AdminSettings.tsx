@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 import { Settings } from 'lucide-react';
 import api from '@/lib/api';
 import PaymentGatewayModal from '@/components/admin/PaymentGatewayModal';
+import BonusConfiguration from '@/components/admin/BonusConfiguration';
+import EmailConfiguration from '@/components/admin/EmailConfiguration';
 
 const AdminSettings = () => {
   const [minPayoutNGN, setMinPayoutNGN] = useState('5000');
@@ -185,6 +187,8 @@ const AdminSettings = () => {
         <TabsList>
           <TabsTrigger value="payout">Payout Settings</TabsTrigger>
           <TabsTrigger value="payment">Payment Gateways</TabsTrigger>
+          <TabsTrigger value="bonus">Bonus Configuration</TabsTrigger>
+          <TabsTrigger value="email">Email Settings</TabsTrigger>
           <TabsTrigger value="system">System Settings</TabsTrigger>
           <TabsTrigger value="referral">Referral Settings</TabsTrigger>
         </TabsList>
@@ -319,6 +323,14 @@ const AdminSettings = () => {
             onSave={handleSavePaymentGateways}
             isSaving={paymentGatewayMutation.isPending}
           />
+        </TabsContent>
+
+        <TabsContent value="bonus">
+          <BonusConfiguration />
+        </TabsContent>
+
+        <TabsContent value="email">
+          <EmailConfiguration />
         </TabsContent>
 
         <TabsContent value="system" className="space-y-4">
