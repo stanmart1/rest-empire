@@ -1,16 +1,29 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Dict
+from pydantic import BaseModel
 from app.core.database import get_db
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, get_admin_user
 from app.models.user import User
 from app.models.bonus import Bonus, BonusType
+from app.models.rank import Rank
 from app.schemas.rank import RankResponse, RankProgress, RankHistory
 from app.services.rank_service import (
     get_all_ranks, get_rank_progress, calculate_user_rank
 )
 from app.services.config_service import get_config
+from app.utils.activity import log_activity
 import json
+
+class RankUpdate(BaseModel):
+    name: str
+    team_turnover_required: float
+    first_leg_requirement: float
+    second_leg_requirement: float
+    other_legs_requirement: float
+
+class BulkRankUpdate(BaseModel):
+    ranks: List[RankUpdate]
 
 router = APIRouter()
 
@@ -26,9 +39,9 @@ def get_ranks(db: Session = Depends(get_db)):
     # Override bonus amounts from config
     for rank in ranks:
         if rank.name in rank_bonus_amounts:
-            rank.bonus = rank_bonus_amounts[rank.name]
+            rank.bonus_amount = rank_bonus_amounts[rank.name]
         else:
-            rank.bonus = 0
+            rank.bonus_amount = 0
     
     return ranks
 
@@ -108,3 +121,26 @@ def recalculate_rank(
             "message": "No rank change",
             "current_rank": current_user.current_rank
         }
+
+@router.put("/bulk-update")
+def bulk_update_ranks(
+    data: BulkRankUpdate,
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Admin: Bulk update rank requirements"""
+    updated_count = 0
+    
+    for rank_update in data.ranks:
+        rank = db.query(Rank).filter(Rank.name == rank_update.name).first()
+        if rank:
+            rank.team_turnover_required = rank_update.team_turnover_required
+            rank.first_leg_requirement = rank_update.first_leg_requirement
+            rank.second_leg_requirement = rank_update.second_leg_requirement
+            rank.other_legs_requirement = rank_update.other_legs_requirement
+            updated_count += 1
+    
+    db.commit()
+    log_activity(db, admin.id, "rank_requirements_updated", details={"count": updated_count})
+    
+    return {"message": f"Updated {updated_count} ranks successfully"}
