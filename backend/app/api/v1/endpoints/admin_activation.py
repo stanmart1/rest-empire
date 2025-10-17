@@ -114,7 +114,7 @@ def delete_package(
     current_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
-    """Delete activation package (admin only)"""
+    """Delete activation package and related records (admin only)"""
     package = db.query(ActivationPackage).filter(
         ActivationPackage.id == package_id
     ).first()
@@ -122,10 +122,29 @@ def delete_package(
     if not package:
         raise HTTPException(status_code=404, detail="Package not found")
     
+    # Get all activations using this package
+    activations = db.query(UserActivation).filter(
+        UserActivation.package_id == package_id
+    ).all()
+    
+    # Delete related transactions and activations
+    for activation in activations:
+        if activation.payment_transaction_id:
+            # Delete the transaction
+            transaction = db.query(Transaction).filter(
+                Transaction.id == activation.payment_transaction_id
+            ).first()
+            if transaction:
+                db.delete(transaction)
+        
+        # Delete the activation record
+        db.delete(activation)
+    
+    # Delete the package
     db.delete(package)
     db.commit()
     
-    return {"message": "Package deleted successfully"}
+    return {"message": "Package and related records deleted successfully"}
 
 @router.get("/payments")
 def get_activation_payments(

@@ -70,6 +70,12 @@ const Activation = () => {
           title: "Redirecting",
           description: "Opening payment gateway. Complete payment to activate your account.",
         });
+      } else if (method === 'paystack') {
+        window.open(data.payment_data.authorization_url, '_blank');
+        toast({
+          title: "Redirecting to Paystack",
+          description: "Complete payment to activate your account.",
+        });
       } else if (method === 'providus') {
         toast({
           title: "Account Generated",

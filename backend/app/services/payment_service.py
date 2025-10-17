@@ -1,6 +1,6 @@
 import hashlib
 import requests
-from typing import Dict
+from typing import Dict, Optional
 from app.core.config import settings
 
 class GTPayService:
@@ -140,3 +140,74 @@ class CryptoPaymentService:
             "confirmations": 1,
             "transaction_hash": transaction_hash
         }
+
+class PaystackService:
+    """Paystack payment gateway integration"""
+    
+    @staticmethod
+    def initiate_payment(transaction_id: int, amount: float, customer_email: str) -> Dict:
+        """Initiate Paystack payment"""
+        headers = {
+            "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
+            "Content-Type": "application/json"
+        }
+        
+        amount_kobo = int(amount * 100)  # Convert to kobo
+        
+        payload = {
+            "email": customer_email,
+            "amount": amount_kobo,
+            "reference": f"REST{transaction_id:08d}",
+            "callback_url": f"{settings.FRONTEND_URL}/payment/callback",
+            "metadata": {
+                "transaction_id": transaction_id
+            }
+        }
+        
+        try:
+            response = requests.post(
+                "https://api.paystack.co/transaction/initialize",
+                json=payload,
+                headers=headers
+            )
+            response.raise_for_status()
+            data = response.json()
+            
+            return {
+                "authorization_url": data["data"]["authorization_url"],
+                "access_code": data["data"]["access_code"],
+                "reference": data["data"]["reference"]
+            }
+        except Exception as e:
+            return {
+                "error": str(e),
+                "authorization_url": None
+            }
+    
+    @staticmethod
+    def verify_payment(reference: str) -> Dict:
+        """Verify Paystack payment"""
+        headers = {
+            "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            response = requests.get(
+                f"https://api.paystack.co/transaction/verify/{reference}",
+                headers=headers
+            )
+            response.raise_for_status()
+            data = response.json()
+            
+            return {
+                "status": data["data"]["status"],
+                "amount": data["data"]["amount"] / 100,  # Convert from kobo
+                "reference": data["data"]["reference"],
+                "paid_at": data["data"]["paid_at"]
+            }
+        except Exception as e:
+            return {
+                "status": "failed",
+                "error": str(e)
+            }

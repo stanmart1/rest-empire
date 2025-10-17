@@ -77,6 +77,7 @@ const PaymentMethodModal = ({
         return <Building2 className="w-6 h-6" />;
       case 'gtpay':
       case 'providus':
+      case 'paystack':
         return <CreditCard className="w-6 h-6" />;
       case 'crypto':
         return <Wallet className="w-6 h-6" />;

@@ -7,7 +7,7 @@ from app.api.deps import get_current_user
 from app.models.user import User
 from app.models.transaction import Transaction
 from app.services.payment_service import (
-    GTPayService, ProvidusService, BankTransferService, CryptoPaymentService
+    GTPayService, ProvidusService, BankTransferService, CryptoPaymentService, PaystackService
 )
 from app.services.transaction_service import create_purchase_transaction
 
@@ -101,6 +101,21 @@ def initiate_payment(
             "payment_data": payment_data
         }
     
+    elif payment.payment_method == "paystack":
+        payment_data = PaystackService.initiate_payment(
+            transaction.id,
+            payment.amount,
+            current_user.email
+        )
+        if payment_data.get("error"):
+            raise HTTPException(status_code=500, detail=payment_data["error"])
+        return {
+            "transaction_id": transaction.id,
+            "payment_method": "paystack",
+            "currency": "NGN",
+            "payment_data": payment_data
+        }
+    
     else:
         raise HTTPException(status_code=400, detail="Invalid payment method")
 
@@ -184,6 +199,13 @@ def get_payment_methods():
                 "description": "Manual bank transfer (24hr confirmation)",
                 "currency": "NGN",
                 "instant": False
+            },
+            {
+                "id": "paystack",
+                "name": "Paystack",
+                "description": "Pay with card, bank transfer, or USSD",
+                "currency": "NGN",
+                "instant": True
             },
             {
                 "id": "crypto",

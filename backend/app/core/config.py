@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     PROVIDUS_ACCOUNT_NUMBER: str = ""
     PROVIDUS_API_URL: str = "https://api.providusbank.com"
     
+    # Payment Gateways - Paystack
+    PAYSTACK_SECRET_KEY: str = ""
+    PAYSTACK_PUBLIC_KEY: str = ""
+    
     # Crypto
     CRYPTO_WALLET_ADDRESS: str = ""
     CRYPTO_API_KEY: str = ""
