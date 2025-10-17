@@ -25,12 +25,22 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'motion/react';
 import { useDashboardStats } from '@/hooks/useApi';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 
 const Sidebar = () => {
   const { user } = useAuth();
   const { data: dashboardStats } = useDashboardStats();
   const [bonusesOpen, setBonusesOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  const { data: bonusConfig } = useQuery({
+    queryKey: ['bonusConfig'],
+    queryFn: async () => {
+      const response = await api.get('/admin/config/config/public/payout-settings');
+      return response.data;
+    },
+  });
 
   const getStatusDate = () => {
     if (dashboardStats?.is_active && dashboardStats?.activated_at) {
@@ -60,10 +70,12 @@ const Sidebar = () => {
   ];
 
   const bonusSubLinks = [
-    { to: '/bonuses/rank', icon: Star, label: 'Rank bonus' },
-    { to: '/bonuses/unilevel', icon: Network, label: 'Unilevel Bonus' },
-    { to: '/bonuses/infinity', icon: Infinity, label: 'Infinity Bonus' },
-  ];
+    { to: '/bonuses/rank', icon: Star, label: 'Rank bonus', enabled: bonusConfig?.rank_bonus_enabled },
+    { to: '/bonuses/unilevel', icon: Network, label: 'Unilevel Bonus', enabled: bonusConfig?.unilevel_enabled },
+    { to: '/bonuses/infinity', icon: Infinity, label: 'Infinity Bonus', enabled: bonusConfig?.infinity_enabled },
+  ].filter(link => link.enabled);
+  
+  const showBonusesMenu = bonusSubLinks.length > 0;
 
   const personalLinks = [
     { to: '/payouts', icon: CreditCard, label: 'Payouts' },
@@ -162,6 +174,7 @@ const Sidebar = () => {
           ))}
 
           {/* Bonuses Section with Submenu */}
+          {showBonusesMenu && (
           <div className="pt-4 bg-sidebar">
             <div className="flex items-center gap-1">
               <NavLink
@@ -212,6 +225,7 @@ const Sidebar = () => {
               </div>
             )}
           </div>
+          )}
 
           {/* Personal Section */}
           <div className="pt-4">
@@ -279,6 +293,7 @@ const Sidebar = () => {
           ))}
 
           {/* Bonuses Section with Submenu */}
+          {showBonusesMenu && (
           <div className="pt-4 bg-sidebar">
             <div className="flex items-center gap-1">
               <NavLink
@@ -327,6 +342,7 @@ const Sidebar = () => {
               </div>
             )}
           </div>
+          )}
 
           {/* Personal Section */}
           <div className="pt-4">

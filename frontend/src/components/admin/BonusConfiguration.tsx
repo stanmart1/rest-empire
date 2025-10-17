@@ -20,7 +20,7 @@ const BonusConfiguration = () => {
   const [infinityEnabled, setInfinityEnabled] = useState(false);
   const [infinityPercentage, setInfinityPercentage] = useState(0);
 
-  const ranks = ['Pearl', 'Sapphire', 'Ruby', 'Emerald', 'Diamond', 'Blue Diamond', 'Green Diamond', 'Purple Diamond', 'Red Diamond', 'Black Diamond', 'Ultima Diamond', 'Double Ultima Diamond', 'Triple Ultima Diamond', 'Billion Diamond'];
+  const ranks = ['Amber', 'Jade', 'Pearl', 'Sapphire', 'Ruby', 'Emerald', 'Diamond', 'Blue Diamond', 'Green Diamond', 'Purple Diamond', 'Red Diamond', 'Black Diamond', 'Ultima Diamond', 'Double Ultima Diamond', 'Triple Ultima Diamond', 'Billion Diamond'];
 
   useEffect(() => {
     if (settings) {
@@ -47,6 +47,14 @@ const BonusConfiguration = () => {
 
   const handleSaveInfinity = () => {
     updateMutation.mutate({
+      infinity_bonus: { enabled: infinityEnabled, percentage: infinityPercentage }
+    });
+  };
+
+  const handleSaveAll = () => {
+    updateMutation.mutate({
+      unilevel: { enabled: unilevelEnabled, percentages: unilevelPercentages },
+      rank_bonus: { enabled: rankBonusEnabled, amounts: rankAmounts },
       infinity_bonus: { enabled: infinityEnabled, percentage: infinityPercentage }
     });
   };
@@ -166,6 +174,11 @@ const BonusConfiguration = () => {
           )}
         </CardContent>
       </Card>
+
+      <Button onClick={handleSaveAll} disabled={updateMutation.isPending} className="w-full">
+        {updateMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+        Save All Bonus Settings
+      </Button>
     </div>
   );
 };

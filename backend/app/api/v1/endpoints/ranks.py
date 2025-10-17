@@ -9,13 +9,27 @@ from app.schemas.rank import RankResponse, RankProgress, RankHistory
 from app.services.rank_service import (
     get_all_ranks, get_rank_progress, calculate_user_rank
 )
+from app.services.config_service import get_config
+import json
 
 router = APIRouter()
 
 @router.get("/", response_model=List[RankResponse])
 def get_ranks(db: Session = Depends(get_db)):
-    """Get all available ranks"""
+    """Get all available ranks with bonus amounts from config"""
     ranks = get_all_ranks(db)
+    
+    # Get rank bonus amounts from config
+    rank_bonus_config = get_config(db, "rank_bonus_amounts")
+    rank_bonus_amounts = json.loads(rank_bonus_config) if rank_bonus_config else {}
+    
+    # Override bonus amounts from config
+    for rank in ranks:
+        if rank.name in rank_bonus_amounts:
+            rank.bonus = rank_bonus_amounts[rank.name]
+        else:
+            rank.bonus = 0
+    
     return ranks
 
 @router.get("/progress/", response_model=RankProgress)

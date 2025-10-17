@@ -6,29 +6,31 @@ from app.models.transaction import Transaction, TransactionType, TransactionStat
 from app.models.bonus import Bonus, BonusType, BonusStatus
 from app.models.rank import Rank
 from app.services.activity_service import check_user_active
+from app.services.config_service import get_config
 from typing import List
+import json
 
-# Unilevel percentages by level
-UNILEVEL_PERCENTAGES = {
-    1: 40.0,   # Direct referral
-    2: 7.0,
-    3: 5.0,
-    4: 3.0,
-    5: 3.0,
-    6: 1.0,
-    7: 1.0,
-    8: 1.0,
-    9: 1.0,
-    10: 1.0,
-    11: 1.0,
-    12: 1.0,
-    13: 1.0,
-    14: 1.0,
-    15: 1.0
-}
+def get_unilevel_percentages(db: Session) -> dict:
+    """Get unilevel percentages from database config"""
+    config_str = get_config(db, "unilevel_percentages")
+    if config_str:
+        percentages_list = json.loads(config_str)
+        return {i + 1: percentages_list[i] for i in range(len(percentages_list))}
+    return {i: 0 for i in range(1, 16)}
+
+def is_unilevel_enabled(db: Session) -> bool:
+    """Check if unilevel bonus is enabled"""
+    return get_config(db, "unilevel_enabled") == "true"
+
+def is_infinity_enabled(db: Session) -> bool:
+    """Check if infinity bonus is enabled"""
+    return get_config(db, "infinity_enabled") == "true"
 
 def calculate_unilevel_bonus(db: Session, transaction_id: int):
     """Calculate and award unilevel bonuses for a transaction"""
+    if not is_unilevel_enabled(db):
+        return []
+    
     transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
     
     if not transaction or transaction.transaction_type != TransactionType.purchase:
@@ -36,6 +38,8 @@ def calculate_unilevel_bonus(db: Session, transaction_id: int):
     
     purchaser_id = transaction.user_id
     amount = float(transaction.amount)
+    
+    UNILEVEL_PERCENTAGES = get_unilevel_percentages(db)
     
     # Get all ancestors up to 15 levels
     ancestors = db.query(TeamMember).filter(
@@ -124,6 +128,9 @@ def calculate_unilevel_bonus(db: Session, transaction_id: int):
 
 def calculate_infinity_bonus(db: Session, month: int, year: int):
     """Calculate monthly infinity bonuses for Diamond+ ranks"""
+    if not is_infinity_enabled(db):
+        return []
+    
     # Get start and end of month
     start_date = datetime(year, month, 1)
     if month == 12:

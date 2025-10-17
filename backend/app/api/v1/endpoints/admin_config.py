@@ -128,11 +128,18 @@ def get_public_configs(db: Session = Depends(get_db)) -> Dict[str, str]:
 @router.get("/config/public/payout-settings")
 def get_public_payout_settings(db: Session = Depends(get_db)):
     """Public: Get payout settings (no auth required)"""
+    unilevel_enabled = get_config(db, "unilevel_enabled")
+    rank_bonus_enabled = get_config(db, "rank_bonus_enabled")
+    infinity_enabled = get_config(db, "infinity_bonus_enabled")
+    
     return {
         "min_payout_ngn": float(get_config(db, "min_payout_ngn") or 5000),
         "min_payout_usdt": float(get_config(db, "min_payout_usdt") or 10),
         "payout_fee_ngn": float(get_config(db, "payout_fee_ngn") or 1.5),
-        "payout_fee_usdt": float(get_config(db, "payout_fee_usdt") or 2.0)
+        "payout_fee_usdt": float(get_config(db, "payout_fee_usdt") or 2.0),
+        "unilevel_enabled": unilevel_enabled == "true" if unilevel_enabled else False,
+        "rank_bonus_enabled": rank_bonus_enabled == "true" if rank_bonus_enabled else False,
+        "infinity_enabled": infinity_enabled == "true" if infinity_enabled else False
     }
 
 @router.get("/config/settings/platform")

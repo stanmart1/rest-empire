@@ -187,7 +187,7 @@ const AdminSettings = () => {
         <TabsList>
           <TabsTrigger value="payout">Payout Settings</TabsTrigger>
           <TabsTrigger value="payment">Payment Gateways</TabsTrigger>
-          <TabsTrigger value="bonus">Bonus Configuration</TabsTrigger>
+          <TabsTrigger value="bonus">Bonus Settings</TabsTrigger>
           <TabsTrigger value="email">Email Settings</TabsTrigger>
           <TabsTrigger value="system">System Settings</TabsTrigger>
           <TabsTrigger value="referral">Referral Settings</TabsTrigger>

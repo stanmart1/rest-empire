@@ -16,18 +16,25 @@ def get_bonus_settings(
     db: Session = Depends(get_db)
 ):
     """Admin: Get bonus settings"""
+    unilevel_enabled = get_config(db, "unilevel_enabled")
+    unilevel_percentages = get_config(db, "unilevel_percentages")
+    rank_bonus_enabled = get_config(db, "rank_bonus_enabled")
+    rank_bonus_amounts = get_config(db, "rank_bonus_amounts")
+    infinity_enabled = get_config(db, "infinity_bonus_enabled")
+    infinity_percentage = get_config(db, "infinity_bonus_percentage")
+    
     return {
         "unilevel": {
-            "enabled": get_config(db, "unilevel_enabled", "false") == "true",
-            "percentages": json.loads(get_config(db, "unilevel_percentages", "[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]"))
+            "enabled": unilevel_enabled == "true" if unilevel_enabled else False,
+            "percentages": json.loads(unilevel_percentages) if unilevel_percentages else [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         },
         "rank_bonus": {
-            "enabled": get_config(db, "rank_bonus_enabled", "false") == "true",
-            "amounts": json.loads(get_config(db, "rank_bonus_amounts", "{}"))
+            "enabled": rank_bonus_enabled == "true" if rank_bonus_enabled else False,
+            "amounts": json.loads(rank_bonus_amounts) if rank_bonus_amounts else {}
         },
         "infinity_bonus": {
-            "enabled": get_config(db, "infinity_bonus_enabled", "false") == "true",
-            "percentage": float(get_config(db, "infinity_bonus_percentage", "0"))
+            "enabled": infinity_enabled == "true" if infinity_enabled else False,
+            "percentage": float(infinity_percentage) if infinity_percentage else 0
         }
     }
 

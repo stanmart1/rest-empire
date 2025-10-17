@@ -5,24 +5,46 @@ from app.models.user import User
 from app.models.transaction import Transaction, TransactionType, TransactionStatus
 from app.models.bonus import Bonus, BonusType, BonusStatus
 from app.services.optimized_team_service import OptimizedTeamService
+from app.services.config_service import get_config
 from typing import List, Dict, Tuple
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
-UNILEVEL_PERCENTAGES = {
-    1: 40.0, 2: 7.0, 3: 5.0, 4: 3.0, 5: 3.0,
-    6: 1.0, 7: 1.0, 8: 1.0, 9: 1.0, 10: 1.0,
-    11: 1.0, 12: 1.0, 13: 1.0, 14: 1.0, 15: 1.0
-}
+def get_unilevel_percentages(db: Session) -> dict:
+    """Get unilevel percentages from database config"""
+    config_str = get_config(db, "unilevel_percentages")
+    if config_str:
+        percentages_list = json.loads(config_str)
+        return {i + 1: percentages_list[i] for i in range(len(percentages_list))}
+    return {i: 0 for i in range(1, 16)}
+
+def get_rank_bonus_amounts(db: Session) -> dict:
+    """Get rank bonus amounts from database config"""
+    config_str = get_config(db, "rank_bonus_amounts")
+    if config_str:
+        return json.loads(config_str)
+    return {}
+
+def is_unilevel_enabled(db: Session) -> bool:
+    return get_config(db, "unilevel_enabled") == "true"
+
+def is_rank_bonus_enabled(db: Session) -> bool:
+    return get_config(db, "rank_bonus_enabled") == "true"
+
+def is_infinity_enabled(db: Session) -> bool:
+    return get_config(db, "infinity_enabled") == "true"
 
 class OptimizedBonusEngine:
     
     @staticmethod
     def calculate_unilevel_bonuses_batch(db: Session, transaction_ids: List[int]) -> List[Bonus]:
         """Process multiple transactions for unilevel bonuses efficiently"""
-        if not transaction_ids:
+        if not transaction_ids or not is_unilevel_enabled(db):
             return []
+        
+        UNILEVEL_PERCENTAGES = get_unilevel_percentages(db)
         
         # Get all transactions with user data in single query
         transactions = db.query(
@@ -149,16 +171,13 @@ class OptimizedBonusEngine:
     @staticmethod
     def calculate_rank_bonuses_batch(db: Session, user_rank_changes: List[Tuple[int, str, str]]) -> List[Bonus]:
         """Process rank achievements for multiple users efficiently"""
-        if not user_rank_changes:
+        if not user_rank_changes or not is_rank_bonus_enabled(db):
             return []
         
-        # Get rank bonus amounts in single query
-        rank_names = list(set([new_rank for _, _, new_rank in user_rank_changes]))
-        rank_bonuses = db.query(
-            text("SELECT name, rank_bonus FROM ranks WHERE name = ANY(:ranks)")
-        ).params(ranks=rank_names).fetchall()
-        
-        rank_bonus_map = {row.name: float(row.rank_bonus or 0) for row in rank_bonuses}
+        # Get rank bonus amounts from config (not from ranks table)
+        rank_bonus_map = get_rank_bonus_amounts(db)
+        if not rank_bonus_map:
+            return []
         
         bonuses_to_create = []
         balance_updates = {}
@@ -208,6 +227,9 @@ class OptimizedBonusEngine:
     @staticmethod
     def calculate_infinity_bonus_optimized(db: Session, month: int, year: int) -> List[Bonus]:
         """Optimized infinity bonus calculation with single query"""
+        if not is_infinity_enabled(db):
+            return []
+        
         start_date = datetime(year, month, 1)
         end_date = datetime(year + 1, 1, 1) if month == 12 else datetime(year, month + 1, 1)
         
