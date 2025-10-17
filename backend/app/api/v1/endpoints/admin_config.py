@@ -125,6 +125,16 @@ def get_public_configs(db: Session = Depends(get_db)) -> Dict[str, str]:
     """Public: Get public configurations (no auth required)"""
     return get_all_configs(db, public_only=True)
 
+@router.get("/config/public/payout-settings")
+def get_public_payout_settings(db: Session = Depends(get_db)):
+    """Public: Get payout settings (no auth required)"""
+    return {
+        "min_payout_ngn": float(get_config(db, "min_payout_ngn") or 5000),
+        "min_payout_usdt": float(get_config(db, "min_payout_usdt") or 10),
+        "payout_fee_ngn": float(get_config(db, "payout_fee_ngn") or 1.5),
+        "payout_fee_usdt": float(get_config(db, "payout_fee_usdt") or 2.0)
+    }
+
 @router.get("/config/settings/platform")
 def admin_get_platform_settings(
     admin: User = Depends(get_admin_user),
@@ -132,13 +142,13 @@ def admin_get_platform_settings(
 ):
     """Admin: Get platform settings"""
     return {
-        "min_payout_ngn": float(get_config(db, "min_payout_ngn", "5000")),
-        "min_payout_usdt": float(get_config(db, "min_payout_usdt", "10")),
-        "payout_fee_ngn": float(get_config(db, "payout_fee_ngn", "1.5")),
-        "payout_fee_usdt": float(get_config(db, "payout_fee_usdt", "2.0")),
-        "registration_enabled": get_config(db, "registration_enabled", "true") == "true",
-        "email_verification_required": get_config(db, "email_verification_required", "true") == "true",
-        "max_referral_depth": int(get_config(db, "max_referral_depth", "15"))
+        "min_payout_ngn": float(get_config(db, "min_payout_ngn") or 5000),
+        "min_payout_usdt": float(get_config(db, "min_payout_usdt") or 10),
+        "payout_fee_ngn": float(get_config(db, "payout_fee_ngn") or 1.5),
+        "payout_fee_usdt": float(get_config(db, "payout_fee_usdt") or 2.0),
+        "registration_enabled": (get_config(db, "registration_enabled") or "true") == "true",
+        "email_verification_required": (get_config(db, "email_verification_required") or "true") == "true",
+        "max_referral_depth": int(get_config(db, "max_referral_depth") or 15)
     }
 
 @router.put("/config/settings/platform")

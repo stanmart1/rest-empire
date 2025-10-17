@@ -3,23 +3,28 @@ from datetime import datetime
 from app.models.user import User
 from app.models.payout import Payout, PayoutStatus
 from app.models.transaction import Transaction, TransactionType, TransactionStatus
+from app.services.config_service import get_config
 from app.utils.activity import log_activity
 
-# Minimum payout amounts
-MINIMUM_PAYOUT = {
-    "NGN": 5000,
-    "USDT": 10
-}
+def get_minimum_payout(db: Session, currency: str) -> float:
+    """Get minimum payout amount from config"""
+    if currency == "NGN":
+        return float(get_config(db, "min_payout_ngn"))
+    elif currency == "USDT":
+        return float(get_config(db, "min_payout_usdt"))
+    return 0
 
-# Processing fees (percentage)
-PROCESSING_FEE = {
-    "NGN": 1.5,  # 1.5%
-    "USDT": 2.0  # 2%
-}
+def get_processing_fee_percentage(db: Session, currency: str) -> float:
+    """Get processing fee percentage from config"""
+    if currency == "NGN":
+        return float(get_config(db, "payout_fee_ngn"))
+    elif currency == "USDT":
+        return float(get_config(db, "payout_fee_usdt"))
+    return 0
 
-def calculate_processing_fee(amount: float, currency: str) -> float:
+def calculate_processing_fee(db: Session, amount: float, currency: str) -> float:
     """Calculate processing fee"""
-    fee_percentage = PROCESSING_FEE.get(currency, 0)
+    fee_percentage = get_processing_fee_percentage(db, currency)
     return amount * (fee_percentage / 100)
 
 def create_payout_request(
@@ -37,8 +42,9 @@ def create_payout_request(
         raise ValueError("User not found")
     
     # Validate minimum amount
-    if amount < MINIMUM_PAYOUT.get(currency, 0):
-        raise ValueError(f"Minimum payout is {MINIMUM_PAYOUT[currency]} {currency}")
+    min_payout = get_minimum_payout(db, currency)
+    if amount < min_payout:
+        raise ValueError(f"Minimum payout is {min_payout} {currency}")
     
     # Check balance
     if currency == "NGN":
@@ -49,7 +55,7 @@ def create_payout_request(
             raise ValueError("Insufficient balance")
     
     # Calculate fee and net amount
-    processing_fee = calculate_processing_fee(amount, currency)
+    processing_fee = calculate_processing_fee(db, amount, currency)
     net_amount = amount - processing_fee
     
     # Create payout
@@ -214,5 +220,8 @@ def get_payout_stats(db: Session, user_id: int) -> dict:
         "rejected_payouts": float(rejected),
         "available_balance_ngn": float(user.balance_ngn) if user else 0,
         "available_balance_usdt": float(user.balance_usdt) if user else 0,
-        "minimum_payout": MINIMUM_PAYOUT
+        "minimum_payout": {
+            "NGN": get_minimum_payout(db, "NGN"),
+            "USDT": get_minimum_payout(db, "USDT")
+        }
     }

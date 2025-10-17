@@ -12,8 +12,9 @@ import { Loader2 } from 'lucide-react';
 import StatusBadge from '@/components/common/StatusBadge';
 import { formatCurrency, formatDateTime } from '@/utils/formatters';
 import { usePayouts } from '@/hooks/useApi';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import apiService from '@/services/api';
+import api from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { Payout } from '@/lib/types';
 
@@ -37,6 +38,14 @@ const Payouts = () => {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const { data: payouts, isLoading } = usePayouts(statusFilter === 'all' ? {} : { status: statusFilter });
+  
+  const { data: payoutConfig } = useQuery({
+    queryKey: ['payoutConfig'],
+    queryFn: async () => {
+      const response = await api.get('/admin/config/config/public/payout-settings');
+      return response.data;
+    },
+  });
 
   const { register, handleSubmit, watch, setValue, formState: { errors }, reset } = useForm<PayoutFormData>({
     resolver: zodResolver(payoutSchema),
@@ -68,11 +77,17 @@ const Payouts = () => {
   const watchAmount = watch('amount');
   const watchCurrency = watch('currency');
   
-  const MINIMUM_PAYOUT = { NGN: 5000, USDT: 10 };
-  const FEE_PERCENTAGE = { NGN: 1.5, USDT: 2.0 };
+  const MINIMUM_PAYOUT = {
+    NGN: payoutConfig?.min_payout_ngn || 5000,
+    USDT: payoutConfig?.min_payout_usdt || 10
+  };
+  const FEE_PERCENTAGE = {
+    NGN: payoutConfig?.payout_fee_ngn || 1.5,
+    USDT: payoutConfig?.payout_fee_usdt || 2.0
+  };
   
-  const fee = watchAmount ? watchAmount * (FEE_PERCENTAGE[watchCurrency] / 100) : 0;
-  const netAmount = watchAmount ? watchAmount - fee : 0;
+  const fee = watchAmount && FEE_PERCENTAGE[watchCurrency] ? watchAmount * (FEE_PERCENTAGE[watchCurrency] / 100) : 0;
+  const netAmount = watchAmount && fee ? watchAmount - fee : watchAmount || 0;
 
   const onSubmit = (data: PayoutFormData) => {
     const minAmount = MINIMUM_PAYOUT[data.currency];
@@ -132,7 +147,7 @@ const Payouts = () => {
                   id="amount"
                   type="number"
                   step="0.01"
-                  placeholder="Min: ₦5,000"
+                  placeholder={`Min: ${watchCurrency === 'NGN' ? '₦' : '$'}${MINIMUM_PAYOUT[watchCurrency]?.toLocaleString() || ''}`}
                   {...register('amount')}
                 />
                 {errors.amount && (
@@ -222,14 +237,14 @@ const Payouts = () => {
               )}
             </div>
 
-            {watchAmount && (
+            {watchAmount && FEE_PERCENTAGE[watchCurrency] && (
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                 <div className="flex justify-between">
                   <span>Requested Amount:</span>
                   <span>{formatCurrency(watchAmount, watchCurrency)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Processing Fee ({FEE_PERCENTAGE[watchCurrency]}%):</span>
+                  <span>Payout Fee ({FEE_PERCENTAGE[watchCurrency]}%):</span>
                   <span>{formatCurrency(fee, watchCurrency)}</span>
                 </div>
                 <div className="flex justify-between font-semibold border-t pt-2">
