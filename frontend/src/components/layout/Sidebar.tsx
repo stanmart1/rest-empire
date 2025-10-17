@@ -22,14 +22,24 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'motion/react';
+import { useDashboardStats } from '@/hooks/useApi';
 
 const Sidebar = () => {
   const { user } = useAuth();
+  const { data: dashboardStats } = useDashboardStats();
   const [bonusesOpen, setBonusesOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const getStatusDate = () => {
+    if (dashboardStats?.is_active && dashboardStats?.activated_at) {
+      return new Date(dashboardStats.activated_at).toLocaleDateString('en-GB');
+    } else if (!dashboardStats?.is_active && dashboardStats?.deactivated_at) {
+      return new Date(dashboardStats.deactivated_at).toLocaleDateString('en-GB');
+    }
+    return 'N/A';
+  };
 
   const getInitials = (name: string) => {
     return name
@@ -112,8 +122,8 @@ const Sidebar = () => {
             </div>
           </div>
           <div className="text-center py-2 bg-muted rounded-lg">
-            <p className="text-xs text-white mb-1">{user?.is_active ? "Active" : "Inactive"}</p>
-            <p className="text-sm font-medium text-white">since {user?.registration_date ? new Date(user.registration_date).toLocaleDateString('en-GB') : 'N/A'}</p>
+            <p className="text-xs text-white mb-1">{dashboardStats?.is_active ? "Active" : "Inactive"}</p>
+            <p className="text-sm font-medium text-white">since {getStatusDate()}</p>
           </div>
         </div>
 
@@ -244,8 +254,8 @@ const Sidebar = () => {
             </div>
           </div>
           <div className="text-center py-2 bg-muted rounded-lg">
-            <p className="text-xs text-white mb-1">{user?.is_active ? "Active" : "Inactive"}</p>
-            <p className="text-sm font-medium text-white">since {user?.registration_date ? new Date(user.registration_date).toLocaleDateString('en-GB') : 'N/A'}</p>
+            <p className="text-xs text-white mb-1">{dashboardStats?.is_active ? "Active" : "Inactive"}</p>
+            <p className="text-sm font-medium text-white">since {getStatusDate()}</p>
           </div>
         </div>
 

@@ -136,7 +136,7 @@ def delete_package(
         UserActivation.package_id == package_id
     ).all()
     
-    # Delete related transactions and activations
+    # Delete related transactions and deactivate users
     for activation in activations:
         if activation.payment_transaction_id:
             # Delete the transaction
@@ -145,6 +145,12 @@ def delete_package(
             ).first()
             if transaction:
                 db.delete(transaction)
+        
+        # Deactivate the user
+        user = db.query(User).filter(User.id == activation.user_id).first()
+        if user:
+            user.is_active = False
+            user.deactivated_at = datetime.utcnow()
         
         # Delete the activation record
         db.delete(activation)
@@ -240,6 +246,7 @@ def approve_activation_payment(
         user = db.query(User).filter(User.id == activation.user_id).first()
         if user:
             user.is_active = True
+            user.deactivated_at = None
         
         db.commit()
     
@@ -311,6 +318,7 @@ def assign_package_to_users(
         
         # Activate user account
         user.is_active = True
+        user.deactivated_at = None
         
         activated_users.append(user.email)
     

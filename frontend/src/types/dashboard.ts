@@ -7,6 +7,8 @@ export interface DashboardStats {
   first_line_count: number;
   pending_payouts: number;
   recent_earnings_30d: number;
+  activated_at?: string;
+  deactivated_at?: string;
 }
 
 export interface TeamStats {

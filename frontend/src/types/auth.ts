@@ -64,6 +64,7 @@ export interface AuthUser {
   balance_ngn: number;
   balance_usdt: number;
   total_earnings: number;
+  role: string
 }
 
 // Form Data Types

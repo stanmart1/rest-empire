@@ -30,6 +30,8 @@ export interface DashboardStats {
   pending_payouts: number;
   recent_earnings_30d: number;
   is_active: boolean;
+  activated_at?: string;
+  deactivated_at?: string;
   rank_progress?: {
     current_rank: string;
     next_rank?: string;

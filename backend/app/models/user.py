@@ -24,6 +24,7 @@ class User(Base):
     verification_token = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
     is_inactive = Column(Boolean, default=False)
+    deactivated_at = Column(DateTime, nullable=True)
     
     role = Column(Enum(UserRole), default=UserRole.user, index=True)
     

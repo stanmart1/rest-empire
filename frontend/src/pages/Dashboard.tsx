@@ -135,10 +135,22 @@ const Dashboard = () => {
                 <p className="text-sm text-muted-foreground">Current Rank</p>
               </div>
             </div>
-            <Badge variant={dashboardStats?.is_active ? "default" : "secondary"}>
-              <CircleDot className="w-3 h-3 mr-1" />
-              {dashboardStats?.is_active ? 'Active' : 'Inactive'}
-            </Badge>
+            <div className="text-right">
+              <Badge variant={dashboardStats?.is_active ? "default" : "secondary"}>
+                <CircleDot className="w-3 h-3 mr-1" />
+                {dashboardStats?.is_active ? 'Active' : 'Inactive'}
+              </Badge>
+              {dashboardStats?.is_active && dashboardStats?.activated_at && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  since {new Date(dashboardStats.activated_at).toLocaleDateString()}
+                </p>
+              )}
+              {!dashboardStats?.is_active && dashboardStats?.deactivated_at && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  since {new Date(dashboardStats.deactivated_at).toLocaleDateString()}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Rank Progress */}
