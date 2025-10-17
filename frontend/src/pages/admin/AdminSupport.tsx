@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -9,66 +8,25 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Eye } from 'lucide-react';
-import { toast } from 'sonner';
-import api from '@/lib/api';
-
-interface SupportTicket {
-  id: number;
-  user_id: number;
-  subject: string;
-  category: string;
-  message: string;
-  status: string;
-  priority: string;
-  created_at: string;
-  user?: {
-    full_name: string;
-    email: string;
-  };
-}
+import { SupportTicket } from '@/types/admin-support';
+import { useSupportTickets, useRespondToTicket, useUpdateTicketStatus } from '@/hooks/useAdminSupport';
 
 const AdminSupport = () => {
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [responseMessage, setResponseMessage] = useState('');
   const [newStatus, setNewStatus] = useState('');
-  const queryClient = useQueryClient();
-
-  const { data: tickets, isLoading } = useQuery<SupportTicket[]>({
-    queryKey: ['adminTickets'],
-    queryFn: async () => {
-      const response = await api.get('/admin/tickets');
-      return response.data;
-    },
-  });
-
-  const respondMutation = useMutation({
-    mutationFn: async ({ id, message }: { id: number; message: string }) => {
-      await api.post(`/admin/tickets/${id}/respond`, { message });
-    },
+  const respondMutation = useRespondToTicket({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminTickets'] });
-      toast.success('Response sent successfully');
       setResponseMessage('');
     },
-    onError: () => {
-      toast.error('Failed to send response');
-    },
   });
-
-  const updateStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      await api.put(`/admin/tickets/${id}/status`, { status });
-    },
+  const updateStatusMutation = useUpdateTicketStatus({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminTickets'] });
-      toast.success('Status updated successfully');
       setDetailsOpen(false);
     },
-    onError: () => {
-      toast.error('Failed to update status');
-    },
   });
+  const { data: tickets, isLoading } = useSupportTickets();
 
   const handleViewDetails = (ticket: SupportTicket) => {
     setSelectedTicket(ticket);
@@ -78,13 +36,13 @@ const AdminSupport = () => {
 
   const handleSendResponse = () => {
     if (selectedTicket && responseMessage.trim()) {
-      respondMutation.mutate({ id: selectedTicket.id, message: responseMessage });
+      respondMutation.mutate({ ticketId: selectedTicket.id, message: responseMessage });
     }
   };
 
   const handleUpdateStatus = () => {
     if (selectedTicket && newStatus) {
-      updateStatusMutation.mutate({ id: selectedTicket.id, status: newStatus });
+      updateStatusMutation.mutate({ ticketId: selectedTicket.id, status: newStatus });
     }
   };
 

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -11,21 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Trash2, Download, Pencil, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import api from '@/lib/api';
-
-interface PromoMaterial {
-  id: number;
-  title: string;
-  description: string;
-  material_type: string;
-  file_url: string;
-  file_size?: number;
-  language: string;
-  is_active: boolean;
-  download_count: number;
-  created_at: string;
-}
+import { PromoMaterial } from '@/types/admin-promo';
+import { usePromoMaterials, useCreatePromoMaterial, useUpdatePromoMaterial, useDeletePromoMaterial } from '@/hooks/useAdminPromo';
 
 const AdminPromoMaterials = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -40,23 +26,8 @@ const AdminPromoMaterials = () => {
     file_url: '',
     language: 'en',
   });
-  const queryClient = useQueryClient();
-
-  const { data: materials, isLoading } = useQuery<PromoMaterial[]>({
-    queryKey: ['adminPromoMaterials'],
-    queryFn: async () => {
-      const response = await api.get('/promo-materials/');
-      return response.data;
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: any) => {
-      await api.post('/admin/promo-materials', data);
-    },
+  const createMutation = useCreatePromoMaterial({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminPromoMaterials'] });
-      toast.success('Material created successfully');
       setCreateDialogOpen(false);
       setFormData({
         title: '',
@@ -66,40 +37,20 @@ const AdminPromoMaterials = () => {
         language: 'en',
       });
     },
-    onError: () => {
-      toast.error('Failed to create material');
-    },
   });
-
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      await api.put(`/admin/promo-materials/${id}`, data);
-    },
+  const updateMutation = useUpdatePromoMaterial({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminPromoMaterials'] });
-      toast.success('Material updated successfully');
       setEditDialogOpen(false);
       setEditingMaterial(null);
     },
-    onError: () => {
-      toast.error('Failed to update material');
-    },
   });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await api.delete(`/admin/promo-materials/${id}`);
-    },
+  const deleteMutation = useDeletePromoMaterial({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminPromoMaterials'] });
-      toast.success('Material deleted successfully');
       setDeleteDialogOpen(false);
       setMaterialToDelete(null);
     },
-    onError: () => {
-      toast.error('Failed to delete material');
-    },
   });
+  const { data: materials, isLoading } = usePromoMaterials();
 
   const handleDeleteClick = (material: PromoMaterial) => {
     setMaterialToDelete(material);
@@ -132,7 +83,7 @@ const AdminPromoMaterials = () => {
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingMaterial) {
-      updateMutation.mutate({ id: editingMaterial.id, data: formData });
+      updateMutation.mutate({ materialId: editingMaterial.id, data: formData });
     }
   };
 

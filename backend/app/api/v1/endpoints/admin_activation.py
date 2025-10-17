@@ -1,15 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+from datetime import datetime
 from app.core.database import get_db
 from app.api.deps import get_admin_user
 from app.models.user import User
-from app.models.activation import ActivationPackage
+from app.models.activation import ActivationPackage, UserActivation
+from app.models.transaction import Transaction, TransactionType, TransactionStatus
 from app.schemas.activation import (
     ActivationPackageResponse, 
     ActivationPackageCreate, 
     ActivationPackageUpdate
 )
+from app.services.transaction_service import complete_purchase_transaction, fail_transaction
 from slugify import slugify
 
 router = APIRouter()
@@ -123,3 +126,110 @@ def delete_package(
     db.commit()
     
     return {"message": "Package deleted successfully"}
+
+@router.get("/payments")
+def get_activation_payments(
+    current_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Get all activation payments"""
+    payments = db.query(
+        Transaction.id,
+        Transaction.amount,
+        Transaction.currency,
+        Transaction.status,
+        Transaction.payment_method,
+        Transaction.payment_reference,
+        Transaction.meta_data,
+        Transaction.created_at,
+        User.id.label('user_id'),
+        User.full_name.label('user_name'),
+        User.email.label('user_email'),
+        ActivationPackage.name.label('package_name')
+    ).join(
+        User, Transaction.user_id == User.id
+    ).join(
+        UserActivation, UserActivation.payment_transaction_id == Transaction.id
+    ).join(
+        ActivationPackage, UserActivation.package_id == ActivationPackage.id
+    ).filter(
+        Transaction.transaction_type == TransactionType.purchase
+    ).order_by(Transaction.created_at.desc()).all()
+    
+    return [
+        {
+            "id": p.id,
+            "amount": float(p.amount),
+            "currency": p.currency,
+            "status": p.status.value,
+            "payment_method": p.payment_method,
+            "payment_reference": p.payment_reference,
+            "meta_data": p.meta_data,
+            "created_at": p.created_at,
+            "user_id": p.user_id,
+            "user_name": p.user_name,
+            "user_email": p.user_email,
+            "package_name": p.package_name
+        }
+        for p in payments
+    ]
+
+@router.post("/payments/{transaction_id}/approve")
+def approve_activation_payment(
+    transaction_id: int,
+    current_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Approve activation payment and activate user account"""
+    transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+    
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    if transaction.status != TransactionStatus.pending:
+        raise HTTPException(status_code=400, detail="Transaction already processed")
+    
+    complete_purchase_transaction(db, transaction_id)
+    
+    activation = db.query(UserActivation).filter(
+        UserActivation.payment_transaction_id == transaction_id
+    ).first()
+    
+    if activation:
+        activation.status = "active"
+        activation.activated_at = datetime.utcnow()
+        
+        user = db.query(User).filter(User.id == activation.user_id).first()
+        if user:
+            user.is_active = True
+        
+        db.commit()
+    
+    return {"message": "Payment approved and account activated"}
+
+@router.post("/payments/{transaction_id}/reject")
+def reject_activation_payment(
+    transaction_id: int,
+    current_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Reject activation payment"""
+    transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+    
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    if transaction.status != TransactionStatus.pending:
+        raise HTTPException(status_code=400, detail="Transaction already processed")
+    
+    fail_transaction(db, transaction_id, "Payment rejected by admin")
+    
+    activation = db.query(UserActivation).filter(
+        UserActivation.payment_transaction_id == transaction_id
+    ).first()
+    
+    if activation:
+        activation.status = "inactive"
+        db.commit()
+    
+    return {"message": "Payment rejected"}

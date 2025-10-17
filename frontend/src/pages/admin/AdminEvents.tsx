@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -11,35 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Plus, Trash2, Users, Edit, Loader2, UserCheck } from 'lucide-react';
-import { toast } from 'sonner';
-import api from '@/lib/api';
-
-interface Event {
-  id: number;
-  title: string;
-  description: string;
-  event_type: string;
-  start_date: string;
-  end_date?: string;
-  location?: string;
-  is_virtual: boolean;
-  meeting_link?: string;
-  max_attendees?: number;
-  status: string;
-  current_attendees: number;
-}
-
-interface Attendee {
-  id: number;
-  user_id: number;
-  event_id: number;
-  registered_at: string;
-  attendance_status: string;
-  user?: {
-    full_name: string;
-    email: string;
-  };
-}
+import { Event } from '@/types/admin-events';
+import { useEvents, useEventAttendees, useCreateEvent, useUpdateEvent, useDeleteEvent } from '@/hooks/useAdminEvents';
 
 const AdminEvents = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -61,69 +33,22 @@ const AdminEvents = () => {
     registration_deadline: '',
     status: 'upcoming',
   });
-  const queryClient = useQueryClient();
-
-  const { data: events, isLoading } = useQuery<Event[]>({
-    queryKey: ['adminEvents'],
-    queryFn: async () => {
-      const response = await api.get('/events/');
-      return response.data;
-    },
-  });
-
-  const { data: attendees = [], isLoading: attendeesLoading } = useQuery<Attendee[]>({
-    queryKey: ['eventAttendees', selectedEvent?.id],
-    queryFn: async () => {
-      if (!selectedEvent) return [];
-      const response = await api.get(`/events/${selectedEvent.id}/attendees`);
-      return response.data;
-    },
-    enabled: !!selectedEvent,
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: any) => {
-      await api.post('/events/', data);
-    },
+  const createMutation = useCreateEvent({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminEvents'] });
-      toast.success('Event created successfully');
       setCreateDialogOpen(false);
       resetForm();
     },
-    onError: () => {
-      toast.error('Failed to create event');
-    },
   });
-
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      await api.put(`/events/${id}`, data);
-    },
+  const updateMutation = useUpdateEvent({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminEvents'] });
-      toast.success('Event updated successfully');
       setEditDialogOpen(false);
       setEditingEvent(null);
       resetForm();
     },
-    onError: () => {
-      toast.error('Failed to update event');
-    },
   });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await api.delete(`/events/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminEvents'] });
-      toast.success('Event deleted successfully');
-    },
-    onError: () => {
-      toast.error('Failed to delete event');
-    },
-  });
+  const deleteMutation = useDeleteEvent();
+  const { data: events, isLoading } = useEvents();
+  const { data: attendees = [], isLoading: attendeesLoading } = useEventAttendees(selectedEvent?.id);
 
   const resetForm = () => {
     setFormData({
@@ -184,7 +109,7 @@ const AdminEvents = () => {
     };
     
     if (editingEvent) {
-      updateMutation.mutate({ id: editingEvent.id, data });
+      updateMutation.mutate({ eventId: editingEvent.id, data });
     } else {
       createMutation.mutate(data);
     }

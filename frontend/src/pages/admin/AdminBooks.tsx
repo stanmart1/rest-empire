@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
@@ -9,26 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Plus, Trash2, Star, Grid3x3, List, Pencil } from 'lucide-react';
-import { toast } from 'sonner';
-import api from '@/lib/api';
-
-interface Book {
-  id: number;
-  title: string;
-  author: string;
-  cover_image?: string;
-  description?: string;
-  created_at: string;
-}
-
-interface BookReview {
-  id: number;
-  book_id: number;
-  user_id: number;
-  rating: number;
-  comment?: string;
-  created_at: string;
-}
+import { Book } from '@/types/admin-books';
+import { useBooks, useBookReviews, useUploadBook, useDeleteBook } from '@/hooks/useAdminBooks';
 
 const AdminBooks = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -44,64 +25,21 @@ const AdminBooks = () => {
     description: '',
     cover_image: null as File | null,
   });
-  const queryClient = useQueryClient();
-
-  const { data: books, isLoading } = useQuery<Book[]>({
-    queryKey: ['adminBooks'],
-    queryFn: async () => {
-      const response = await api.get('/admin/books');
-      return response.data;
-    },
-  });
-
-  const { data: reviews } = useQuery<BookReview[]>({
-    queryKey: ['bookReviews', selectedBookReviews?.id],
-    queryFn: async () => {
-      if (!selectedBookReviews) return [];
-      const response = await api.get(`/books/${selectedBookReviews.id}/reviews`);
-      return response.data;
-    },
-    enabled: !!selectedBookReviews,
-  });
-
-  const uploadMutation = useMutation({
-    mutationFn: async (data: FormData) => {
-      if (editingBook) {
-        await api.put(`/admin/books/${editingBook.id}`, data, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-      } else {
-        await api.post('/admin/books', data, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-      }
-    },
+  const uploadMutation = useUploadBook({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminBooks'] });
-      toast.success(editingBook ? 'Book updated successfully' : 'Book uploaded successfully');
       setUploadDialogOpen(false);
       setEditingBook(null);
       setFormData({ title: '', author: '', description: '', cover_image: null });
     },
-    onError: () => {
-      toast.error(editingBook ? 'Failed to update book' : 'Failed to upload book');
-    },
   });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (bookId: number) => {
-      await api.delete(`/admin/books/${bookId}`);
-    },
+  const deleteMutation = useDeleteBook({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminBooks'] });
-      toast.success('Book deleted successfully');
       setDeleteDialogOpen(false);
       setBookToDelete(null);
     },
-    onError: () => {
-      toast.error('Failed to delete book');
-    },
   });
+  const { data: books, isLoading } = useBooks();
+  const { data: reviews } = useBookReviews(selectedBookReviews?.id);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,7 +50,7 @@ const AdminBooks = () => {
     if (formData.cover_image) {
       data.append('cover_image', formData.cover_image);
     }
-    uploadMutation.mutate(data);
+    uploadMutation.mutate({ data, bookId: editingBook?.id });
   };
 
   const handleDialogClose = (open: boolean) => {
