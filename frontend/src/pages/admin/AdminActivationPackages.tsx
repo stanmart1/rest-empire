@@ -38,7 +38,7 @@ const AdminActivationPackages = () => {
     price: '',
     duration_days: '30',
     features: '',
-    allowed_features: ['crypto_signals', 'events', 'promo_materials', 'books', 'payouts'],
+    allowed_features: ['crypto_signals', 'events', 'promo_materials', 'book_review', 'payouts'],
     is_active: true,
   });
 
@@ -86,7 +86,7 @@ const AdminActivationPackages = () => {
             price: '',
             duration_days: '30',
             features: '',
-            allowed_features: ['crypto_signals', 'events', 'promo_materials', 'books', 'payouts'],
+            allowed_features: ['crypto_signals', 'events', 'promo_materials', 'book_review', 'payouts'],
             is_active: true,
           });
         }
@@ -212,7 +212,7 @@ const AdminActivationPackages = () => {
                     { id: 'crypto_signals', label: 'Crypto Signals' },
                     { id: 'events', label: 'Events' },
                     { id: 'promo_materials', label: 'Promo Materials' },
-                    { id: 'books', label: 'Books' },
+                    { id: 'book_review', label: 'Book Review' },
                     { id: 'payouts', label: 'Payouts' }
                   ].map((feature) => (
                     <label key={feature.id} className="flex items-center gap-2 cursor-pointer">
@@ -474,7 +474,7 @@ const AdminActivationPackages = () => {
                   { id: 'crypto_signals', label: 'Crypto Signals' },
                   { id: 'events', label: 'Events' },
                   { id: 'promo_materials', label: 'Promo Materials' },
-                  { id: 'books', label: 'Books' },
+                  { id: 'book_review', label: 'Book Review' },
                   { id: 'payouts', label: 'Payouts' }
                 ].map((feature) => (
                   <label key={feature.id} className="flex items-center gap-2 cursor-pointer">
@@ -588,9 +588,22 @@ const AdminActivationPackages = () => {
               {selectedPayment.payment_method === 'bank_transfer' && selectedPayment.meta_data?.proof_uploaded && (
                 <div>
                   <Label className="text-muted-foreground">Payment Proof</Label>
-                  <div className="mt-2 p-4 border rounded-lg">
-                    <p className="text-sm">File: {selectedPayment.meta_data.proof_filename}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Proof uploaded by user</p>
+                  <div className="mt-2 border rounded-lg overflow-hidden">
+                    {selectedPayment.meta_data.proof_filename?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                      <img 
+                        src={`/api/v1/uploads/payment-proofs/${selectedPayment.meta_data.proof_filename}`}
+                        alt="Payment proof"
+                        className="w-full h-auto max-h-96 object-contain bg-gray-50"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
+                    <div className={selectedPayment.meta_data.proof_filename?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? 'hidden' : 'p-4'}>
+                      <p className="text-sm">File: {selectedPayment.meta_data.proof_filename}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Proof uploaded by user</p>
+                    </div>
                   </div>
                 </div>
               )}

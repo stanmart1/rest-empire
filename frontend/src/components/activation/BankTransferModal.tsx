@@ -20,6 +20,7 @@ const BankTransferModal = ({ open, onClose, paymentData, onSuccess }: BankTransf
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const bankDetails = paymentData?.payment_data;
   const transactionId = paymentData?.transaction_id;
@@ -64,6 +65,14 @@ const BankTransferModal = ({ open, onClose, paymentData, onSuccess }: BankTransf
     }
   };
 
+  // Simulate loading when modal opens
+  useState(() => {
+    if (open && paymentData) {
+      setLoading(true);
+      setTimeout(() => setLoading(false), 500);
+    }
+  });
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
@@ -71,7 +80,13 @@ const BankTransferModal = ({ open, onClose, paymentData, onSuccess }: BankTransf
           <DialogTitle>Bank Transfer Payment</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 mt-4">
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            <span className="ml-2 text-sm text-muted-foreground">Loading payment details...</span>
+          </div>
+        ) : (
+          <div className="space-y-4 mt-4">
           <Card>
             <CardContent className="p-4 space-y-3">
               <div>
@@ -172,6 +187,7 @@ const BankTransferModal = ({ open, onClose, paymentData, onSuccess }: BankTransf
             </Button>
           </div>
         </div>
+        )}
       </DialogContent>
     </Dialog>
   );

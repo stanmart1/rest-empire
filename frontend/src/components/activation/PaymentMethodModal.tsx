@@ -31,7 +31,8 @@ const PaymentMethodModal = ({
   onMethodSelected 
 }: PaymentMethodModalProps) => {
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingMethods, setLoadingMethods] = useState(false);
+  const [initiatingPayment, setInitiatingPayment] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [paymentData, setPaymentData] = useState<any>(null);
 
@@ -42,18 +43,21 @@ const PaymentMethodModal = ({
   }, [open]);
 
   const fetchMethods = async () => {
+    setLoadingMethods(true);
     try {
       const data = await apiService.payment.getMethods();
       const filtered = data.methods.filter((m: PaymentMethod) => m.currency === currency);
       setMethods(filtered);
     } catch (error) {
       console.error('Failed to fetch payment methods:', error);
+    } finally {
+      setLoadingMethods(false);
     }
   };
 
   const handleMethodClick = async (methodId: string) => {
     setSelectedMethod(methodId);
-    setLoading(true);
+    setInitiatingPayment(true);
     
     try {
       const response = await apiService.payment.initiatePayment({
@@ -67,7 +71,7 @@ const PaymentMethodModal = ({
       alert(error.response?.data?.detail || 'Failed to initiate payment');
       setSelectedMethod(null);
     } finally {
-      setLoading(false);
+      setInitiatingPayment(false);
     }
   };
 
@@ -114,12 +118,21 @@ const PaymentMethodModal = ({
             </p>
           </div>
 
-          {!selectedMethod ? (
+          {loadingMethods ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <span className="ml-2 text-sm text-muted-foreground">Loading payment methods...</span>
+            </div>
+          ) : methods.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-sm text-muted-foreground">No payment methods available</p>
+            </div>
+          ) : !selectedMethod ? (
             methods.map((method) => (
               <Card 
                 key={method.id}
                 className="p-4 hover:border-primary cursor-pointer transition-colors"
-                onClick={() => !loading && handleMethodClick(method.id)}
+                onClick={() => !initiatingPayment && handleMethodClick(method.id)}
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-primary/10 rounded-lg text-primary">
@@ -129,12 +142,14 @@ const PaymentMethodModal = ({
                     <h4 className="font-medium">{method.name}</h4>
                     <p className="text-xs text-muted-foreground">{method.description}</p>
                   </div>
-                  {loading && (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  )}
                 </div>
               </Card>
             ))
+          ) : initiatingPayment ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <span className="ml-2 text-sm text-muted-foreground">Initiating payment...</span>
+            </div>
           ) : (
             <div className="text-center py-4">
               <p className="text-sm text-muted-foreground mb-2">Selected payment method:</p>
@@ -144,11 +159,11 @@ const PaymentMethodModal = ({
         </div>
 
         <div className="flex gap-2 mt-4">
-          <Button variant="outline" onClick={handleCancel} className="flex-1">
+          <Button variant="outline" onClick={handleCancel} className="flex-1" disabled={initiatingPayment}>
             Cancel
           </Button>
           {selectedMethod && paymentData && (
-            <Button onClick={handleProceed} className="flex-1">
+            <Button onClick={handleProceed} className="flex-1" disabled={initiatingPayment}>
               Proceed to Payment
             </Button>
           )}

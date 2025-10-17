@@ -325,24 +325,36 @@ const Activation = () => {
 
 
       {/* Active Account Benefits */}
-      {status?.status === 'active' && (
-        <Card className="border-green-200 bg-green-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-700">
-              <CheckCircle className="w-5 h-5" />
-              Account Active
+      {status?.status === 'active' && status?.package?.allowed_features && (
+        <Card className="border-2 border-blue-200 bg-blue-50 shadow-lg">
+          <CardHeader className="border-b border-blue-200 bg-blue-100/50">
+            <CardTitle className="flex items-center gap-3 text-blue-700">
+              <div className="p-2 bg-blue-200 rounded-full">
+                <CheckCircle className="w-6 h-6" />
+              </div>
+              <span className="text-xl">Account Active</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-green-700 mb-3">
+          <CardContent className="pt-6">
+            <p className="text-blue-700 mb-4 font-medium">
               Congratulations! Your account is now active. You can:
             </p>
-            <ul className="space-y-1 text-sm text-green-600">
-              <li>• Earn bonuses from your team's activities</li>
-              <li>• Build and manage your team</li>
-              <li>• Access training materials and resources</li>
-              <li>• Participate in company events and webinars</li>
-              <li>• Request payouts of your earnings</li>
+            <ul className="space-y-2 text-sm text-blue-700">
+              {status.package.allowed_features.map((feature) => {
+                const benefits: Record<string, string> = {
+                  crypto_signals: 'Access crypto trading signals and market analysis',
+                  events: 'Participate in company events and webinars',
+                  promo_materials: 'Download promotional materials and resources',
+                  book_review: 'Leave reviews and ratings for books',
+                  payouts: 'Request payouts of your earnings'
+                };
+                return benefits[feature] ? (
+                  <li key={feature} className="flex items-start gap-2">
+                    <span className="text-blue-500 font-bold mt-0.5">✓</span>
+                    <span>{benefits[feature]}</span>
+                  </li>
+                ) : null;
+              })}
             </ul>
           </CardContent>
         </Card>

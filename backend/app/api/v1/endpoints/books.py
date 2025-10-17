@@ -13,7 +13,7 @@ router = APIRouter()
 def get_books(
     skip: int = 0,
     limit: int = 100,
-    current_user: User = Depends(check_feature_access("books")),
+    current_user: User = Depends(check_feature_access("book_review")),
     db: Session = Depends(get_db)
 ):
     """Get all books"""
@@ -24,7 +24,7 @@ def get_books(
 def create_review(
     book_id: int,
     review_data: BookReviewCreate,
-    current_user: User = Depends(check_feature_access("books")),
+    current_user: User = Depends(check_feature_access("book_review")),
     db: Session = Depends(get_db)
 ):
     """Create a book review"""
@@ -62,7 +62,7 @@ def create_review(
 @router.get("/{book_id}/reviews", response_model=List[BookReviewResponse])
 def get_book_reviews(
     book_id: int,
-    current_user: User = Depends(check_feature_access("books")),
+    current_user: User = Depends(check_feature_access("book_review")),
     db: Session = Depends(get_db)
 ):
     """Get reviews for a book"""
