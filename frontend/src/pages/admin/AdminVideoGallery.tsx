@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Loader2, Pencil, Trash2, Video } from 'lucide-react';
+import { Plus, Loader2, Pencil, Trash2, Video, Play } from 'lucide-react';
+import VideoPlayerModal from '@/components/VideoPlayerModal';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { toast } from 'sonner';
@@ -40,6 +41,7 @@ const AdminVideoGallery = () => {
   const [thumbnailUrl, setThumbnailUrl] = useState('');
   const [thumbnailMode, setThumbnailMode] = useState<'generate' | 'upload'>('generate');
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -284,18 +286,32 @@ const AdminVideoGallery = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {videos.map((video: VideoItem) => (
             <Card key={video.id}>
               <CardContent className="p-4">
-                <div className="relative w-full h-48 bg-black rounded-lg mb-4 overflow-hidden">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${extractYouTubeId(video.video_url)}`}
-                    title={video.title}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+                <div 
+                  className="relative w-full h-64 bg-black rounded-lg mb-4 overflow-hidden group cursor-pointer"
+                  onClick={() => setSelectedVideo(video)}
+                >
+                  {video.thumbnail_url ? (
+                    <>
+                      <img
+                        src={video.thumbnail_url}
+                        alt={video.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 group-hover:bg-opacity-60 transition-all">
+                        <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center">
+                          <Play className="w-8 h-8 text-white ml-1" fill="white" />
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Play className="w-12 h-12 text-muted-foreground" />
+                    </div>
+                  )}
                 </div>
                 <h3 className="font-semibold mb-2">{video.title}</h3>
                 <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
@@ -325,6 +341,8 @@ const AdminVideoGallery = () => {
           ))}
         </div>
       )}
+
+      <VideoPlayerModal video={selectedVideo} onClose={() => setSelectedVideo(null)} />
     </div>
   );
 };
