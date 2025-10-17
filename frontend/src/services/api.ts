@@ -335,5 +335,4 @@ export default {
   activation: activationAPI,
   support: supportAPI,
   payment: paymentAPI,
-  activation: activationAPI
 };
