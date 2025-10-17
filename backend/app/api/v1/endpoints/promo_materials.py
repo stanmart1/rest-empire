@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional
 from app.core.database import get_db
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, check_feature_access
 from app.models.user import User
 from app.models.promo_material import PromoMaterial, MaterialType
 from app.schemas.promo_material import PromoMaterialResponse
@@ -16,7 +16,7 @@ def get_promo_materials(
     language: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_feature_access("promo_materials")),
     db: Session = Depends(get_db)
 ):
     """Get promotional materials"""
@@ -34,7 +34,7 @@ def get_promo_materials(
 @router.post("/{material_id}/download")
 def download_material(
     material_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_feature_access("promo_materials")),
     db: Session = Depends(get_db)
 ):
     """Track material download"""

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
 from app.core.database import get_db
-from app.api.deps import get_admin_user
+from app.api.deps import get_admin_user, check_feature_access
 from app.models.crypto_signal import CryptoSignal, SignalStatus
 from app.schemas.crypto_signal import CryptoSignalCreate, CryptoSignalUpdate, CryptoSignalResponse
 
@@ -73,7 +73,8 @@ def delete_signal(
 def get_published_signals(
     skip: int = 0,
     limit: int = 20,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(check_feature_access("crypto_signals"))
 ):
     return db.query(CryptoSignal).filter(
         CryptoSignal.is_published == True,

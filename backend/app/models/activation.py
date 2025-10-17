@@ -12,7 +12,9 @@ class ActivationPackage(Base):
     description = Column(Text)
     price = Column(Float, nullable=False)
     currency = Column(String(10), default="NGN")
-    features = Column(JSON)  # Store features as JSON array
+    duration_days = Column(Integer, nullable=False, default=30)
+    features = Column(JSON)  # Store package features/benefits as JSON array
+    allowed_features = Column(JSON, default=["crypto_signals", "events", "promo_materials", "books", "payouts"])  # Features user can access
     is_active = Column(Boolean, default=True)
     sort_order = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)

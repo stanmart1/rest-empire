@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+from datetime import datetime
 from app.core.database import get_db
 from app.api.deps import get_current_user
 from app.models.user import User
@@ -38,6 +39,14 @@ def get_activation_status(
         db.add(activation)
         db.commit()
         db.refresh(activation)
+    
+    # Check if activation has expired
+    if activation.status == "active" and activation.expires_at:
+        if datetime.utcnow() > activation.expires_at:
+            activation.status = "expired"
+            current_user.is_active = False
+            db.commit()
+            db.refresh(activation)
     
     # Sync activation status with user.is_active
     if current_user.is_active and activation.status != "active":

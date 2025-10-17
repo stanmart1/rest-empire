@@ -61,7 +61,9 @@ def create_package(
         description=package_data.description,
         price=package_data.price,
         currency="NGN",
+        duration_days=package_data.duration_days,
         features=package_data.features or [],
+        allowed_features=package_data.allowed_features,
         is_active=package_data.is_active,
         sort_order=max_order + 1
     )
@@ -98,8 +100,14 @@ def update_package(
     if package_data.price is not None:
         package.price = package_data.price
     
+    if package_data.duration_days is not None:
+        package.duration_days = package_data.duration_days
+    
     if package_data.features is not None:
         package.features = package_data.features
+    
+    if package_data.allowed_features is not None:
+        package.allowed_features = package_data.allowed_features
     
     if package_data.is_active is not None:
         package.is_active = package_data.is_active
@@ -201,6 +209,8 @@ def approve_activation_payment(
     db: Session = Depends(get_db)
 ):
     """Approve activation payment and activate user account"""
+    from datetime import timedelta
+    
     transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
     
     if not transaction:
@@ -218,6 +228,14 @@ def approve_activation_payment(
     if activation:
         activation.status = "active"
         activation.activated_at = datetime.utcnow()
+        
+        # Calculate expiration date based on package duration
+        package = db.query(ActivationPackage).filter(
+            ActivationPackage.id == activation.package_id
+        ).first()
+        
+        if package and package.duration_days:
+            activation.expires_at = activation.activated_at + timedelta(days=package.duration_days)
         
         user = db.query(User).filter(User.id == activation.user_id).first()
         if user:
@@ -253,3 +271,52 @@ def reject_activation_payment(
         db.commit()
     
     return {"message": "Payment rejected"}
+
+@router.post("/packages/{package_id}/assign")
+def assign_package_to_users(
+    package_id: int,
+    user_ids: list[int],
+    current_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Assign activation package to users"""
+    from datetime import timedelta
+    
+    package = db.query(ActivationPackage).filter(ActivationPackage.id == package_id).first()
+    if not package:
+        raise HTTPException(status_code=404, detail="Package not found")
+    
+    activated_users = []
+    
+    for user_id in user_ids:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            continue
+        
+        # Get or create activation record
+        activation = db.query(UserActivation).filter(
+            UserActivation.user_id == user_id
+        ).first()
+        
+        if not activation:
+            activation = UserActivation(user_id=user_id)
+            db.add(activation)
+        
+        # Update activation
+        activation.package_id = package_id
+        activation.activation_fee = package.price
+        activation.status = "active"
+        activation.activated_at = datetime.utcnow()
+        activation.expires_at = datetime.utcnow() + timedelta(days=package.duration_days)
+        
+        # Activate user account
+        user.is_active = True
+        
+        activated_users.append(user.email)
+    
+    db.commit()
+    
+    return {
+        "message": f"Package assigned to {len(activated_users)} user(s)",
+        "activated_users": activated_users
+    }

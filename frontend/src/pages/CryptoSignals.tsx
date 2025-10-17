@@ -3,9 +3,14 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Target, AlertTriangle, TrendingUpIcon } from 'lucide-react';
 import { CryptoSignal } from '@/types/crypto-signals';
 import { usePublishedSignals } from '@/hooks/useCryptoSignals';
+import FeatureRestricted from '@/components/common/FeatureRestricted';
 
 const CryptoSignals = () => {
-  const { data: signals = [], isLoading } = usePublishedSignals();
+  const { data: signals = [], isLoading, error } = usePublishedSignals();
+
+  if (error && (error as any)?.response?.status === 403) {
+    return <FeatureRestricted message={(error as any)?.response?.data?.detail} />;
+  }
 
   const formatPrice = (price: string | undefined) => {
     if (!price) return '-';

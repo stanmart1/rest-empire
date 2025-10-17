@@ -9,6 +9,7 @@ import { usePromoMaterials } from '@/hooks/useApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiService from '@/services/api';
 import { PromoMaterial } from '@/types/promo';
+import FeatureRestricted from '@/components/common/FeatureRestricted';
 
 const PromoMaterials = () => {
   const { toast } = useToast();
@@ -16,10 +17,14 @@ const PromoMaterials = () => {
   const [typeFilter, setTypeFilter] = useState('all');
   const [languageFilter, setLanguageFilter] = useState('all');
 
-  const { data: materials, isLoading: materialsLoading } = usePromoMaterials({
+  const { data: materials, isLoading: materialsLoading, error: materialsError } = usePromoMaterials({
     material_type: typeFilter !== 'all' ? typeFilter : undefined,
     language: languageFilter !== 'all' ? languageFilter : undefined,
   });
+
+  if (materialsError && (materialsError as any)?.response?.status === 403) {
+    return <FeatureRestricted message={(materialsError as any)?.response?.data?.detail} />;
+  }
 
   const downloadMutation = useMutation({
     mutationFn: (materialId: number) => apiService.promoMaterials.downloadMaterial(materialId),

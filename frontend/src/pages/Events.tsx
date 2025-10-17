@@ -8,6 +8,7 @@ import { Calendar, Clock, MapPin, Users, Video, Loader2, ExternalLink } from 'lu
 import { useToast } from '@/hooks/use-toast';
 import { useEvents, useMyEvents, useEventStats } from '@/hooks/useApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import FeatureRestricted from '@/components/common/FeatureRestricted';
 import apiService from '@/services/api';
 import { Event } from '@/types/events';
 import EventDetailModal from '@/components/events/EventDetailModal';
@@ -32,13 +33,17 @@ const Events = () => {
     phone: '',
   });
 
-  const { data: allEvents, isLoading: allEventsLoading } = useEvents({
+  const { data: allEvents, isLoading: allEventsLoading, error: eventsError } = useEvents({
     event_type: eventTypeFilter !== 'all' ? eventTypeFilter : undefined,
     status: statusFilter !== 'all' ? statusFilter : undefined,
   });
 
   const { data: myEvents, isLoading: myEventsLoading } = useMyEvents(true);
   const { data: eventStats, isLoading: statsLoading } = useEventStats();
+
+  if (eventsError && (eventsError as any)?.response?.status === 403) {
+    return <FeatureRestricted message={(eventsError as any)?.response?.data?.detail} />;
+  }
 
   const registerMutation = useMutation({
     mutationFn: (eventId: number) => apiService.events.registerForEvent(eventId),

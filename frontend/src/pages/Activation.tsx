@@ -131,9 +131,20 @@ const Activation = () => {
         return 'Payment Pending';
       case 'suspended':
         return 'Account Suspended';
+      case 'expired':
+        return 'Subscription Expired';
       default:
         return 'Account Inactive';
     }
+  };
+
+  const getDaysRemaining = (expiresAt?: string) => {
+    if (!expiresAt) return null;
+    const now = new Date();
+    const expiry = new Date(expiresAt);
+    const diff = expiry.getTime() - now.getTime();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return days;
   };
 
   const getStatusColor = (status?: string) => {
@@ -143,6 +154,7 @@ const Activation = () => {
       case 'pending_payment':
         return 'bg-yellow-100 text-yellow-700';
       case 'suspended':
+      case 'expired':
         return 'bg-red-100 text-red-700';
       default:
         return 'bg-gray-100 text-gray-700';
@@ -191,6 +203,14 @@ const Activation = () => {
                     Activated: {new Date(status.activated_at).toLocaleDateString()}
                   </p>
                 )}
+                {status?.expires_at && status?.status === 'active' && (
+                  <p className="text-sm text-muted-foreground">
+                    Expires: {new Date(status.expires_at).toLocaleDateString()}
+                    {getDaysRemaining(status.expires_at) !== null && (
+                      <span className="ml-1">({getDaysRemaining(status.expires_at)} days remaining)</span>
+                    )}
+                  </p>
+                )}
               </div>
               {status?.status === 'pending_payment' && status?.package && (
                 <div className="text-right">
@@ -204,6 +224,24 @@ const Activation = () => {
               <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
                 <p className="text-sm text-yellow-700 font-medium">Payment Successful</p>
                 <p className="text-xs text-yellow-600 mt-1">Awaiting verification from admins</p>
+              </div>
+            )}
+            {status?.status === 'expired' && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded">
+                <p className="text-sm text-red-700 font-medium">Subscription Expired</p>
+                <p className="text-xs text-red-600 mt-1">Renew your subscription to continue accessing premium features</p>
+              </div>
+            )}
+            {status?.package?.allowed_features && status?.status === 'active' && (
+              <div className="mt-3">
+                <p className="text-xs text-muted-foreground mb-2">Included Features:</p>
+                <div className="flex flex-wrap gap-1">
+                  {status.package.allowed_features.map((feature) => (
+                    <Badge key={feature} variant="outline" className="text-xs">
+                      {feature.replace('_', ' ')}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -254,14 +292,20 @@ const Activation = () => {
                     ))}
                   </ul>
                   
-                  <Button 
-                    className="w-full"
-                    variant={pkg.slug === 'professional' ? 'default' : 'outline'}
-                    onClick={() => handlePackageSelect(pkg)}
-                    disabled={status?.status === 'pending_payment'}
-                  >
-                    {status?.status === 'pending_payment' ? 'Payment Pending' : 'Select Package'}
-                  </Button>
+                  <div className="space-y-2">
+                    <div className="text-xs text-muted-foreground">
+                      <p>Duration: {pkg.duration_days} days</p>
+                      <p className="mt-1">Includes: {pkg.allowed_features?.map(f => f.replace('_', ' ')).join(', ')}</p>
+                    </div>
+                    <Button 
+                      className="w-full"
+                      variant={pkg.slug === 'professional' ? 'default' : 'outline'}
+                      onClick={() => handlePackageSelect(pkg)}
+                      disabled={status?.status === 'pending_payment'}
+                    >
+                      {status?.status === 'pending_payment' ? 'Payment Pending' : 'Select Package'}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}

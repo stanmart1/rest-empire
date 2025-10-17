@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.core.database import get_db
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, check_feature_access
 from app.models.user import User
 from app.models.payout import Payout, PayoutStatus
 from app.schemas.payout import (
@@ -16,7 +16,7 @@ router = APIRouter()
 @router.post("/request", response_model=PayoutResponse)
 def request_payout(
     payout: PayoutRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_feature_access("payouts")),
     db: Session = Depends(get_db)
 ):
     """Request a payout"""

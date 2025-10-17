@@ -8,7 +8,7 @@ import qrcode.image.svg
 import json
 from datetime import datetime
 from app.core.database import get_db
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, check_feature_access
 from app.models.user import User
 from app.models.event import EventType, EventStatus
 from app.schemas.event import (
@@ -29,7 +29,7 @@ def list_events(
     upcoming_only: bool = False,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_feature_access("events")),
     db: Session = Depends(get_db)
 ):
     """Get all events"""
@@ -52,7 +52,7 @@ def list_events(
 @router.get("/my-events", response_model=List[EventResponse])
 def get_my_events(
     upcoming_only: bool = False,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_feature_access("events")),
     db: Session = Depends(get_db)
 ):
     """Get events user is registered for"""
@@ -66,7 +66,7 @@ def get_my_events(
 
 @router.get("/stats", response_model=EventStats)
 def get_events_stats(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_feature_access("events")),
     db: Session = Depends(get_db)
 ):
     """Get event statistics"""
@@ -75,7 +75,7 @@ def get_events_stats(
 @router.get("/{event_id}", response_model=EventResponse)
 def get_event(
     event_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_feature_access("events")),
     db: Session = Depends(get_db)
 ):
     """Get event by ID"""
@@ -130,7 +130,7 @@ def delete_existing_event(
 @router.post("/{event_id}/register", response_model=EventRegistrationResponse)
 def register_for_existing_event(
     event_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_feature_access("events")),
     db: Session = Depends(get_db)
 ):
     """Register for event"""
@@ -146,7 +146,7 @@ def register_for_existing_event(
 @router.delete("/{event_id}/register")
 def unregister_from_existing_event(
     event_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_feature_access("events")),
     db: Session = Depends(get_db)
 ):
     """Unregister from event"""

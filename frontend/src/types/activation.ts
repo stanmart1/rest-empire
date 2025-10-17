@@ -5,7 +5,9 @@ export interface ActivationPackage {
   description: string;
   price: number;
   currency: string;
+  duration_days: number;
   features: string[];
+  allowed_features: string[];
   is_active: boolean;
   sort_order: number;
 }
@@ -14,7 +16,7 @@ export interface UserActivation {
   id: number;
   user_id: number;
   package_id?: number;
-  status: 'inactive' | 'pending_payment' | 'active' | 'suspended';
+  status: 'inactive' | 'pending_payment' | 'active' | 'suspended' | 'expired';
   package?: ActivationPackage;
   activation_fee?: number;
   payment_transaction_id?: number;

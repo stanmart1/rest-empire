@@ -5,7 +5,9 @@ export interface ActivationPackage {
   description: string;
   price: number;
   currency: string;
+  duration_days: number;
   features: string[];
+  allowed_features: string[];
   is_active: boolean;
   sort_order: number;
   created_at: string;
@@ -36,5 +38,6 @@ export interface PackageFormData {
   price: string;
   duration_days: string;
   features: string;
+  allowed_features: string[];
   is_active: boolean;
 }

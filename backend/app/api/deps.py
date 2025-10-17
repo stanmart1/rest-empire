@@ -48,3 +48,54 @@ def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
             detail="Admin access required"
         )
     return current_user
+
+def check_feature_access(feature_name: str):
+    """Check if user has access to a specific feature"""
+    def _check_access(
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+    ) -> User:
+        from app.models.activation import UserActivation, ActivationPackage
+        from datetime import datetime
+        
+        # Check if user is active
+        if not current_user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Please activate your account to access this feature"
+            )
+        
+        # Get user's activation
+        activation = db.query(UserActivation).filter(
+            UserActivation.user_id == current_user.id
+        ).first()
+        
+        if not activation or activation.status != "active":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Please activate your account to access this feature"
+            )
+        
+        # Check if activation has expired
+        if activation.expires_at and datetime.utcnow() > activation.expires_at:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Your subscription has expired. Please renew to access this feature"
+            )
+        
+        # Check if package includes this feature
+        if activation.package_id:
+            package = db.query(ActivationPackage).filter(
+                ActivationPackage.id == activation.package_id
+            ).first()
+            
+            if package and package.allowed_features:
+                if feature_name not in package.allowed_features:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail=f"Your package does not include access to {feature_name.replace('_', ' ')}. Please upgrade your package"
+                    )
+        
+        return current_user
+    
+    return _check_access

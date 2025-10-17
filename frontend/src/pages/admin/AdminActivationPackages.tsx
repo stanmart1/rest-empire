@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Edit, Trash2, Loader2, Package, Eye, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Package, Eye, CheckCircle, XCircle, UserPlus } from 'lucide-react';
 import { ActivationPackage, ActivationPayment, PackageFormData } from '@/types/admin-activation';
 import { formatCurrency } from '@/utils/formatters';
 import {
@@ -20,6 +20,7 @@ import {
   useApprovePayment,
   useRejectPayment
 } from '@/hooks/useAdminActivation';
+import AssignPackageModal from '@/components/admin/AssignPackageModal';
 
 const AdminActivationPackages = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -29,12 +30,15 @@ const AdminActivationPackages = () => {
   const [deletingPackage, setDeletingPackage] = useState<ActivationPackage | null>(null);
   const [paymentDetailsOpen, setPaymentDetailsOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<ActivationPayment | null>(null);
+  const [assignModalOpen, setAssignModalOpen] = useState(false);
+  const [assigningPackage, setAssigningPackage] = useState<ActivationPackage | null>(null);
   const [formData, setFormData] = useState<PackageFormData>({
     name: '',
     description: '',
     price: '',
-    duration_days: '',
+    duration_days: '30',
     features: '',
+    allowed_features: ['crypto_signals', 'events', 'promo_materials', 'books', 'payouts'],
     is_active: true,
   });
 
@@ -59,8 +63,9 @@ const AdminActivationPackages = () => {
       name: formData.name,
       description: formData.description,
       price: parseFloat(formData.price),
-      duration_days: formData.duration_days ? parseInt(formData.duration_days) : null,
+      duration_days: parseInt(formData.duration_days),
       features,
+      allowed_features: formData.allowed_features,
       is_active: formData.is_active,
     };
 
@@ -79,8 +84,9 @@ const AdminActivationPackages = () => {
             name: '',
             description: '',
             price: '',
-            duration_days: '',
+            duration_days: '30',
             features: '',
+            allowed_features: ['crypto_signals', 'events', 'promo_materials', 'books', 'payouts'],
             is_active: true,
           });
         }
@@ -94,8 +100,9 @@ const AdminActivationPackages = () => {
       name: pkg.name,
       description: pkg.description || '',
       price: pkg.price.toString(),
-      duration_days: '',
+      duration_days: pkg.duration_days.toString(),
       features: pkg.features.join('\n'),
+      allowed_features: pkg.allowed_features || [],
       is_active: pkg.is_active,
     });
     setIsEditOpen(true);
@@ -184,19 +191,47 @@ const AdminActivationPackages = () => {
                     type="number"
                     value={formData.duration_days}
                     onChange={(e) => setFormData({ ...formData, duration_days: e.target.value })}
-                    placeholder="Optional"
+                    required
                   />
                 </div>
               </div>
               <div>
-                <Label htmlFor="features">Features (one per line)</Label>
+                <Label htmlFor="features">Package Benefits (one per line)</Label>
                 <Textarea
                   id="features"
                   value={formData.features}
                   onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                  placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
+                  placeholder="Access to premium training materials&#10;Priority customer support&#10;Exclusive bonus opportunities&#10;Advanced team management tools"
                   rows={4}
                 />
+              </div>
+              <div>
+                <Label>Allowed Features</Label>
+                <div className="grid grid-cols-2 gap-3 mt-2">
+                  {[
+                    { id: 'crypto_signals', label: 'Crypto Signals' },
+                    { id: 'events', label: 'Events' },
+                    { id: 'promo_materials', label: 'Promo Materials' },
+                    { id: 'books', label: 'Books' },
+                    { id: 'payouts', label: 'Payouts' }
+                  ].map((feature) => (
+                    <label key={feature.id} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.allowed_features.includes(feature.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData({ ...formData, allowed_features: [...formData.allowed_features, feature.id] });
+                          } else {
+                            setFormData({ ...formData, allowed_features: formData.allowed_features.filter(f => f !== feature.id) });
+                          }
+                        }}
+                        className="rounded"
+                      />
+                      <span className="text-sm">{feature.label}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
               <Button type="submit" className="w-full" disabled={createMutation.isPending}>
                 {createMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
@@ -271,6 +306,17 @@ const AdminActivationPackages = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setAssigningPackage(pkg);
+                            setAssignModalOpen(true);
+                          }}
+                          title="Assign to User"
+                        >
+                          <UserPlus className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -408,18 +454,46 @@ const AdminActivationPackages = () => {
                   type="number"
                   value={formData.duration_days}
                   onChange={(e) => setFormData({ ...formData, duration_days: e.target.value })}
-                  placeholder="Optional"
+                  required
                 />
               </div>
             </div>
             <div>
-              <Label htmlFor="edit-features">Features (one per line)</Label>
+              <Label htmlFor="edit-features">Package Benefits (one per line)</Label>
               <Textarea
                 id="edit-features"
                 value={formData.features}
                 onChange={(e) => setFormData({ ...formData, features: e.target.value })}
                 rows={4}
               />
+            </div>
+            <div>
+              <Label>Allowed Features</Label>
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                {[
+                  { id: 'crypto_signals', label: 'Crypto Signals' },
+                  { id: 'events', label: 'Events' },
+                  { id: 'promo_materials', label: 'Promo Materials' },
+                  { id: 'books', label: 'Books' },
+                  { id: 'payouts', label: 'Payouts' }
+                ].map((feature) => (
+                  <label key={feature.id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.allowed_features.includes(feature.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({ ...formData, allowed_features: [...formData.allowed_features, feature.id] });
+                        } else {
+                          setFormData({ ...formData, allowed_features: formData.allowed_features.filter(f => f !== feature.id) });
+                        }
+                      }}
+                      className="rounded"
+                    />
+                    <span className="text-sm">{feature.label}</span>
+                  </label>
+                ))}
+              </div>
             </div>
             <Button type="submit" className="w-full" disabled={updateMutation.isPending}>
               {updateMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
@@ -457,6 +531,16 @@ const AdminActivationPackages = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AssignPackageModal
+        open={assignModalOpen}
+        onClose={() => {
+          setAssignModalOpen(false);
+          setAssigningPackage(null);
+        }}
+        packageId={assigningPackage?.id || 0}
+        packageName={assigningPackage?.name || ''}
+      />
 
       <Dialog open={paymentDetailsOpen} onOpenChange={setPaymentDetailsOpen}>
         <DialogContent className="max-w-2xl">

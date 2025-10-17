@@ -6,8 +6,9 @@ class ActivationPackageCreate(BaseModel):
     name: str
     description: Optional[str] = None
     price: float
-    duration_days: Optional[int] = None
+    duration_days: int = 30
     features: Optional[List[str]] = []
+    allowed_features: List[str] = ["crypto_signals", "events", "promo_materials", "books", "payouts"]
     is_active: bool = True
 
 class ActivationPackageUpdate(BaseModel):
@@ -16,6 +17,7 @@ class ActivationPackageUpdate(BaseModel):
     price: Optional[float] = None
     duration_days: Optional[int] = None
     features: Optional[List[str]] = None
+    allowed_features: Optional[List[str]] = None
     is_active: Optional[bool] = None
 
 class ActivationPackageResponse(BaseModel):
@@ -25,7 +27,9 @@ class ActivationPackageResponse(BaseModel):
     description: Optional[str]
     price: float
     currency: str
+    duration_days: int
     features: List[str]
+    allowed_features: List[str]
     is_active: bool
     sort_order: int
     created_at: datetime

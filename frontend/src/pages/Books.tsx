@@ -10,6 +10,7 @@ import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import apiService from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 import { Book, BookReview } from '@/types/books';
+import FeatureRestricted from '@/components/common/FeatureRestricted';
 
 const BOOKS_PER_PAGE = 12;
 
@@ -17,8 +18,7 @@ const Books = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
-  const { data: books, isLoading } = useBooks();
-  
+  const { data: books, isLoading, error: booksError } = useBooks();
   const [bookReviews, setBookReviews] = useState<Record<number, BookReview[]>>({});
   const [userReviews, setUserReviews] = useState<Record<number, BookReview>>({});
   const [currentReview, setCurrentReview] = useState({
@@ -106,6 +106,10 @@ const Books = () => {
       rating
     });
   };
+
+  if (booksError && (booksError as any)?.response?.status === 403) {
+    return <FeatureRestricted message={(booksError as any)?.response?.data?.detail} />;
+  }
 
   if (isLoading) {
     return (

@@ -109,3 +109,21 @@ export const useRejectPayment = () => {
     },
   });
 };
+
+export const useAssignPackage = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ packageId, userIds }: { packageId: number; userIds: number[] }) => {
+      const response = await api.post(`/admin/activation-packages/packages/${packageId}/assign`, userIds);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['activation-packages'] });
+      toast.success('Package assigned successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || 'Failed to assign package');
+    },
+  });
+};
