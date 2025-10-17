@@ -6,6 +6,7 @@ from app.core.database import get_db
 from app.api.deps import get_current_user
 from app.models.user import User
 from app.models.transaction import Transaction
+from app.models.payment_gateway import PaymentGateway
 from app.services.payment_service import (
     GTPayService, ProvidusService, BankTransferService, CryptoPaymentService, PaystackService
 )
@@ -59,7 +60,8 @@ def initiate_payment(
             transaction.id,
             payment.amount,
             current_user.email,
-            current_user.full_name or current_user.email
+            current_user.full_name or current_user.email,
+            db
         )
         return {
             "transaction_id": transaction.id,
@@ -71,7 +73,8 @@ def initiate_payment(
     elif payment.payment_method == "providus":
         payment_data = ProvidusService.generate_dynamic_account(
             transaction.id,
-            current_user.full_name or current_user.email
+            current_user.full_name or current_user.email,
+            db
         )
         return {
             "transaction_id": transaction.id,
@@ -81,7 +84,7 @@ def initiate_payment(
         }
     
     elif payment.payment_method == "bank_transfer":
-        payment_data = BankTransferService.get_bank_details(transaction.id)
+        payment_data = BankTransferService.get_bank_details(transaction.id, db)
         return {
             "transaction_id": transaction.id,
             "payment_method": "bank_transfer",
@@ -92,7 +95,8 @@ def initiate_payment(
     elif payment.payment_method == "crypto":
         payment_data = CryptoPaymentService.get_payment_address(
             transaction.id,
-            payment.amount
+            payment.amount,
+            db
         )
         return {
             "transaction_id": transaction.id,
@@ -105,7 +109,8 @@ def initiate_payment(
         payment_data = PaystackService.initiate_payment(
             transaction.id,
             payment.amount,
-            current_user.email
+            current_user.email,
+            db
         )
         if payment_data.get("error"):
             raise HTTPException(status_code=500, detail=payment_data["error"])
@@ -174,45 +179,30 @@ async def upload_payment_proof(
     }
 
 @router.get("/methods")
-def get_payment_methods():
-    """Get available payment methods"""
+def get_payment_methods(db: Session = Depends(get_db)):
+    """Get available payment methods (only enabled gateways)"""
+    enabled_gateways = db.query(PaymentGateway).filter(PaymentGateway.is_enabled == True).all()
+    
+    gateway_info = {
+        "gtpay": {"description": "Pay with GTBank or other Nigerian banks", "currency": "NGN", "instant": True},
+        "providus": {"description": "Dynamic account number for instant payment", "currency": "NGN", "instant": True},
+        "bank_transfer": {"description": "Manual bank transfer (24hr confirmation)", "currency": "NGN", "instant": False},
+        "paystack": {"description": "Pay with card, bank transfer, or USSD", "currency": "NGN", "instant": True},
+        "crypto": {"description": "Pay with USDT on TRC20 network", "currency": "USDT", "instant": True}
+    }
+    
+    methods = []
+    for gateway in enabled_gateways:
+        info = gateway_info.get(gateway.gateway_id, {})
+        methods.append({
+            "id": gateway.gateway_id,
+            "name": gateway.name,
+            "description": info.get("description", "Payment gateway"),
+            "currency": info.get("currency", "NGN"),
+            "instant": info.get("instant", True)
+        })
+    
     return {
         "currencies": ["USDT", "NGN"],
-        "methods": [
-            {
-                "id": "gtpay",
-                "name": "GTPay",
-                "description": "Pay with GTBank or other Nigerian banks",
-                "currency": "NGN",
-                "instant": True
-            },
-            {
-                "id": "providus",
-                "name": "Providus Bank",
-                "description": "Dynamic account number for instant payment",
-                "currency": "NGN",
-                "instant": True
-            },
-            {
-                "id": "bank_transfer",
-                "name": "Bank Transfer",
-                "description": "Manual bank transfer (24hr confirmation)",
-                "currency": "NGN",
-                "instant": False
-            },
-            {
-                "id": "paystack",
-                "name": "Paystack",
-                "description": "Pay with card, bank transfer, or USSD",
-                "currency": "NGN",
-                "instant": True
-            },
-            {
-                "id": "crypto",
-                "name": "Cryptocurrency (USDT)",
-                "description": "Pay with USDT on TRC20 network",
-                "currency": "USDT",
-                "instant": True
-            }
-        ]
+        "methods": methods
     }
