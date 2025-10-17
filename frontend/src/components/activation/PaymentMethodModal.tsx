@@ -33,6 +33,7 @@ const PaymentMethodModal = ({
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+  const [paymentData, setPaymentData] = useState<any>(null);
 
   useEffect(() => {
     if (open) {
@@ -50,7 +51,7 @@ const PaymentMethodModal = ({
     }
   };
 
-  const handleMethodSelect = async (methodId: string) => {
+  const handleMethodClick = async (methodId: string) => {
     setSelectedMethod(methodId);
     setLoading(true);
     
@@ -60,15 +61,27 @@ const PaymentMethodModal = ({
         currency,
         payment_method: methodId
       });
-      
-      onMethodSelected(methodId, response);
+      setPaymentData(response);
     } catch (error: any) {
       console.error('Payment initiation failed:', error);
       alert(error.response?.data?.detail || 'Failed to initiate payment');
+      setSelectedMethod(null);
     } finally {
       setLoading(false);
-      setSelectedMethod(null);
     }
+  };
+
+  const handleProceed = () => {
+    if (selectedMethod && paymentData) {
+      onMethodSelected(selectedMethod, paymentData);
+      onClose();
+    }
+  };
+
+  const handleCancel = () => {
+    setSelectedMethod(null);
+    setPaymentData(null);
+    onClose();
   };
 
   const getIcon = (methodId: string) => {
@@ -101,31 +114,45 @@ const PaymentMethodModal = ({
             </p>
           </div>
 
-          {methods.map((method) => (
-            <Card 
-              key={method.id}
-              className="p-4 hover:border-primary cursor-pointer transition-colors"
-              onClick={() => !loading && handleMethodSelect(method.id)}
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                  {getIcon(method.id)}
+          {!selectedMethod ? (
+            methods.map((method) => (
+              <Card 
+                key={method.id}
+                className="p-4 hover:border-primary cursor-pointer transition-colors"
+                onClick={() => !loading && handleMethodClick(method.id)}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                    {getIcon(method.id)}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium">{method.name}</h4>
+                    <p className="text-xs text-muted-foreground">{method.description}</p>
+                  </div>
+                  {loading && (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  )}
                 </div>
-                <div className="flex-1">
-                  <h4 className="font-medium">{method.name}</h4>
-                  <p className="text-xs text-muted-foreground">{method.description}</p>
-                </div>
-                {loading && selectedMethod === method.id && (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                )}
-              </div>
-            </Card>
-          ))}
+              </Card>
+            ))
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-sm text-muted-foreground mb-2">Selected payment method:</p>
+              <p className="font-medium">{methods.find(m => m.id === selectedMethod)?.name}</p>
+            </div>
+          )}
         </div>
 
-        <Button variant="outline" onClick={onClose} className="mt-4">
-          Cancel
-        </Button>
+        <div className="flex gap-2 mt-4">
+          <Button variant="outline" onClick={handleCancel} className="flex-1">
+            Cancel
+          </Button>
+          {selectedMethod && paymentData && (
+            <Button onClick={handleProceed} className="flex-1">
+              Proceed to Payment
+            </Button>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -39,6 +39,12 @@ def get_activation_status(
         db.commit()
         db.refresh(activation)
     
+    # Sync activation status with user.is_active
+    if current_user.is_active and activation.status != "active":
+        activation.status = "active"
+        db.commit()
+        db.refresh(activation)
+    
     return activation
 
 @router.post("/request", response_model=dict)

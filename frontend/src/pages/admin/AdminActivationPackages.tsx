@@ -165,10 +165,15 @@ const AdminActivationPackages = () => {
                   <Label htmlFor="price">Price (₦)</Label>
                   <Input
                     id="price"
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    type="text"
+                    value={formData.price ? parseFloat(formData.price.replace(/,/g, '')).toLocaleString() : ''}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/,/g, '');
+                      if (value === '' || !isNaN(Number(value))) {
+                        setFormData({ ...formData, price: value });
+                      }
+                    }}
+                    placeholder="10,000"
                     required
                   />
                 </div>
@@ -384,10 +389,15 @@ const AdminActivationPackages = () => {
                 <Label htmlFor="edit-price">Price (₦)</Label>
                 <Input
                   id="edit-price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  type="text"
+                  value={formData.price ? parseFloat(formData.price.replace(/,/g, '')).toLocaleString() : ''}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/,/g, '');
+                    if (value === '' || !isNaN(Number(value))) {
+                      setFormData({ ...formData, price: value });
+                    }
+                  }}
+                  placeholder="10,000"
                   required
                 />
               </div>

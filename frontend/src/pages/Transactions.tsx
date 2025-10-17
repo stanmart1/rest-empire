@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -11,14 +11,13 @@ import { useTransactions } from '@/hooks/useApi';
 import { Transaction } from '@/lib/types';
 
 const Transactions = () => {
-  const [activeTab, setActiveTab] = useState('all');
+
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   
   const limit = 20;
   const { data: transactions, isLoading } = useTransactions({
-    type: activeTab !== 'all' ? activeTab : undefined,
     status: statusFilter !== 'all' ? statusFilter : undefined,
     skip: (page - 1) * limit,
     limit
@@ -65,50 +64,7 @@ const Transactions = () => {
       </div>
 
       <Card>
-        <CardContent className="p-0">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="border-b border-border px-6 pt-4">
-              <TabsList className="h-auto p-0 bg-transparent border-0 gap-6 w-full justify-start">
-                <TabsTrigger 
-                  value="all"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary px-4 pb-3 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  All
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="purchase"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary px-4 pb-3 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Purchases
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="bonus"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary px-4 pb-3 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Bonuses
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="payout"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary px-4 pb-3 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Payouts
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="refund"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary px-4 pb-3 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Refunds
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="fee"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary px-4 pb-3 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Fees
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            <TabsContent value={activeTab} className="space-y-4 p-6 mt-0">
+        <CardContent className="p-6">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -184,8 +140,6 @@ const Transactions = () => {
                   </div>
                 </div>
               )}
-            </TabsContent>
-          </Tabs>
         </CardContent>
       </Card>
 

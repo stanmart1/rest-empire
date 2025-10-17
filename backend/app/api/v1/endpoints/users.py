@@ -183,7 +183,7 @@ def get_dashboard_stats(
         first_line_count=first_line_count,
         pending_payouts=float(pending_payouts),
         recent_earnings_30d=float(recent_earnings),
-        is_active=activation.status == "active" if activation else False,
+        is_active=current_user.is_active,
         rank_progress={
             "percentage": max(0, progress_percentage),
             "current_turnover": user_turnover,

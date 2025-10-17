@@ -175,29 +175,35 @@ const Activation = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
-            <div>
-              <Badge className={getStatusColor(status?.status)}>
-                {getStatusText(status?.status)}
-              </Badge>
-              {status?.package && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  Package: {status.package.name}
-                </p>
-              )}
-              {status?.activated_at && (
-                <p className="text-sm text-muted-foreground">
-                  Activated: {new Date(status.activated_at).toLocaleDateString()}
-                </p>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <Badge className={getStatusColor(status?.status)}>
+                  {getStatusText(status?.status)}
+                </Badge>
+                {status?.package && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Package: {status.package.name}
+                  </p>
+                )}
+                {status?.activated_at && (
+                  <p className="text-sm text-muted-foreground">
+                    Activated: {new Date(status.activated_at).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+              {status?.status === 'pending_payment' && status?.package && (
+                <div className="text-right">
+                  <p className="text-xl font-bold">
+                    {formatCurrency(status.activation_fee, 'NGN')}
+                  </p>
+                </div>
               )}
             </div>
-            {status?.status === 'pending_payment' && status?.package && (
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Amount Due</p>
-                <p className="text-xl font-bold">
-                  {formatCurrency(status.activation_fee, 'NGN')}
-                </p>
-                <p className="text-xs text-muted-foreground">Contact support to complete payment</p>
+            {status?.status === 'pending_payment' && (
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
+                <p className="text-sm text-yellow-700 font-medium">Payment Successful</p>
+                <p className="text-xs text-yellow-600 mt-1">Awaiting verification from admins</p>
               </div>
             )}
           </div>
@@ -272,33 +278,7 @@ const Activation = () => {
         </Card>
       )}
 
-      {/* Payment Instructions */}
-      {status?.status === 'pending_payment' && (
-        <Card className="border-yellow-200 bg-yellow-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-yellow-700">
-              <Clock className="w-5 h-5" />
-              Payment Required
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <p className="text-yellow-700">
-                Your activation request has been submitted. To complete your account activation:
-              </p>
-              <ol className="list-decimal list-inside space-y-1 text-sm text-yellow-600">
-                <li>Contact our support team</li>
-                <li>Complete payment of {formatCurrency(status.activation_fee, 'NGN')}</li>
-                <li>Your account will be activated within 24 hours</li>
-              </ol>
-              <div className="mt-4 p-3 bg-white rounded border">
-                <p className="text-sm font-medium">Support Contact:</p>
-                <p className="text-sm">Contact support through the Support page</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
 
       {/* Active Account Benefits */}
       {status?.status === 'active' && (
