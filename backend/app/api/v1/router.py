@@ -28,7 +28,7 @@ api_router.include_router(admin_users.router, prefix="/admin", tags=["Admin - Us
 api_router.include_router(admin_bonuses.router, prefix="/admin", tags=["Admin - Bonuses"])
 api_router.include_router(admin_support.router, prefix="/admin", tags=["Admin - Support"])
 api_router.include_router(admin_analytics.router, prefix="/admin", tags=["Admin - Analytics"])
-api_router.include_router(admin_config.router, prefix="/admin", tags=["Admin - Configuration"])
+api_router.include_router(admin_config.router, prefix="/admin/config", tags=["Admin - Configuration"])
 api_router.include_router(admin_books.router, prefix="/admin", tags=["Admin - Books"])
 api_router.include_router(admin_promo_materials.router, prefix="/admin", tags=["Admin - Promo Materials"])
 api_router.include_router(admin_activation.router, prefix="/admin/activation-packages", tags=["Admin - Activation Packages"])

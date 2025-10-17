@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Dict
+from typing import Dict, List
 from pydantic import BaseModel
 from app.core.database import get_db
 from app.api.deps import get_admin_user
 from app.models.user import User
 from app.models.system_config import SystemConfig
+from app.models.payment_gateway import PaymentGateway
+from app.schemas.payment_gateway import PaymentGatewayCreate, PaymentGatewayUpdate, PaymentGatewayResponse
 from app.services.config_service import get_config, set_config, get_all_configs, delete_config
 from app.utils.activity import log_activity
 
@@ -155,3 +157,63 @@ def admin_update_platform_settings(
     )
     
     return {"message": "Platform settings updated successfully"}
+
+@router.get("/payment-gateways", response_model=List[PaymentGatewayResponse])
+def get_payment_gateways(
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Admin: Get all payment gateways"""
+    return db.query(PaymentGateway).all()
+
+@router.post("/payment-gateways", response_model=PaymentGatewayResponse)
+def create_payment_gateway(
+    gateway: PaymentGatewayCreate,
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Admin: Create new payment gateway"""
+    db_gateway = PaymentGateway(**gateway.dict())
+    db.add(db_gateway)
+    db.commit()
+    db.refresh(db_gateway)
+    log_activity(db, admin.id, "payment_gateway_created", details={"gateway_id": db_gateway.gateway_id})
+    return db_gateway
+
+@router.put("/payment-gateways/{gateway_id}", response_model=PaymentGatewayResponse)
+def update_payment_gateway(
+    gateway_id: str,
+    gateway_update: PaymentGatewayUpdate,
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Admin: Update payment gateway"""
+    db_gateway = db.query(PaymentGateway).filter(PaymentGateway.gateway_id == gateway_id).first()
+    if not db_gateway:
+        raise HTTPException(status_code=404, detail="Payment gateway not found")
+    
+    for key, value in gateway_update.dict(exclude_unset=True).items():
+        setattr(db_gateway, key, value)
+    
+    db.commit()
+    db.refresh(db_gateway)
+    log_activity(db, admin.id, "payment_gateway_updated", details={"gateway_id": gateway_id})
+    return db_gateway
+
+@router.delete("/payment-gateways/{gateway_id}")
+def delete_payment_gateway(
+    gateway_id: str,
+    admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Admin: Delete payment gateway"""
+    db_gateway = db.query(PaymentGateway).filter(PaymentGateway.gateway_id == gateway_id).first()
+    if not db_gateway:
+        raise HTTPException(status_code=404, detail="Payment gateway not found")
+    
+    db.delete(db_gateway)
+    db.commit()
+    log_activity(db, admin.id, "payment_gateway_deleted", details={"gateway_id": gateway_id})
+    return {"message": "Payment gateway deleted successfully"}
+
+

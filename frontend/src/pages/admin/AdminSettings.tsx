@@ -8,7 +8,9 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
+import { Settings } from 'lucide-react';
 import api from '@/lib/api';
+import PaymentGatewayModal from '@/components/admin/PaymentGatewayModal';
 
 const AdminSettings = () => {
   const [minPayoutNGN, setMinPayoutNGN] = useState('5000');
@@ -18,12 +20,48 @@ const AdminSettings = () => {
   const [registrationEnabled, setRegistrationEnabled] = useState(true);
   const [emailVerificationRequired, setEmailVerificationRequired] = useState(true);
   const [maxReferralDepth, setMaxReferralDepth] = useState('15');
+  
+  // Payment Gateway States
+  const [gtpayEnabled, setGtpayEnabled] = useState(false);
+  const [gtpayMerchantId, setGtpayMerchantId] = useState('');
+  const [gtpayApiKey, setGtpayApiKey] = useState('');
+  const [gtpayCallbackUrl, setGtpayCallbackUrl] = useState('');
+  
+  const [providusEnabled, setProvidusEnabled] = useState(false);
+  const [providusAccountNumber, setProvidusAccountNumber] = useState('');
+  const [providusBankCode, setProvidusBankCode] = useState('');
+  const [providusApiKey, setProvidusApiKey] = useState('');
+  
+  const [paystackEnabled, setPaystackEnabled] = useState(false);
+  const [paystackPublicKey, setPaystackPublicKey] = useState('');
+  const [paystackSecretKey, setPaystackSecretKey] = useState('');
+  const [paystackCallbackUrl, setPaystackCallbackUrl] = useState('');
+  
+  const [cryptoEnabled, setCryptoEnabled] = useState(false);
+  const [cryptoWalletAddress, setCryptoWalletAddress] = useState('');
+  
+  const [bankTransferEnabled, setBankTransferEnabled] = useState(false);
+  const [bankTransferBankName, setBankTransferBankName] = useState('');
+  const [bankTransferAccountNumber, setBankTransferAccountNumber] = useState('');
+  const [bankTransferAccountName, setBankTransferAccountName] = useState('');
+  
+  const [editingGateway, setEditingGateway] = useState<any>(null);
+  const [gatewaySettings, setGatewaySettings] = useState<Record<string, any>>({});
+  
   const queryClient = useQueryClient();
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ['platformSettings'],
     queryFn: async () => {
-      const response = await api.get('/admin/config/settings/platform');
+      const response = await api.get('/admin/config/config/settings/platform');
+      return response.data;
+    },
+  });
+
+  const { data: availableGateways } = useQuery({
+    queryKey: ['paymentGateways'],
+    queryFn: async () => {
+      const response = await api.get('/admin/config/payment-gateways');
       return response.data;
     },
   });
@@ -39,10 +77,12 @@ const AdminSettings = () => {
       setMaxReferralDepth(settings.max_referral_depth?.toString() || '15');
     }
   }, [settings]);
+  
+
 
   const updateMutation = useMutation({
     mutationFn: async (data: Record<string, string>) => {
-      await api.put('/admin/config/settings/platform', data);
+      await api.put('/admin/config/config/settings/platform', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['platformSettings'] });
@@ -69,6 +109,44 @@ const AdminSettings = () => {
       max_referral_depth: maxReferralDepth,
     });
   };
+  
+  const paymentGatewayMutation = useMutation({
+    mutationFn: async ({ gateway_id, data }: { gateway_id: string; data: any }) => {
+      await api.put(`/admin/config/payment-gateways/${gateway_id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['paymentGateways'] });
+      toast.success('Payment gateway updated successfully');
+    },
+    onError: () => {
+      toast.error('Failed to update payment gateway');
+    },
+  });
+  
+  const handleSavePaymentGateways = () => {
+    if (!editingGateway) return;
+    paymentGatewayMutation.mutate({
+      gateway_id: editingGateway.gateway_id,
+      data: { config_values: gatewaySettings }
+    });
+    setEditingGateway(null);
+  };
+  
+  const handleFieldChange = (key: string, value: string) => {
+    setGatewaySettings(prev => ({ ...prev, [key]: value }));
+  };
+  
+  const handleToggleGateway = (gateway: any) => {
+    paymentGatewayMutation.mutate({
+      gateway_id: gateway.gateway_id,
+      data: { is_enabled: !gateway.is_enabled }
+    });
+  };
+  
+  const handleEditGateway = (gateway: any) => {
+    setGatewaySettings(gateway.config_values || {});
+    setEditingGateway(gateway);
+  };
 
   return (
     <div className="space-y-6">
@@ -80,6 +158,7 @@ const AdminSettings = () => {
       <Tabs defaultValue="payout">
         <TabsList>
           <TabsTrigger value="payout">Payout Settings</TabsTrigger>
+          <TabsTrigger value="payment">Payment Gateways</TabsTrigger>
           <TabsTrigger value="system">System Settings</TabsTrigger>
           <TabsTrigger value="referral">Referral Settings</TabsTrigger>
         </TabsList>
@@ -152,6 +231,41 @@ const AdminSettings = () => {
               </Button>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="payment" className="space-y-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {availableGateways?.map((gateway: any) => (
+              <Card key={gateway.id} className="flex flex-col items-center justify-between p-4 h-40">
+                <div className="flex items-center justify-between w-full">
+                  <h3 className="font-semibold text-sm">{gateway.name}</h3>
+                  <Switch 
+                    checked={gateway.is_enabled} 
+                    onCheckedChange={() => handleToggleGateway(gateway)} 
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEditGateway(gateway)}
+                  className="mt-auto"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Edit
+                </Button>
+              </Card>
+            ))}
+          </div>
+
+          <PaymentGatewayModal
+            open={!!editingGateway}
+            onClose={() => setEditingGateway(null)}
+            gateway={editingGateway}
+            values={gatewaySettings}
+            onChange={handleFieldChange}
+            onSave={handleSavePaymentGateways}
+            isSaving={paymentGatewayMutation.isPending}
+          />
         </TabsContent>
 
         <TabsContent value="system" className="space-y-4">
