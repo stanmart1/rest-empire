@@ -26,30 +26,24 @@
             padding: 40px 30px; 
             text-align: center;
         }
-        .content { 
-            padding: 40px 30px;
-        }
-        .member-box {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #0a2c1c;
-            margin: 20px 0;
-        }
-        .stats {
-            display: table;
-            width: 100%;
-            margin: 20px 0;
-        }
-        .stat-item {
-            display: table-cell;
-            text-align: center;
-            padding: 15px;
-        }
-        .stat-value {
+        .header h1 {
+            margin: 0;
             font-size: 32px;
             font-weight: 700;
+        }
+        .content { 
+            padding: 40px 30px;
+            background: #ffffff;
+        }
+        .content h2 {
             color: #0a2c1c;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .content p {
+            color: #333333;
+            margin-bottom: 15px;
         }
         .button { 
             display: inline-block; 
@@ -59,6 +53,62 @@
             text-decoration: none; 
             border-radius: 8px;
             font-weight: 600;
+            margin: 25px 0;
+        }
+        .member-card {
+            background: #f9f9f9;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 8px;
+            border-left: 4px solid #0a2c1c;
+        }
+        .member-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .member-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0a2c1c 0%, #0f321e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            margin-right: 15px;
+        }
+        .member-details h3 {
+            margin: 0 0 5px 0;
+            color: #0a2c1c;
+            font-size: 20px;
+        }
+        .member-details p {
+            margin: 0;
+            color: #666666;
+            font-size: 14px;
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0a2c1c;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666666;
+            text-transform: uppercase;
         }
         .footer { 
             text-align: center; 
@@ -67,40 +117,57 @@
             color: #666666;
             font-size: 13px;
         }
+        .footer p {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎉 New Team Member!</h1>
+            <h1>🎉 New Team Member! - Opened Seal and Rest Empire</h1>
         </div>
         <div class="content">
-            <h2 style="color: #0a2c1c;">Your Team is Growing</h2>
-            <p>Great news! A new member has joined your team.</p>
+            <h2>Your Team is Growing!</h2>
+            <p>Congratulations! A new member has joined your team on Rest Empire.</p>
             
-            <div class="member-box">
-                <p style="margin: 0;"><strong>New Member:</strong> {{member_name}}</p>
-                <p style="margin: 5px 0 0 0; color: #666;">{{member_email}}</p>
+            <div class="member-card">
+                <div class="member-info">
+                    <div class="member-avatar">
+                        {{member_name[0]}}
+                    </div>
+                    <div class="member-details">
+                        <h3>{{member_name}}</h3>
+                        <p>{{member_email}}</p>
+                    </div>
+                </div>
+                
+                <div class="stats-row">
+                    <div class="stat">
+                        <div class="stat-value">{{team_size}}</div>
+                        <div class="stat-label">Total Team</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">{{first_line}}</div>
+                        <div class="stat-label">First Line</div>
+                    </div>
+                </div>
             </div>
             
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-value">{{team_size}}</div>
-                    <div style="font-size: 14px; color: #666;">Total Team</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">{{first_line}}</div>
-                    <div style="font-size: 14px; color: #666;">First Line</div>
-                </div>
-            </div>
+            <p>This is a great opportunity to welcome your new team member and help them get started on their journey to success!</p>
             
             <div style="text-align: center;">
                 <a href="{{team_url}}" class="button">View Your Team</a>
             </div>
+            
+            <p style="margin-top: 30px; padding: 20px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0a2c1c;">
+                <strong>💡 Leadership Tip:</strong> Reach out to your new team member and offer guidance. A supported team member is a successful team member!
+            </p>
         </div>
         <div class="footer">
-            <p><strong>Rest Empire</strong></p>
-            <p>&copy; 2025 Rest Empire. All rights reserved.</p>
+            <p><strong>Opened Seal and Rest Empire</strong></p>
+            <p>&copy; 2025 Opened Seal and Rest Empire. All rights reserved.</p>
+            <p>Building Your Network Marketing Empire</p>
         </div>
     </div>
 </body>

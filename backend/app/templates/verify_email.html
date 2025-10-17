@@ -28,7 +28,7 @@
         }
         .header h1 {
             margin: 0;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
         }
         .content { 
@@ -54,37 +54,13 @@
             border-radius: 8px;
             font-weight: 600;
             margin: 25px 0;
-            transition: background 0.3s;
         }
-        .button:hover {
-            background: #0d311e;
-        }
-        .link-box {
-            background: #f9f9f9;
-            padding: 15px;
+        .info-box { 
+            background: #f0f9ff;
+            padding: 20px;
+            margin: 20px 0;
             border-radius: 8px;
             border-left: 4px solid #0a2c1c;
-            margin: 20px 0;
-            word-break: break-all;
-        }
-        .link-box p {
-            margin: 5px 0;
-            font-size: 14px;
-            color: #666666;
-        }
-        .link-box a {
-            color: #0a2c1c;
-            text-decoration: none;
-        }
-        .expiry {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 12px 15px;
-            margin: 20px 0;
-            border-radius: 4px;
-        }
-        .expiry strong {
-            color: #856404;
         }
         .footer { 
             text-align: center; 
@@ -101,37 +77,28 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌟 Welcome to Rest Empire!</h1>
+            <h1>✉️ Verify Your Email - Opened Seal and Rest Empire</h1>
         </div>
         <div class="content">
-            <h2>Verify Your Email Address</h2>
-            <p>Thank you for joining Rest Empire. We're excited to have you on board!</p>
-            <p>To activate your account and start building your network marketing empire, please verify your email address by clicking the button below:</p>
+            <h2>Welcome to Rest Empire!</h2>
+            <p>Thank you for registering with Rest Empire. To complete your registration and activate your account, please verify your email address.</p>
             
             <div style="text-align: center;">
                 <a href="{{verification_url}}" class="button">Verify Email Address</a>
             </div>
             
-            <div class="link-box">
-                <p><strong>Or copy and paste this link:</strong></p>
-                <a href="{{verification_url}}">{{verification_url}}</a>
+            <div class="info-box">
+                <p style="margin: 0;"><strong>🔒 Security Note:</strong> This verification link will expire in 24 hours. If you didn't create an account with Rest Empire, please ignore this email.</p>
             </div>
             
-            <div class="expiry">
-                <strong>⏰ Important:</strong> This verification link will expire in 48 hours.
-            </div>
-            
-            <p>Once verified, you'll be able to:</p>
-            <ul style="color: #333333;">
-                <li>Access your personalized dashboard</li>
-                <li>Share your referral link</li>
-                <li>Start building your team</li>
-                <li>Track your earnings and bonuses</li>
-            </ul>
+            <p style="margin-top: 30px; color: #666666; font-size: 14px;">
+                If the button doesn't work, copy and paste this link into your browser:<br>
+                <span style="color: #0a2c1c; word-break: break-all;">{{verification_url}}</span>
+            </p>
         </div>
         <div class="footer">
-            <p><strong>Rest Empire</strong></p>
-            <p>&copy; 2025 Rest Empire. All rights reserved.</p>
+            <p><strong>Opened Seal and Rest Empire</strong></p>
+            <p>&copy; 2025 Opened Seal and Rest Empire. All rights reserved.</p>
             <p>Building Your Network Marketing Empire</p>
         </div>
     </div>

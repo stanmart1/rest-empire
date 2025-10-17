@@ -26,20 +26,24 @@
             padding: 40px 30px; 
             text-align: center;
         }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+        }
         .content { 
             padding: 40px 30px;
+            background: #ffffff;
         }
-        .info-box {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
+        .content h2 {
+            color: #0a2c1c;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
         }
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #e0e0e0;
+        .content p {
+            color: #333333;
+            margin-bottom: 15px;
         }
         .button { 
             display: inline-block; 
@@ -49,6 +53,47 @@
             text-decoration: none; 
             border-radius: 8px;
             font-weight: 600;
+            margin: 25px 0;
+        }
+        .payout-details {
+            background: #f9f9f9;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 8px;
+            border-left: 4px solid #0a2c1c;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            color: #666666;
+            font-size: 14px;
+        }
+        .detail-value {
+            color: #0a2c1c;
+            font-weight: 600;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
         }
         .footer { 
             text-align: center; 
@@ -57,43 +102,57 @@
             color: #666666;
             font-size: 13px;
         }
+        .footer p {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>✅ Payout {{status}}</h1>
+            <h1>💸 Payout Update - Opened Seal and Rest Empire</h1>
         </div>
         <div class="content">
-            <h2 style="color: #0a2c1c;">Payout Update</h2>
-            <p>Your payout request has been {{status}}.</p>
+            <h2>Payout {{status}}</h2>
+            <p>Your payout request has been processed. Here are the details:</p>
             
-            <div class="info-box">
-                <div class="info-row">
-                    <span><strong>Amount:</strong></span>
-                    <span>€{{amount}}</span>
+            <div class="payout-details">
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="status-badge status-{{status}}">{{status}}</span>
                 </div>
-                <div class="info-row">
-                    <span><strong>Method:</strong></span>
-                    <span>{{method}}</span>
+                <div class="detail-row">
+                    <span class="detail-label">Amount</span>
+                    <span class="detail-value">₦{{amount}}</span>
                 </div>
-                <div class="info-row" style="border-bottom: none;">
-                    <span><strong>Reference:</strong></span>
-                    <span>{{reference}}</span>
+                <div class="detail-row">
+                    <span class="detail-label">Payment Method</span>
+                    <span class="detail-value">{{method}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Reference</span>
+                    <span class="detail-value">{{reference}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Expected Arrival</span>
+                    <span class="detail-value">{{expected_arrival}}</span>
                 </div>
             </div>
             
-            <p style="background: #f0f9ff; padding: 15px; border-radius: 8px; border-left: 4px solid #0a2c1c;">
-                <strong>Expected Arrival:</strong> {{expected_arrival}}
-            </p>
+            <p>Your funds are on their way! You should receive them within the expected timeframe.</p>
             
             <div style="text-align: center;">
-                <a href="{{payouts_url}}" class="button">View Payouts</a>
+                <a href="{{payouts_url}}" class="button">View Payout History</a>
             </div>
+            
+            <p style="margin-top: 30px; padding: 20px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0a2c1c;">
+                <strong>📌 Note:</strong> If you have any questions about this payout, please contact our support team with your reference number.
+            </p>
         </div>
         <div class="footer">
-            <p><strong>Rest Empire</strong></p>
-            <p>&copy; 2025 Rest Empire. All rights reserved.</p>
+            <p><strong>Opened Seal and Rest Empire</strong></p>
+            <p>&copy; 2025 Opened Seal and Rest Empire. All rights reserved.</p>
+            <p>Building Your Network Marketing Empire</p>
         </div>
     </div>
 </body>

@@ -28,25 +28,22 @@
         }
         .header h1 {
             margin: 0;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
         }
         .content { 
             padding: 40px 30px;
             background: #ffffff;
         }
-        .amount-box {
-            background: linear-gradient(135deg, #0a2c1c 0%, #0f321e 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 8px;
-            text-align: center;
-            margin: 20px 0;
+        .content h2 {
+            color: #0a2c1c;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
         }
-        .amount {
-            font-size: 48px;
-            font-weight: 700;
-            margin: 10px 0;
+        .content p {
+            color: #333333;
+            margin-bottom: 15px;
         }
         .button { 
             display: inline-block; 
@@ -58,12 +55,46 @@
             font-weight: 600;
             margin: 25px 0;
         }
+        .bonus-box { 
+            background: linear-gradient(135deg, #0a2c1c 0%, #0f321e 100%);
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+        }
+        .bonus-amount {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        .balance-box {
+            background: #f9f9f9;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .balance-label {
+            font-size: 14px;
+            color: #666666;
+        }
+        .balance-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0a2c1c;
+        }
         .footer { 
             text-align: center; 
             padding: 30px;
             background: #f9f9f9;
             color: #666666;
             font-size: 13px;
+        }
+        .footer p {
+            margin: 5px 0;
         }
     </style>
 </head>
@@ -73,28 +104,36 @@
             <h1>💰 Bonus Earned!</h1>
         </div>
         <div class="content">
-            <h2 style="color: #0a2c1c; text-align: center;">You've Earned a Bonus</h2>
+            <h2>Great News!</h2>
+            <p>You've just earned a new bonus on Rest Empire!</p>
             
-            <div class="amount-box">
-                <p style="margin: 0; font-size: 14px; opacity: 0.9;">{{bonus_type}} Bonus</p>
-                <div class="amount">€{{amount}}</div>
+            <div class="bonus-box">
+                <div style="font-size: 48px; margin-bottom: 10px;">🎁</div>
+                <div style="font-size: 16px; opacity: 0.9; text-transform: uppercase;">{{bonus_type}}</div>
+                <div class="bonus-amount">₦{{amount}}</div>
             </div>
             
-            <p style="text-align: center; color: #333333;">
-                Great news! A new bonus has been added to your account.
-            </p>
+            <div class="balance-box">
+                <div>
+                    <div class="balance-label">New Balance</div>
+                    <div class="balance-value">₦{{new_balance}}</div>
+                </div>
+            </div>
             
-            <p style="background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #0a2c1c;">
-                <strong>Updated Balance:</strong> €{{new_balance}}
-            </p>
+            <p>Your hard work is paying off! This bonus has been added to your account and is ready for withdrawal.</p>
             
             <div style="text-align: center;">
                 <a href="{{dashboard_url}}" class="button">View Dashboard</a>
             </div>
+            
+            <p style="margin-top: 30px; padding: 20px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0a2c1c;">
+                <strong>💡 Keep Growing:</strong> Continue building your team and watch your bonuses multiply!
+            </p>
         </div>
         <div class="footer">
-            <p><strong>Rest Empire</strong></p>
-            <p>&copy; 2025 Rest Empire. All rights reserved.</p>
+            <p><strong>Opened Seal and Rest Empire</strong></p>
+            <p>&copy; 2025 Opened Seal and Rest Empire. All rights reserved.</p>
+            <p>Building Your Network Marketing Empire</p>
         </div>
     </div>
 </body>

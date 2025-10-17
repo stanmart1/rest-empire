@@ -21,7 +21,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .header { 
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: linear-gradient(135deg, #0a2c1c 0%, #0f321e 100%);
             color: white; 
             padding: 40px 30px; 
             text-align: center;
@@ -36,7 +36,7 @@
             background: #ffffff;
         }
         .content h2 {
-            color: #dc3545;
+            color: #0a2c1c;
             font-size: 24px;
             margin-top: 0;
             margin-bottom: 20px;
@@ -48,30 +48,24 @@
         .button { 
             display: inline-block; 
             padding: 14px 40px; 
-            background: #dc3545;
+            background: #0a2c1c;
             color: white !important;
             text-decoration: none; 
             border-radius: 8px;
             font-weight: 600;
             margin: 25px 0;
         }
-        .alert-box {
-            background: #fff3cd;
+        .payment-details {
+            background: #f9f9f9;
             padding: 25px;
             margin: 25px 0;
             border-radius: 8px;
-            border-left: 4px solid #ffc107;
-        }
-        .activity-details {
-            background: #f9f9f9;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 8px;
+            border-left: 4px solid #0a2c1c;
         }
         .detail-row {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #e0e0e0;
         }
         .detail-row:last-child {
@@ -82,8 +76,21 @@
             font-size: 14px;
         }
         .detail-value {
-            color: #333333;
+            color: #0a2c1c;
             font-weight: 600;
+        }
+        .amount-box {
+            background: linear-gradient(135deg, #0a2c1c 0%, #0f321e 100%);
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+        }
+        .amount {
+            font-size: 42px;
+            font-weight: 700;
+            margin: 10px 0;
         }
         .footer { 
             text-align: center; 
@@ -100,45 +107,45 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔒 Security Alert - Opened Seal and Rest Empire</h1>
+            <h1>✅ Payment Received - Opened Seal and Rest Empire</h1>
         </div>
         <div class="content">
-            <h2>Account Activity Detected</h2>
-            <p>We detected a security-related activity on your Rest Empire account. Please review the details below:</p>
+            <h2>Payment Confirmation</h2>
+            <p>We've successfully received your payment for the {{package_name}} package.</p>
             
-            <div class="activity-details">
+            <div class="amount-box">
+                <div style="font-size: 48px; margin-bottom: 10px;">💳</div>
+                <div style="font-size: 16px; opacity: 0.9;">Amount Paid</div>
+                <div class="amount">₦{{amount}}</div>
+            </div>
+            
+            <div class="payment-details">
                 <div class="detail-row">
-                    <span class="detail-label">Action</span>
-                    <span class="detail-value">{{action}}</span>
+                    <span class="detail-label">Package</span>
+                    <span class="detail-value">{{package_name}}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Time</span>
-                    <span class="detail-value">{{timestamp}}</span>
+                    <span class="detail-label">Payment Method</span>
+                    <span class="detail-value">{{payment_method}}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Location</span>
-                    <span class="detail-value">{{location}}</span>
+                    <span class="detail-label">Transaction Reference</span>
+                    <span class="detail-value">{{reference}}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Device</span>
-                    <span class="detail-value">{{device}}</span>
+                    <span class="detail-label">Date</span>
+                    <span class="detail-value">{{date}}</span>
                 </div>
             </div>
             
-            <div class="alert-box">
-                <p style="margin: 0;"><strong>⚠️ Was this you?</strong> If you recognize this activity, no action is needed. If you don't recognize this activity, please secure your account immediately.</p>
-            </div>
+            <p>Your payment is being processed and your account will be activated shortly. You'll receive another email once your account is fully activated.</p>
             
             <div style="text-align: center;">
-                <a href="{{security_url}}" class="button">Review Security Settings</a>
+                <a href="{{dashboard_url}}" class="button">View Dashboard</a>
             </div>
             
             <p style="margin-top: 30px; padding: 20px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0a2c1c;">
-                <strong>🛡️ Security Tips:</strong>
-                <br>• Use a strong, unique password
-                <br>• Enable two-factor authentication
-                <br>• Never share your password with anyone
-                <br>• Be cautious of phishing attempts
+                <strong>📌 Keep This Email:</strong> Save this confirmation for your records. If you have any questions, please contact support with your transaction reference.
             </p>
         </div>
         <div class="footer">

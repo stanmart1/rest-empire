@@ -35,53 +35,15 @@
             padding: 40px 30px;
             background: #ffffff;
         }
-        .rank-badge {
-            text-align: center;
-            padding: 30px;
-            background: linear-gradient(135deg, #0a2c1c 0%, #0f321e 100%);
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-        .rank-badge h2 {
-            color: white;
-            font-size: 36px;
-            margin: 0;
-        }
-        .bonus-box {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 4px;
-            text-align: center;
-        }
-        .bonus-amount {
-            font-size: 32px;
-            font-weight: 700;
-            color: #856404;
-            margin: 10px 0;
-        }
-        .stats-grid {
-            display: table;
-            width: 100%;
-            margin: 20px 0;
-        }
-        .stat-item {
-            display: table-cell;
-            text-align: center;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 8px;
-        }
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
+        .content h2 {
             color: #0a2c1c;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
         }
-        .stat-label {
-            font-size: 12px;
-            color: #666666;
-            margin-top: 5px;
+        .content p {
+            color: #333333;
+            margin-bottom: 15px;
         }
         .button { 
             display: inline-block; 
@@ -93,6 +55,46 @@
             font-weight: 600;
             margin: 25px 0;
         }
+        .achievement-box { 
+            background: linear-gradient(135deg, #0a2c1c 0%, #0f321e 100%);
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+        }
+        .achievement-box h3 {
+            font-size: 36px;
+            margin: 0 0 10px 0;
+        }
+        .stats-grid {
+            display: table;
+            width: 100%;
+            margin: 20px 0;
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .stat-item {
+            display: table-cell;
+            text-align: center;
+            padding: 10px;
+            border-right: 1px solid #e0e0e0;
+        }
+        .stat-item:last-child {
+            border-right: none;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0a2c1c;
+        }
         .footer { 
             text-align: center; 
             padding: 30px;
@@ -100,62 +102,54 @@
             color: #666666;
             font-size: 13px;
         }
+        .footer p {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎉 Congratulations!</h1>
+            <h1>🎉 Congratulations! - Opened Seal and Rest Empire</h1>
         </div>
         <div class="content">
-            <h2 style="color: #0a2c1c; text-align: center;">You've Achieved a New Rank!</h2>
+            <h2>Hi {{user_name}},</h2>
+            <p>We're thrilled to announce that you've achieved a new rank in Rest Empire!</p>
             
-            <div class="rank-badge">
-                <h2>{{rank_name}}</h2>
+            <div class="achievement-box">
+                <div style="font-size: 48px; margin-bottom: 10px;">🏆</div>
+                <h3>{{rank_name}}</h3>
+                <p style="margin: 0; opacity: 0.9;">You've unlocked this prestigious rank!</p>
             </div>
             
-            <p style="text-align: center; font-size: 18px; color: #333333;">
-                Amazing work, {{user_name}}! Your dedication and hard work have paid off.
+            <p style="font-size: 18px; text-align: center; color: #0a2c1c; font-weight: 600;">
+                Rank Bonus: ₦{{bonus_amount}}
             </p>
-            
-            <div class="bonus-box">
-                <p style="margin: 0; color: #856404;"><strong>🎁 Rank Achievement Bonus</strong></p>
-                <div class="bonus-amount">€{{bonus_amount}}</div>
-                <p style="margin: 0; color: #856404; font-size: 14px;">Added to your account</p>
-            </div>
             
             <div class="stats-grid">
-                <div class="stat-item" style="margin-right: 10px;">
-                    <div class="stat-value">€{{total_turnover}}</div>
+                <div class="stat-item">
                     <div class="stat-label">Total Turnover</div>
+                    <div class="stat-value">₦{{total_turnover}}</div>
                 </div>
                 <div class="stat-item">
+                    <div class="stat-label">Team Size</div>
                     <div class="stat-value">{{team_size}}</div>
-                    <div class="stat-label">Team Members</div>
                 </div>
             </div>
             
-            <p style="margin-top: 30px; color: #333333;">
-                <strong>What's Next?</strong>
-            </p>
-            <ul style="color: #333333;">
-                <li>Continue building your team</li>
-                <li>Support your downline members</li>
-                <li>Work towards the next rank level</li>
-                <li>Enjoy increased earning potential</li>
-            </ul>
+            <p>This achievement is a testament to your hard work, dedication, and leadership. Your team is growing, and your empire is expanding!</p>
             
             <div style="text-align: center;">
                 <a href="{{dashboard_url}}" class="button">View Your Dashboard</a>
             </div>
             
-            <p style="margin-top: 30px; padding: 20px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0a2c1c; color: #333333;">
-                <strong>💡 Keep Going!</strong> You're on the path to building a successful network marketing empire. Every rank brings new opportunities and rewards!
+            <p style="margin-top: 30px; padding: 20px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0a2c1c;">
+                <strong>💡 What's Next?</strong> Keep building your team and working towards the next rank. The sky's the limit!
             </p>
         </div>
         <div class="footer">
-            <p><strong>Rest Empire</strong></p>
-            <p>&copy; 2025 Rest Empire. All rights reserved.</p>
+            <p><strong>Opened Seal and Rest Empire</strong></p>
+            <p>&copy; 2025 Opened Seal and Rest Empire. All rights reserved.</p>
             <p>Building Your Network Marketing Empire</p>
         </div>
     </div>

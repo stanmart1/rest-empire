@@ -55,12 +55,25 @@
             font-weight: 600;
             margin: 25px 0;
         }
-        .warning-box { 
-            background: #fff3cd;
+        .request-box {
+            background: linear-gradient(135deg, #0a2c1c 0%, #0f321e 100%);
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+        }
+        .amount {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        .info-box {
+            background: #f0f9ff;
             padding: 20px;
             margin: 20px 0;
             border-radius: 8px;
-            border-left: 4px solid #ffc107;
+            border-left: 4px solid #0a2c1c;
         }
         .footer { 
             text-align: center; 
@@ -77,23 +90,31 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔑 Reset Your Password - Opened Seal and Rest Empire</h1>
+            <h1>📤 Payout Request Received - Opened Seal and Rest Empire</h1>
         </div>
         <div class="content">
-            <h2>Password Reset Request</h2>
-            <p>We received a request to reset your password for your Rest Empire account. Click the button below to create a new password.</p>
+            <h2>We've Received Your Request</h2>
+            <p>Your payout request has been successfully submitted and is now being processed by our team.</p>
+            
+            <div class="request-box">
+                <div style="font-size: 48px; margin-bottom: 10px;">💰</div>
+                <div style="font-size: 16px; opacity: 0.9;">Requested Amount</div>
+                <div class="amount">₦{{amount}}</div>
+            </div>
+            
+            <div class="info-box">
+                <p style="margin: 0 0 10px 0;"><strong>⏱️ Processing Time:</strong> Your payout will be processed within 24-48 hours.</p>
+                <p style="margin: 0;"><strong>📧 Updates:</strong> You'll receive an email notification once your payout has been approved and sent.</p>
+            </div>
+            
+            <p>Your funds will be transferred to your registered payment method once the request is approved.</p>
             
             <div style="text-align: center;">
-                <a href="{{reset_url}}" class="button">Reset Password</a>
+                <a href="{{payouts_url}}" class="button">Track Payout Status</a>
             </div>
             
-            <div class="warning-box">
-                <p style="margin: 0;"><strong>⚠️ Important:</strong> This password reset link will expire in 1 hour. If you didn't request a password reset, please ignore this email and your password will remain unchanged.</p>
-            </div>
-            
-            <p style="margin-top: 30px; color: #666666; font-size: 14px;">
-                If the button doesn't work, copy and paste this link into your browser:<br>
-                <span style="color: #0a2c1c; word-break: break-all;">{{reset_url}}</span>
+            <p style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                <strong>📌 Note:</strong> Make sure your payment details are up to date in your account settings to avoid any delays.
             </p>
         </div>
         <div class="footer">

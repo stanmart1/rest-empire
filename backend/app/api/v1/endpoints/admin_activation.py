@@ -13,6 +13,7 @@ from app.schemas.activation import (
     ActivationPackageUpdate
 )
 from app.services.transaction_service import complete_purchase_transaction, fail_transaction
+from app.services.email_service import send_account_activated_email, send_payment_received_email
 from slugify import slugify
 
 router = APIRouter()
@@ -247,6 +248,16 @@ def approve_activation_payment(
         if user:
             user.is_active = True
             user.deactivated_at = None
+            
+            # Send account activated email
+            import asyncio
+            asyncio.create_task(send_account_activated_email(
+                user.email,
+                user.full_name or "User",
+                package.name,
+                float(package.price),
+                db
+            ))
         
         db.commit()
     
@@ -319,6 +330,16 @@ def assign_package_to_users(
         # Activate user account
         user.is_active = True
         user.deactivated_at = None
+        
+        # Send account activated email
+        import asyncio
+        asyncio.create_task(send_account_activated_email(
+            user.email,
+            user.full_name or "User",
+            package.name,
+            float(package.price),
+            db
+        ))
         
         activated_users.append(user.email)
     

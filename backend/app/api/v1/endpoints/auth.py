@@ -159,7 +159,7 @@ async def verify_email(verification: EmailVerification, db: Session = Depends(ge
     log_activity(db, user.id, "email_verified")
     
     # Send welcome email
-    await send_welcome_email(user.email, user.full_name or "User")
+    await send_welcome_email(user.email, user.full_name or "User", db)
     
     return {"message": "Email verified successfully"}
 
@@ -178,7 +178,7 @@ async def request_password_reset(request_data: PasswordResetRequest, db: Session
         log_activity(db, user.id, "password_reset_requested")
         
         # Send password reset email
-        await send_password_reset_email(user.email, reset_token)
+        await send_password_reset_email(user.email, reset_token, db)
     
     return {"message": "If the email exists, a reset link has been sent"}
 
@@ -221,6 +221,6 @@ async def resend_verification(email_data: PasswordResetRequest, db: Session = De
     log_activity(db, user.id, "verification_resent")
     
     # Send verification email
-    await send_verification_email(user.email, verification_token)
+    await send_verification_email(user.email, verification_token, db)
     
     return {"message": "If the email exists, a verification link has been sent"}

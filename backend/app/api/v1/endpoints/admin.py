@@ -12,7 +12,9 @@ from app.schemas.payout import PayoutResponse
 from app.schemas.admin import AdminStatsResponse, ManualTransaction, RefundRequest, PayoutApproval, PayoutRejection
 from app.services.transaction_service import refund_transaction, fail_transaction
 from app.services.payout_service import approve_payout, complete_payout, reject_payout
+from app.services.email_service import send_payout_processed_email
 from app.utils.activity import log_activity
+import asyncio
 
 router = APIRouter()
 
@@ -183,6 +185,12 @@ def admin_complete_payout(
     db: Session = Depends(get_db)
 ):
     """Admin: Mark payout as completed"""
+    payout = db.query(Payout).filter(Payout.id == payout_id).first()
+    if not payout:
+        raise HTTPException(status_code=404, detail="Payout not found")
+    
+    user = db.query(User).filter(User.id == payout.user_id).first()
+    
     success = complete_payout(
         db,
         payout_id,
@@ -192,6 +200,18 @@ def admin_complete_payout(
     
     if not success:
         raise HTTPException(status_code=400, detail="Cannot complete payout")
+    
+    # Send payout processed email
+    if user:
+        asyncio.create_task(send_payout_processed_email(
+            user.email,
+            "approved",
+            float(payout.amount),
+            payout.payout_method,
+            completion.external_transaction_id or payout.payout_reference,
+            "1-3 business days",
+            db
+        ))
     
     return {"message": "Payout completed successfully"}
 

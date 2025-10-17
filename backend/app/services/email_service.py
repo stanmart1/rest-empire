@@ -26,7 +26,7 @@ async def send_verification_email(email: str, token: str, db: Session):
         resend.Emails.send({
             "from": from_email,
             "to": email,
-            "subject": "Verify Your Email - Rest Empire",
+            "subject": "Verify Your Email - Opened Seal and Rest Empire",
             "html": html_content
         })
 
@@ -42,7 +42,7 @@ async def send_password_reset_email(email: str, token: str, db: Session):
         resend.Emails.send({
             "from": from_email,
             "to": email,
-            "subject": "Password Reset - Rest Empire",
+            "subject": "Password Reset - Opened Seal and Rest Empire",
             "html": html_content
         })
 
@@ -58,7 +58,7 @@ async def send_welcome_email(email: str, name: str, db: Session):
         resend.Emails.send({
             "from": from_email,
             "to": email,
-            "subject": "Welcome to Rest Empire!",
+            "subject": "Welcome to Opened Seal and Rest Empire!",
             "html": html_content
         })
 
@@ -82,7 +82,7 @@ async def send_rank_achievement_email(email: str, user_name: str, rank_name: str
         resend.Emails.send({
             "from": from_email,
             "to": email,
-            "subject": f"🎉 Congratulations! You've Achieved {rank_name} - Rest Empire",
+            "subject": f"🎉 Congratulations! You've Achieved {rank_name} - Opened Seal and Rest Empire",
             "html": html_content
         })
 
@@ -104,7 +104,7 @@ async def send_bonus_earned_email(email: str, bonus_type: str, amount: float, ne
         resend.Emails.send({
             "from": from_email,
             "to": email,
-            "subject": f"💰 Bonus Earned: €{amount:,.2f} - Rest Empire",
+            "subject": f"💰 Bonus Earned: ₦{amount:,.2f}",
             "html": html_content
         })
 
@@ -128,7 +128,7 @@ async def send_payout_processed_email(email: str, status: str, amount: float, me
         resend.Emails.send({
             "from": from_email,
             "to": email,
-            "subject": f"Payout {status.title()} - Rest Empire",
+            "subject": f"Payout {status.title()} - Opened Seal and Rest Empire",
             "html": html_content
         })
 
@@ -151,7 +151,7 @@ async def send_team_member_joined_email(email: str, member_name: str, member_ema
         resend.Emails.send({
             "from": from_email,
             "to": email,
-            "subject": "🎉 New Team Member Joined - Rest Empire",
+            "subject": "🎉 New Team Member Joined - Opened Seal and Rest Empire",
             "html": html_content
         })
 
@@ -174,6 +174,72 @@ async def send_security_alert_email(email: str, action: str, timestamp: str, loc
         resend.Emails.send({
             "from": from_email,
             "to": email,
-            "subject": "🔒 Security Alert - Rest Empire",
+            "subject": "🔒 Security Alert - Opened Seal and Rest Empire",
+            "html": html_content
+        })
+
+async def send_account_activated_email(email: str, user_name: str, package_name: str, package_price: float, db: Session):
+    dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
+    html_content = load_template(
+        "account_activated.html",
+        user_name=user_name,
+        package_name=package_name,
+        package_price=f"{package_price:,.2f}",
+        dashboard_url=dashboard_url
+    )
+    
+    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
+    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    
+    if api_key:
+        resend.api_key = api_key
+        resend.Emails.send({
+            "from": from_email,
+            "to": email,
+            "subject": "🚀 Account Activated - Opened Seal and Rest Empire",
+            "html": html_content
+        })
+
+async def send_payment_received_email(email: str, package_name: str, amount: float, payment_method: str, reference: str, date: str, db: Session):
+    dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
+    html_content = load_template(
+        "payment_received.html",
+        package_name=package_name,
+        amount=f"{amount:,.2f}",
+        payment_method=payment_method,
+        reference=reference,
+        date=date,
+        dashboard_url=dashboard_url
+    )
+    
+    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
+    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    
+    if api_key:
+        resend.api_key = api_key
+        resend.Emails.send({
+            "from": from_email,
+            "to": email,
+            "subject": "✅ Payment Received - Opened Seal and Rest Empire",
+            "html": html_content
+        })
+
+async def send_payout_request_email(email: str, amount: float, db: Session):
+    payouts_url = f"{settings.FRONTEND_URL}/payouts"
+    html_content = load_template(
+        "payout_request.html",
+        amount=f"{amount:,.2f}",
+        payouts_url=payouts_url
+    )
+    
+    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
+    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    
+    if api_key:
+        resend.api_key = api_key
+        resend.Emails.send({
+            "from": from_email,
+            "to": email,
+            "subject": "📤 Payout Request Received - Opened Seal and Rest Empire",
             "html": html_content
         })

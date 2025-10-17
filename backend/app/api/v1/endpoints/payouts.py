@@ -10,6 +10,8 @@ from app.schemas.payout import (
     BankAccountDetails, CryptoAccountDetails
 )
 from app.services.payout_service import create_payout_request
+from app.services.email_service import send_payout_request_email
+import asyncio
 
 router = APIRouter()
 
@@ -44,6 +46,14 @@ def request_payout(
             payout.payout_method,
             payout.account_details
         )
+        
+        # Send payout request email
+        asyncio.create_task(send_payout_request_email(
+            current_user.email,
+            float(payout.amount),
+            db
+        ))
+        
         return payout_record
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
