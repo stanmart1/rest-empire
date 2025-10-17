@@ -31,61 +31,64 @@ const Activation = () => {
     setPaymentData(data);
     setPaymentMethodModalOpen(false);
 
-    // Create activation request
     try {
+      // Create activation request
       await apiService.activation.requestActivation({
         package_id: selectedPackage!.id,
         payment_method: method
       });
       
-      // Link transaction to activation
+      // Link transaction to activation for all methods
       if (data.transaction_id) {
         await apiService.activation.linkTransaction(data.transaction_id);
       }
+
+      // Handle different payment methods
+      if (method === 'bank_transfer') {
+        setBankTransferModalOpen(true);
+      } else if (method === 'gtpay') {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = data.payment_data.gateway_url;
+        form.target = '_blank';
+        
+        Object.keys(data.payment_data).forEach(key => {
+          if (key !== 'gateway_url') {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = data.payment_data[key];
+            form.appendChild(input);
+          }
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+        
+        toast({
+          title: "Redirecting",
+          description: "Opening payment gateway. Complete payment to activate your account.",
+        });
+      } else if (method === 'providus') {
+        toast({
+          title: "Account Generated",
+          description: `Transfer ${selectedPackage?.currency} ${selectedPackage?.price.toLocaleString()} to account ${data.payment_data.account_number}. Your account will be activated after payment confirmation.`,
+        });
+      } else if (method === 'crypto') {
+        toast({
+          title: "Crypto Payment",
+          description: `Send ${selectedPackage?.price} USDT to ${data.payment_data.wallet_address}. Your account will be activated after blockchain confirmation.`,
+        });
+      }
+
+      // Refresh activation status
+      await queryClient.invalidateQueries({ queryKey: ['activation-status'] });
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.response?.data?.detail || "Failed to create activation request",
+        description: error.response?.data?.detail || "Failed to process payment",
         variant: "destructive",
-      });
-      return;
-    }
-
-    if (method === 'bank_transfer') {
-      setBankTransferModalOpen(true);
-    } else if (method === 'gtpay') {
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = data.payment_data.gateway_url;
-      form.target = '_blank';
-      
-      Object.keys(data.payment_data).forEach(key => {
-        if (key !== 'gateway_url') {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = key;
-          input.value = data.payment_data[key];
-          form.appendChild(input);
-        }
-      });
-      
-      document.body.appendChild(form);
-      form.submit();
-      document.body.removeChild(form);
-      
-      toast({
-        title: "Redirecting",
-        description: "Opening payment gateway...",
-      });
-    } else if (method === 'providus') {
-      toast({
-        title: "Account Generated",
-        description: `Transfer to ${data.payment_data.account_number}`,
-      });
-    } else if (method === 'crypto') {
-      toast({
-        title: "Crypto Address",
-        description: data.payment_data.wallet_address,
       });
     }
   };
