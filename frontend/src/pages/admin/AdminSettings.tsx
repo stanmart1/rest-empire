@@ -47,6 +47,7 @@ const AdminSettings = () => {
   
   const [editingGateway, setEditingGateway] = useState<any>(null);
   const [gatewaySettings, setGatewaySettings] = useState<Record<string, any>>({});
+  const [togglingGatewayId, setTogglingGatewayId] = useState<string | null>(null);
   
   const queryClient = useQueryClient();
 
@@ -58,7 +59,7 @@ const AdminSettings = () => {
     },
   });
 
-  const { data: availableGateways } = useQuery({
+  const { data: availableGateways, isLoading: isLoadingGateways } = useQuery({
     queryKey: ['paymentGateways'],
     queryFn: async () => {
       const response = await api.get('/admin/config/payment-gateways');
@@ -114,22 +115,46 @@ const AdminSettings = () => {
     mutationFn: async ({ gateway_id, data }: { gateway_id: string; data: any }) => {
       await api.put(`/admin/config/payment-gateways/${gateway_id}`, data);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['paymentGateways'] });
-      toast.success('Payment gateway updated successfully');
+    onMutate: async ({ gateway_id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ['paymentGateways'] });
+      const previousGateways = queryClient.getQueryData(['paymentGateways']);
+      
+      queryClient.setQueryData(['paymentGateways'], (old: any) => {
+        if (!old) return old;
+        return old.map((g: any) => 
+          g.gateway_id === gateway_id ? { ...g, ...data } : g
+        );
+      });
+      
+      return { previousGateways };
     },
-    onError: () => {
+    onSuccess: () => {
+      toast.success('Payment gateway updated successfully');
+      setTogglingGatewayId(null);
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(['paymentGateways'], context?.previousGateways);
       toast.error('Failed to update payment gateway');
+      setTogglingGatewayId(null);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['paymentGateways'] });
     },
   });
   
   const handleSavePaymentGateways = () => {
     if (!editingGateway) return;
-    paymentGatewayMutation.mutate({
-      gateway_id: editingGateway.gateway_id,
-      data: { config_values: gatewaySettings }
-    });
-    setEditingGateway(null);
+    paymentGatewayMutation.mutate(
+      {
+        gateway_id: editingGateway.gateway_id,
+        data: { config_values: gatewaySettings }
+      },
+      {
+        onSuccess: () => {
+          setEditingGateway(null);
+        }
+      }
+    );
   };
   
   const handleFieldChange = (key: string, value: string) => {
@@ -137,6 +162,7 @@ const AdminSettings = () => {
   };
   
   const handleToggleGateway = (gateway: any) => {
+    setTogglingGatewayId(gateway.gateway_id);
     paymentGatewayMutation.mutate({
       gateway_id: gateway.gateway_id,
       data: { is_enabled: !gateway.is_enabled }
@@ -234,28 +260,55 @@ const AdminSettings = () => {
         </TabsContent>
 
         <TabsContent value="payment" className="space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {availableGateways?.map((gateway: any) => (
-              <Card key={gateway.id} className="flex flex-col items-center justify-between p-4 h-40">
-                <div className="flex items-center justify-between w-full">
-                  <h3 className="font-semibold text-sm">{gateway.name}</h3>
-                  <Switch 
-                    checked={gateway.is_enabled} 
-                    onCheckedChange={() => handleToggleGateway(gateway)} 
-                  />
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEditGateway(gateway)}
-                  className="mt-auto"
-                >
-                  <Settings className="w-4 h-4 mr-2" />
-                  Edit
-                </Button>
-              </Card>
-            ))}
-          </div>
+          {isLoadingGateways ? (
+            <div className="flex items-center justify-center h-40">
+              <p className="text-muted-foreground">Loading payment gateways...</p>
+            </div>
+          ) : !availableGateways || availableGateways.length === 0 ? (
+            <Card className="p-8">
+              <div className="text-center">
+                <p className="text-muted-foreground">No payment gateways configured</p>
+              </div>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {availableGateways.map((gateway: any) => {
+                const descriptions: Record<string, string> = {
+                  gtpay: 'Online payment gateway',
+                  providus: 'Dynamic account generation',
+                  paystack: 'Card & bank payments',
+                  crypto: 'USDT cryptocurrency payments',
+                  bank_transfer: 'Manual bank transfer'
+                };
+                const isToggling = togglingGatewayId === gateway.gateway_id;
+                return (
+                  <Card key={gateway.id} className="flex flex-col p-4 h-40">
+                    <div className="flex items-center justify-between w-full mb-2">
+                      <h3 className="font-semibold text-sm">{gateway.name}</h3>
+                      <Switch 
+                        checked={gateway.is_enabled} 
+                        onCheckedChange={() => handleToggleGateway(gateway)}
+                        disabled={isToggling}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground flex-1">
+                      {isToggling ? 'Updating...' : descriptions[gateway.gateway_id] || 'Payment gateway'}
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditGateway(gateway)}
+                      className="mt-auto bg-green-50 hover:bg-green-600 text-green-700 hover:text-white border-green-200"
+                      disabled={isToggling}
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Edit
+                    </Button>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
 
           <PaymentGatewayModal
             open={!!editingGateway}
