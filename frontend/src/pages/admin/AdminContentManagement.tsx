@@ -38,6 +38,16 @@ const AdminContentManagement = () => {
   const [blogFormData, setBlogFormData] = useState({ title: '', content: '', author: '', image_url: '' });
   const [aboutContent, setAboutContent] = useState('');
   const [aboutInitialized, setAboutInitialized] = useState(false);
+  const [contactContent, setContactContent] = useState({
+    phone: '',
+    phone_hours: '',
+    email1: '',
+    email2: '',
+    office_address: '',
+    office_city: '',
+    business_hours: ''
+  });
+  const [contactInitialized, setContactInitialized] = useState(false);
 
   const { data: faqs, isLoading } = useQuery({
     queryKey: ['faqs'],
@@ -67,6 +77,46 @@ const AdminContentManagement = () => {
     setAboutContent(aboutData.content);
     setAboutInitialized(true);
   }
+
+  const { data: contactData } = useQuery({
+    queryKey: ['contact-content'],
+    queryFn: async () => {
+      const response = await api.get('/contact/');
+      return response.data;
+    },
+  });
+
+  if (contactData && !contactInitialized) {
+    try {
+      const parsed = JSON.parse(contactData.content);
+      setContactContent(parsed);
+    } catch {
+      setContactContent({
+        phone: '',
+        phone_hours: '',
+        email1: '',
+        email2: '',
+        office_address: '',
+        office_city: '',
+        business_hours: ''
+      });
+    }
+    setContactInitialized(true);
+  }
+
+  const updateContactMutation = useMutation({
+    mutationFn: async (content: any) => {
+      await api.put('/contact/', { content: JSON.stringify(content) });
+    },
+    onSuccess: () => {
+      toast({ title: 'Success', description: 'Contact page updated successfully' });
+      queryClient.invalidateQueries({ queryKey: ['contact-content'] });
+    },
+  });
+
+  const handleContactSave = () => {
+    updateContactMutation.mutate(contactContent);
+  };
 
   const updateAboutMutation = useMutation({
     mutationFn: async (content: string) => {
@@ -391,8 +441,70 @@ const AdminContentManagement = () => {
               </Button>
             </TabsContent>
 
-            <TabsContent value="contact">
-              <p className="text-muted-foreground">Contact page content management coming soon...</p>
+            <TabsContent value="contact" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>Phone Number</Label>
+                  <Input
+                    value={contactContent.phone}
+                    onChange={(e) => setContactContent({ ...contactContent, phone: e.target.value })}
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+                <div>
+                  <Label>Phone Hours</Label>
+                  <Input
+                    value={contactContent.phone_hours}
+                    onChange={(e) => setContactContent({ ...contactContent, phone_hours: e.target.value })}
+                    placeholder="Mon-Fri, 9:00 AM - 6:00 PM EST"
+                  />
+                </div>
+                <div>
+                  <Label>Email 1</Label>
+                  <Input
+                    value={contactContent.email1}
+                    onChange={(e) => setContactContent({ ...contactContent, email1: e.target.value })}
+                    placeholder="support@restempire.com"
+                  />
+                </div>
+                <div>
+                  <Label>Email 2</Label>
+                  <Input
+                    value={contactContent.email2}
+                    onChange={(e) => setContactContent({ ...contactContent, email2: e.target.value })}
+                    placeholder="partnerships@restempire.com"
+                  />
+                </div>
+                <div>
+                  <Label>Office Address</Label>
+                  <Input
+                    value={contactContent.office_address}
+                    onChange={(e) => setContactContent({ ...contactContent, office_address: e.target.value })}
+                    placeholder="123 Business Avenue, Suite 100"
+                  />
+                </div>
+                <div>
+                  <Label>Office City</Label>
+                  <Input
+                    value={contactContent.office_city}
+                    onChange={(e) => setContactContent({ ...contactContent, office_city: e.target.value })}
+                    placeholder="San Francisco, CA 94107"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label>Business Hours</Label>
+                <Textarea
+                  value={contactContent.business_hours}
+                  onChange={(e) => setContactContent({ ...contactContent, business_hours: e.target.value })}
+                  placeholder="Monday - Friday: 9:00 AM - 6:00 PM EST&#10;Saturday: 10:00 AM - 4:00 PM EST&#10;Sunday: Closed"
+                  className="min-h-[100px]"
+                />
+              </div>
+              <Button onClick={handleContactSave} disabled={updateContactMutation.isPending}>
+                {updateContactMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Save Changes
+              </Button>
             </TabsContent>
           </Tabs>
         </CardContent>

@@ -3,11 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Phone, Mail, MapPin, Clock, ArrowRight, Users, Gift, TrendingUp } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, ArrowRight, Users, Gift, TrendingUp, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useState, useEffect } from "react";
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -17,10 +19,25 @@ const Contact = () => {
     message: ""
   });
 
-  // Scroll to top when component mounts
+  const { data: contactData, isLoading: contactLoading } = useQuery({
+    queryKey: ['public-contact'],
+    queryFn: async () => {
+      const response = await api.get('/contact/');
+      return response.data;
+    },
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  if (contactLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin" />
+      </div>
+    );
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -107,50 +124,59 @@ const Contact = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex items-start">
-                    <div className="bg-primary/10 p-3 rounded-full mr-4">
-                      <Phone className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">Phone</h3>
-                      <p className="text-foreground">+1 (555) 123-4567</p>
-                      <p className="text-foreground text-sm">Mon-Fri, 9:00 AM - 6:00 PM EST</p>
-                    </div>
-                  </div>
+                  {(() => {
+                    try {
+                      const data = JSON.parse(contactData?.content || '{}');
+                      return (
+                        <>
+                          <div className="flex items-start">
+                            <div className="bg-primary/10 p-3 rounded-full mr-4">
+                              <Phone className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-foreground">Phone</h3>
+                              <p className="text-foreground">{data.phone}</p>
+                              <p className="text-foreground text-sm">{data.phone_hours}</p>
+                            </div>
+                          </div>
 
-                  <div className="flex items-start">
-                    <div className="bg-primary/10 p-3 rounded-full mr-4">
-                      <Mail className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">Email</h3>
-                      <p className="text-foreground">support@restempire.com</p>
-                      <p className="text-foreground">partnerships@restempire.com</p>
-                    </div>
-                  </div>
+                          <div className="flex items-start">
+                            <div className="bg-primary/10 p-3 rounded-full mr-4">
+                              <Mail className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-foreground">Email</h3>
+                              <p className="text-foreground">{data.email1}</p>
+                              <p className="text-foreground">{data.email2}</p>
+                            </div>
+                          </div>
 
-                  <div className="flex items-start">
-                    <div className="bg-primary/10 p-3 rounded-full mr-4">
-                      <MapPin className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">Office</h3>
-                      <p className="text-foreground">123 Business Avenue, Suite 100</p>
-                      <p className="text-foreground">San Francisco, CA 94107</p>
-                    </div>
-                  </div>
+                          <div className="flex items-start">
+                            <div className="bg-primary/10 p-3 rounded-full mr-4">
+                              <MapPin className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-foreground">Office</h3>
+                              <p className="text-foreground">{data.office_address}</p>
+                              <p className="text-foreground">{data.office_city}</p>
+                            </div>
+                          </div>
 
-                  <div className="flex items-start">
-                    <div className="bg-primary/10 p-3 rounded-full mr-4">
-                      <Clock className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">Business Hours</h3>
-                      <p className="text-foreground">Monday - Friday: 9:00 AM - 6:00 PM EST</p>
-                      <p className="text-foreground">Saturday: 10:00 AM - 4:00 PM EST</p>
-                      <p className="text-foreground">Sunday: Closed</p>
-                    </div>
-                  </div>
+                          <div className="flex items-start">
+                            <div className="bg-primary/10 p-3 rounded-full mr-4">
+                              <Clock className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-foreground">Business Hours</h3>
+                              <p className="text-foreground whitespace-pre-wrap">{data.business_hours}</p>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    } catch {
+                      return <p className="text-foreground">Contact information not available</p>;
+                    }
+                  })()}
                 </CardContent>
               </Card>
             </div>
