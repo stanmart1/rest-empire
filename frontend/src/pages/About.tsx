@@ -1,15 +1,32 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useEffect } from "react";
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 
 const About = () => {
-  // Scroll to top when component mounts
+  const { data: aboutData, isLoading } = useQuery({
+    queryKey: ['public-about'],
+    queryFn: async () => {
+      const response = await api.get('/about/');
+      return response.data;
+    },
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,40 +91,10 @@ const About = () => {
       {/* Content Section */}
       <div className="container mx-auto px-4 py-16 relative z-10 bg-background">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-card rounded-xl border p-8 mb-16">
-            <h2 className="text-2xl font-bold text-foreground mb-6">OUR SERVICES</h2>
-            <p className="text-foreground mb-6 text-lg">
-              At OPENED SEAL AND REST EMPIRE, our mission is to liberate individuals from the confines of poverty, ignorance, and disease. Our three-pronged approach focuses on Wealth Education, Health Education and Capacity Development to empower people and help them take control of their lives.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-8 mb-16">
-            <div className="bg-card rounded-xl border p-8">
-              <h3 className="text-2xl font-bold text-foreground mb-6">WEALTH EDUCATION</h3>
-              <p className="text-foreground mb-4 text-lg">
-                Our Wealth Education programs utilize cutting-edge Blockchain technology and cryptography, providing individuals with the tools to create unstoppable wealth and secure their financial futures. Through our comprehensive resources and expert guidance, participants gain the knowledge and confidence to navigate the ever-evolving world of finance and secure long-lasting prosperity.
-              </p>
+          <div className="bg-card rounded-xl border p-8">
+            <div className="prose prose-lg max-w-none whitespace-pre-wrap text-foreground">
+              {aboutData?.content}
             </div>
-
-            <div className="bg-card rounded-xl border p-8">
-              <h3 className="text-2xl font-bold text-foreground mb-6">HEALTH EDUCATION</h3>
-              <p className="text-foreground mb-4 text-lg">
-                In the realm of Health Education, we draw upon our extensive expertise in Naturopathic medicine to promote plant and nature-based health practices. By offering transformative programs that focus on natural healing and holistic well-being, we enable individuals to overcome various ailments and enhance their health in ways that conventional medicine often falls short.
-              </p>
-            </div>
-
-            <div className="bg-card rounded-xl border p-8">
-              <h3 className="text-2xl font-bold text-foreground mb-6">CAPACITY DEVELOPMENT</h3>
-              <p className="text-foreground mb-4 text-lg">
-                Through our Capacity Development initiatives, we are dedicated to fostering personal and professional growth by providing educational products and practices that cultivate a range of skills and knowledge. Our customized programs focus on nurturing talent and potential, enabling participants to enhance their capacities and confidently contribute to their communities and the world at large.
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-primary/5 rounded-xl border border-primary/10 p-8">
-            <p className="text-foreground text-lg">
-              At OPENED SEAL AND REST EMPIRE, we are steadfast in our commitment to create a brighter future for all, and we believe that by combining Wealth Creation, Health Education and Capacity Development, we can empower individuals to reach their full potential and lead more fulfilling lives.
-            </p>
           </div>
         </div>
       </div>

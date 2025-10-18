@@ -37,6 +37,7 @@ const AdminContentManagement = () => {
   const [formData, setFormData] = useState({ category: '', question: '', answer: '', order: 0 });
   const [blogFormData, setBlogFormData] = useState({ title: '', content: '', author: '', image_url: '' });
   const [aboutContent, setAboutContent] = useState('');
+  const [aboutInitialized, setAboutInitialized] = useState(false);
 
   const { data: faqs, isLoading } = useQuery({
     queryKey: ['faqs'],
@@ -54,18 +55,22 @@ const AdminContentManagement = () => {
     },
   });
 
-  useQuery({
+  const { data: aboutData } = useQuery({
     queryKey: ['about-content'],
     queryFn: async () => {
-      const response = await api.get('/content/about');
-      setAboutContent(response.data.content);
+      const response = await api.get('/about/');
       return response.data;
     },
   });
 
+  if (aboutData && !aboutInitialized) {
+    setAboutContent(aboutData.content);
+    setAboutInitialized(true);
+  }
+
   const updateAboutMutation = useMutation({
     mutationFn: async (content: string) => {
-      await api.put('/content/about', { content });
+      await api.put('/about/', { content });
     },
     onSuccess: () => {
       toast({ title: 'Success', description: 'About page updated successfully' });
