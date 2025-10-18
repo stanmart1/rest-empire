@@ -11,6 +11,7 @@ from app.models.notification import Notification, NotificationType
 from app.models.notification_preferences import NotificationPreferences
 from app.models.system_config import SystemConfig
 from app.models.crypto_signal import CryptoSignal, SignalType, SignalStatus
+from app.models.content import Content
 
 __all__ = [
     "User", "UserRole",
@@ -25,5 +26,6 @@ __all__ = [
     "Notification", "NotificationType",
     "NotificationPreferences",
     "SystemConfig",
-    "CryptoSignal", "SignalType", "SignalStatus"
+    "CryptoSignal", "SignalType", "SignalStatus",
+    "Content"
 ]

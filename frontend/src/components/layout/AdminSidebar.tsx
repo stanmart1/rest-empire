@@ -18,6 +18,7 @@ import {
   TrendingUp,
   Package,
   Video,
+  FileEdit,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -51,6 +52,7 @@ const AdminSidebar = () => {
     { to: '/admin/events', icon: Calendar, label: 'Events' },
     { to: '/admin/promo-materials', icon: FileText, label: 'Promo Materials' },
     { to: '/admin/video-gallery', icon: Video, label: 'Video Gallery' },
+    { to: '/admin/content-management', icon: FileEdit, label: 'Content Management' },
     { to: '/admin/support', icon: HelpCircle, label: 'Support' },
     { to: '/admin/settings', icon: Settings, label: 'Settings' },
   ];

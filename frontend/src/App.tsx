@@ -51,6 +51,7 @@ import AdminSupport from "./pages/admin/AdminSupport";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminActivationPackages from "./pages/admin/AdminActivationPackages";
 import AdminVideoGallery from "./pages/admin/AdminVideoGallery";
+import AdminContentManagement from "./pages/admin/AdminContentManagement";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -115,6 +116,7 @@ const AnimatedRoutes = () => {
         <Route path="/admin/support" element={<AdminRoute><DashboardLayout><PageWrapper><AdminSupport /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><DashboardLayout><PageWrapper><AdminSettings /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/video-gallery" element={<AdminRoute><DashboardLayout><PageWrapper><AdminVideoGallery /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/content-management" element={<AdminRoute><DashboardLayout><PageWrapper><AdminContentManagement /></PageWrapper></DashboardLayout></AdminRoute>} />
 
         {/* Catch-all */}
         <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
