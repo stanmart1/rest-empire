@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronRight, Users, Gift, CreditCard, Shield, Globe, ArrowRight, BarChart3, Zap, Lock } from "lucide-react";
+import { ChevronRight, Users, Gift, CreditCard, Shield, Globe, ArrowRight, BarChart3, Zap, Lock, Loader2 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import {
@@ -11,87 +11,43 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useEffect } from "react";
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 
 const FAQ = () => {
-  const faqs = [
-    {
-      category: "Getting Started",
-      icon: <Users className="h-5 w-5" />,
-      questions: [
-        {
-          question: "How do I create an account?",
-          answer: "Creating an account is simple. Click the 'Sign Up' button in the top right corner, fill in your details, and verify your email address. Once verified, you can log in and start building your network."
-        },
-        {
-          question: "Is there a cost to join?",
-          answer: "No, joining Rest Empire is completely free. You only pay for products you wish to purchase or promote. There are no hidden fees or membership costs."
-        },
-        {
-          question: "Do I need prior experience in network marketing?",
-          answer: "Not at all. We provide comprehensive training materials and support for beginners. Our platform is designed to be intuitive for users of all experience levels."
-        }
-      ]
+  const { data: faqData, isLoading } = useQuery({
+    queryKey: ['public-faqs'],
+    queryFn: async () => {
+      const response = await api.get('/faq/');
+      return response.data;
     },
-    {
-      category: "Earning & Bonuses",
-      icon: <Gift className="h-5 w-5" />,
-      questions: [
-        {
-          question: "How do I earn money with Rest Empire?",
-          answer: "You can earn through multiple streams: direct sales commissions, team building bonuses, rank advancement bonuses, and unilevel commissions. Our 14-tier rank system provides increasing earning potential as you grow."
-        },
-        {
-          question: "What are the different bonus types?",
-          answer: "We offer three main bonus types: Rank Bonuses (based on your personal rank), Unilevel Bonuses (based on your team's performance), and Infinity Bonuses (residual income from your extended network)."
-        },
-        {
-          question: "How often are payouts processed?",
-          answer: "Payouts are processed weekly. You can request a payout at any time through your dashboard, and funds are typically transferred within 24 hours of approval."
-        }
-      ]
-    },
-    {
-      category: "Payments & Security",
-      icon: <Shield className="h-5 w-5" />,
-      questions: [
-        {
-          question: "What payment methods do you accept?",
-          answer: "We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers. All transactions are secured with 256-bit SSL encryption."
-        },
-        {
-          question: "How do I get paid?",
-          answer: "You can choose from several payout options including direct bank transfer, PayPal, or major cryptocurrency wallets. Payouts are processed weekly and typically arrive within 1-3 business days."
-        },
-        {
-          question: "Is my personal information secure?",
-          answer: "Absolutely. We use industry-standard encryption and security protocols to protect your data. We never share your personal information with third parties without your consent, and we comply with all relevant data protection regulations."
-        }
-      ]
-    },
-    {
-      category: "Account Management",
-      icon: <CreditCard className="h-5 w-5" />,
-      questions: [
-        {
-          question: "How do I reset my password?",
-          answer: "Click the 'Login' button and then select 'Forgot Password'. Enter your email address and we'll send you a link to reset your password. The link will expire after 24 hours for security."
-        },
-        {
-          question: "Can I change my email address?",
-          answer: "Yes, you can update your email address in your account settings. You'll need to verify the new address before the change takes effect."
-        },
-        {
-          question: "What should I do if I suspect unauthorized access to my account?",
-          answer: "Contact our support team immediately through the contact form or by emailing security@restempire.com. We'll help you secure your account and investigate any suspicious activity."
-        }
-      ]
-    }
-  ];
+  });
 
-  // Scroll to top when component mounts
+  const groupedFaqs = faqData?.reduce((acc: any, faq: any) => {
+    if (!acc[faq.category]) {
+      acc[faq.category] = [];
+    }
+    acc[faq.category].push({ question: faq.question, answer: faq.answer });
+    return acc;
+  }, {});
+
+  const faqs = groupedFaqs ? Object.keys(groupedFaqs).map(category => ({
+    category,
+    icon: <Users className="h-5 w-5" />,
+    questions: groupedFaqs[category]
+  })) : [];
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
