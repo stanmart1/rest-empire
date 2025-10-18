@@ -73,7 +73,7 @@ def update_video(
     
     return db_video
 
-@router.delete("/{video_id}")
+@router.delete("/{video_id}/")
 def delete_video(
     video_id: int,
     admin: User = Depends(get_admin_user),
