@@ -241,7 +241,7 @@ const Payouts = () => {
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                 <div className="flex justify-between">
                   <span>Requested Amount:</span>
-                  <span>{formatCurrency(watchAmount, watchCurrency)}</span>
+                  <span>{formatCurrency(Number(watchAmount), watchCurrency)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Payout Fee ({FEE_PERCENTAGE[watchCurrency]}%):</span>

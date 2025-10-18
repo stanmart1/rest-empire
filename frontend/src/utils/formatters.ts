@@ -10,12 +10,16 @@ export const formatCurrency = (amount: number | undefined | null, currency: stri
   };
 
   const symbol = currencySymbols[currency] || currency;
+  const formatted = safeAmount.toLocaleString('en-US', { 
+    minimumFractionDigits: 2, 
+    maximumFractionDigits: 2 
+  });
   
   if (currency === 'DBSP' || currency === 'USDT') {
-    return `${safeAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${symbol}`;
+    return `${formatted} ${symbol}`;
   }
 
-  return `${symbol}${safeAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `${symbol}${formatted}`;
 };
 
 export const formatDate = (date: string | Date): string => {
