@@ -6,14 +6,10 @@ from app.api.deps import get_current_user
 from app.models.user import User
 from app.models.verification import UserVerification, VerificationStatus
 from app.utils.activity import log_activity
+from app.core.storage import save_file, get_file_url
 import os
-import shutil
-from pathlib import Path
 
 router = APIRouter()
-
-UPLOAD_DIR = Path("uploads/verifications")
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 @router.post("/submit")
 async def submit_verification(
@@ -40,10 +36,8 @@ async def submit_verification(
     # Save document file
     file_extension = os.path.splitext(document_file.filename)[1]
     file_name = f"{current_user.id}_{datetime.utcnow().timestamp()}{file_extension}"
-    file_path = UPLOAD_DIR / file_name
-    
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(document_file.file, buffer)
+    file_data = await document_file.read()
+    file_path = save_file(file_data, file_name, "verifications")
     
     # Create verification record
     verification = UserVerification(

@@ -6,7 +6,7 @@ from app.api.deps import get_admin_user
 from app.models.user import User
 from app.models.book import Book
 from app.schemas.book import BookResponse
-import shutil
+from app.core.storage import save_file, get_file_url
 import os
 from datetime import datetime
 
@@ -34,20 +34,11 @@ async def create_book(
     cover_image_path = None
     
     if cover_image:
-        # Create uploads directory if it doesn't exist
-        upload_dir = "uploads/books"
-        os.makedirs(upload_dir, exist_ok=True)
-        
-        # Generate unique filename
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         filename = f"{timestamp}_{cover_image.filename}"
-        file_path = os.path.join(upload_dir, filename)
-        
-        # Save file
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(cover_image.file, buffer)
-        
-        cover_image_path = f"/{file_path}"
+        file_data = await cover_image.read()
+        file_path = save_file(file_data, filename, "books")
+        cover_image_path = get_file_url(file_path)
     
     book = Book(
         title=title,
@@ -81,17 +72,11 @@ async def update_book(
     book.description = description
     
     if cover_image:
-        upload_dir = "uploads/books"
-        os.makedirs(upload_dir, exist_ok=True)
-        
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         filename = f"{timestamp}_{cover_image.filename}"
-        file_path = os.path.join(upload_dir, filename)
-        
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(cover_image.file, buffer)
-        
-        book.cover_image = f"/{file_path}"
+        file_data = await cover_image.read()
+        file_path = save_file(file_data, filename, "books")
+        book.cover_image = get_file_url(file_path)
     
     db.commit()
     db.refresh(book)

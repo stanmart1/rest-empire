@@ -62,6 +62,7 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "Rest Empire API"
     DEBUG_MODE: bool = False
+    ENVIRONMENT: str = "development"
     CORS_ORIGINS: List[str] | str = ["http://localhost:8080"]
     API_V1_PREFIX: str = "/api/v1"
 

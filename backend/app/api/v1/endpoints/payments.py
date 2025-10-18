@@ -11,6 +11,7 @@ from app.services.payment_service import (
     GTPayService, ProvidusService, BankTransferService, CryptoPaymentService, PaystackService
 )
 from app.services.transaction_service import create_purchase_transaction
+from app.core.storage import save_file, get_file_url
 
 router = APIRouter()
 
@@ -165,10 +166,16 @@ async def upload_payment_proof(
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
     
-    # TODO: Save file to storage (S3, local, etc.)
-    # For now, just store filename
+    # Save payment proof
+    file_data = await file.read()
+    file_name = f"{transaction_id}_{file.filename}"
+    file_path = save_file(file_data, file_name, "payment_proofs")
+    file_url = get_file_url(file_path)
+    
     transaction.meta_data = {
         "proof_filename": file.filename,
+        "proof_file_path": file_path,
+        "proof_file_url": file_url,
         "proof_uploaded": True
     }
     db.commit()

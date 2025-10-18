@@ -7,9 +7,8 @@ from app.api.deps import get_admin_user
 from app.models.user import User
 from app.models.video import Video
 from app.utils.activity import log_activity
+from app.core.storage import save_file, get_file_url
 import os
-import shutil
-from pathlib import Path
 from datetime import datetime
 
 router = APIRouter()
@@ -99,14 +98,10 @@ async def upload_thumbnail(
     admin: User = Depends(get_admin_user)
 ):
     """Admin: Upload video thumbnail"""
-    UPLOAD_DIR = Path("uploads/thumbnails")
-    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    
     file_extension = os.path.splitext(file.filename)[1]
     file_name = f"{datetime.utcnow().timestamp()}{file_extension}"
-    file_path = UPLOAD_DIR / file_name
+    file_data = await file.read()
+    file_path = save_file(file_data, file_name, "thumbnails")
+    file_url = get_file_url(file_path)
     
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    
-    return {"url": f"/uploads/thumbnails/{file_name}"}
+    return {"url": file_url}
