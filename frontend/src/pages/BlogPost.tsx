@@ -1,12 +1,38 @@
 import { Button } from "@/components/ui/button";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Calendar, User, Tag, Share2 } from "lucide-react";
+import { ArrowLeft, Calendar, User, Tag, Share2, Loader2 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useEffect } from "react";
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 
-// Dummy blog data
-const blogPosts = [
+const BlogPost = () => {
+  const { id } = useParams();
+  
+  const { data: post, isLoading } = useQuery({
+    queryKey: ['blog', id],
+    queryFn: async () => {
+      const response = await api.get(`/blog/${id}`);
+      return response.data;
+    },
+  });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!post) return null;
+
+const blogPosts_old = [
   {
     id: 1,
     title: "How to Build a Successful Network Marketing Business",
@@ -86,30 +112,7 @@ const blogPosts = [
   }
 ];
 
-const BlogPost = () => {
-  const { id } = useParams();
-  const postId = parseInt(id || "1");
-  const post = blogPosts.find(p => p.id === postId) || blogPosts[0];
 
-  // Scroll to top when component mounts
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  // Function to handle sharing
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: post.title,
-        text: post.excerpt,
-        url: window.location.href,
-      }).catch(console.error);
-    } else {
-      // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -141,9 +144,8 @@ const BlogPost = () => {
               </div>
               <div className="flex items-center">
                 <Calendar className="w-4 h-4 mr-1" />
-                <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                <span>{new Date(post.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
               </div>
-              <div>{post.readTime}</div>
             </div>
           </div>
         </div>
@@ -177,23 +179,12 @@ const BlogPost = () => {
       <div className="container mx-auto px-4 py-16 relative z-10 bg-background">
         <div className="max-w-4xl mx-auto">
           <div className="bg-card rounded-xl border p-8 mb-8">
-            <div 
-              className="prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: post.content }} 
-            />
+            <div className="prose prose-lg max-w-none whitespace-pre-wrap">
+              {post.content}
+            </div>
           </div>
           
-          <div className="flex flex-wrap items-center justify-between gap-4 p-6 bg-card rounded-xl border">
-            <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag, index) => (
-                <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
-                  <Tag className="w-4 h-4 mr-1" />
-                  {tag}
-                </span>
-              ))}
-            </div>
-            
-          </div>
+
           
           {/* Author Box */}
           <div className="bg-card rounded-xl border p-6 mt-8">

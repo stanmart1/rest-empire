@@ -1,47 +1,33 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, User, Tag, ArrowRight } from "lucide-react";
+import { Calendar, User, Tag, ArrowRight, Loader2 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useEffect } from "react";
-
-// Dummy blog data
-const blogPosts = [
-  {
-    id: 1,
-    title: "How to Build a Successful Network Marketing Business",
-    excerpt: "Learn the fundamental strategies that top distributors use to build their network marketing empires.",
-    date: "2023-06-15",
-    author: "John Smith",
-    tags: ["Network Marketing", "Business Tips", "Success"],
-    readTime: "5 min read"
-  },
-  {
-    id: 2,
-    title: "Understanding the 14-Tier Rank System",
-    excerpt: "A comprehensive guide to maximizing your earnings through our unique ranking system.",
-    date: "2023-06-10",
-    author: "Sarah Johnson",
-    tags: ["Rank System", "Earnings", "Growth"],
-    readTime: "7 min read"
-  },
-  {
-    id: 3,
-    title: "Top 5 Mistakes New Distributors Make",
-    excerpt: "Avoid these common pitfalls that prevent new distributors from achieving success.",
-    date: "2023-06-05",
-    author: "Michael Brown",
-    tags: ["Beginners", "Mistakes", "Tips"],
-    readTime: "6 min read"
-  }
-];
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 
 const Blog = () => {
-  // Scroll to top when component mounts
+  const { data: blogPosts, isLoading } = useQuery({
+    queryKey: ['public-blogs'],
+    queryFn: async () => {
+      const response = await api.get('/blog/');
+      return response.data;
+    },
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -107,11 +93,11 @@ const Blog = () => {
       <div className="container mx-auto px-4 py-16 relative z-10 bg-background">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts.map((post) => (
+            {blogPosts?.map((post: any) => (
               <Card key={post.id} className="flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-xl">{post.title}</CardTitle>
-                  <CardDescription className="text-foreground">{post.excerpt}</CardDescription>
+                  <CardDescription className="text-foreground">{post.content.substring(0, 100)}...</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <div className="flex items-center text-sm text-foreground mb-2">
@@ -120,18 +106,10 @@ const Blog = () => {
                   </div>
                   <div className="flex items-center text-sm text-foreground">
                     <Calendar className="w-4 h-4 mr-1" />
-                    <span>{new Date(post.date).toLocaleDateString()}</span>
+                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
                   </div>
                 </CardContent>
-                <CardFooter className="flex flex-col">
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {post.tags.map((tag, index) => (
-                      <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                        <Tag className="w-3 h-3 mr-1" />
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                <CardFooter>
                   <Button asChild className="w-full">
                     <Link to={`/blog/${post.id}`}>
                       Read More <ArrowRight className="ml-2 h-4 w-4" />
