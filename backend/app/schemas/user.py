@@ -34,18 +34,18 @@ class UserResponse(UserBase):
     is_verified: bool
     is_active: bool
     role: str
-    current_rank: str
-    balance_ngn: float
-    balance_usdt: float
-    total_earnings: float
+    current_rank: Optional[str] = "Amber"
+    balance_ngn: Optional[float] = 0.0
+    balance_usdt: Optional[float] = 0.0
+    total_earnings: Optional[float] = 0.0
     referral_code: str
     sponsor_id: Optional[int] = None
     phone_number: Optional[str] = None
     gender: Optional[str] = None
     date_of_birth: Optional[datetime] = None
     occupation: Optional[str] = None
-    registration_date: datetime
-    created_at: datetime
+    registration_date: Optional[datetime] = None
+    created_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True

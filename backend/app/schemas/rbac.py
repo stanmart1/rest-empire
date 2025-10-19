@@ -47,29 +47,12 @@ class RoleResponse(RoleBase):
 
 # User Role Assignment
 class UserRoleAssign(BaseModel):
-    user_id: int
     role_ids: List[int]
 
 class UserRoleResponse(BaseModel):
     id: int
     user_id: int
     role_id: int
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
-
-# User Permission Assignment
-class UserPermissionAssign(BaseModel):
-    user_id: int
-    permission_id: int
-    granted: bool = True
-
-class UserPermissionResponse(BaseModel):
-    id: int
-    user_id: int
-    permission_id: int
-    granted: bool
     created_at: datetime
 
     class Config:
