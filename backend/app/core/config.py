@@ -1,6 +1,6 @@
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import List
+from typing import List, Union
 
 class Settings(BaseSettings):
     # Database
@@ -63,7 +63,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Rest Empire API"
     DEBUG_MODE: bool = False
     ENVIRONMENT: str = "development"
-    CORS_ORIGINS: List[str] | str = ["http://localhost:8080"]
+    CORS_ORIGINS: Union[List[str], str] = ["http://localhost:8080"]
     API_V1_PREFIX: str = "/api/v1"
 
     # ✅ Pydantic v2 config style

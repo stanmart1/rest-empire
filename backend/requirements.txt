@@ -21,7 +21,6 @@ celery==5.4.0
 redis==5.2.0
 
 # Payment Processing
-stripe==11.2.0
 web3==7.6.0
 
 # Email

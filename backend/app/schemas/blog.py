@@ -1,11 +1,12 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 class BlogBase(BaseModel):
     title: str
     content: str
     author: str
-    image_url: str | None = None
+    image_url: Optional[str] = None
 
 class BlogCreate(BlogBase):
     pass
