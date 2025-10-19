@@ -16,10 +16,10 @@ const Header = () => {
           <div className="flex items-center">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">RE</span>
+                <span className="text-primary-foreground font-bold text-sm">OS</span>
               </div>
               <span className="font-bold text-lg text-foreground">
-                <span className="text-primary">REST</span> EMPIRE
+                Opened Seal and Rest Empire
               </span>
             </div>
           </div>
@@ -110,10 +110,10 @@ const Header = () => {
             >
               <div className="flex items-center gap-2 mb-8">
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-sm">RE</span>
+                  <span className="text-primary-foreground font-bold text-sm">OS</span>
                 </div>
                 <span className="font-bold text-lg text-foreground">
-                  <span className="text-primary">REST</span> EMPIRE
+                  Opened Seal and Rest Empire
                 </span>
               </div>
             </motion.div>

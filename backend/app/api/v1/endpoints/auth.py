@@ -109,8 +109,8 @@ def login(credentials: UserLogin, request: Request, db: Session = Depends(get_db
     log_activity(db, user.id, "login_success", ip_address=request.client.host)
     
     # Create tokens
-    access_token = create_access_token(data={"sub": str(user.id)})
-    refresh_token = create_refresh_token(data={"sub": str(user.id)})
+    access_token = create_access_token(data={"sub": str(user.id)}, db=db)
+    refresh_token = create_refresh_token(data={"sub": str(user.id)}, db=db)
     
     return {
         "access_token": access_token,
@@ -141,8 +141,8 @@ def refresh_token(token_data: TokenRefresh, db: Session = Depends(get_db)):
     log_activity(db, user.id, "token_refreshed")
     
     # Create new tokens
-    access_token = create_access_token(data={"sub": str(user.id)})
-    refresh_token = create_refresh_token(data={"sub": str(user.id)})
+    access_token = create_access_token(data={"sub": str(user.id)}, db=db)
+    refresh_token = create_refresh_token(data={"sub": str(user.id)}, db=db)
     
     return {
         "access_token": access_token,

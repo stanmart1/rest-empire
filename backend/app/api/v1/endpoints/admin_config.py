@@ -167,7 +167,9 @@ def admin_get_platform_settings(
         "daily_withdrawal_limit": float(get_config(db, "daily_withdrawal_limit") or 0),
         "weekly_withdrawal_limit": float(get_config(db, "weekly_withdrawal_limit") or 0),
         "monthly_withdrawal_limit": float(get_config(db, "monthly_withdrawal_limit") or 0),
-        "max_referral_depth": int(get_config(db, "max_referral_depth") or 15)
+        "max_referral_depth": int(get_config(db, "max_referral_depth") or 15),
+        "access_token_expire_minutes": int(get_config(db, "access_token_expire_minutes") or 30),
+        "refresh_token_expire_days": int(get_config(db, "refresh_token_expire_days") or 7)
     }
 
 @router.put("/config/settings/platform")

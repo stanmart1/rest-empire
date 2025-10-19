@@ -5,6 +5,8 @@ export interface SystemSettings {
   daily_withdrawal_limit: number;
   weekly_withdrawal_limit: number;
   monthly_withdrawal_limit: number;
+  access_token_expire_minutes: number;
+  refresh_token_expire_days: number;
 }
 
 export interface SystemSettingsUpdate {
@@ -14,4 +16,6 @@ export interface SystemSettingsUpdate {
   daily_withdrawal_limit?: string;
   weekly_withdrawal_limit?: string;
   monthly_withdrawal_limit?: string;
+  access_token_expire_minutes?: string;
+  refresh_token_expire_days?: string;
 }

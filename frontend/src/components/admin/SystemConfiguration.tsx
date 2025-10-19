@@ -19,6 +19,8 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
   const [dailyWithdrawalLimit, setDailyWithdrawalLimit] = useState('0');
   const [weeklyWithdrawalLimit, setWeeklyWithdrawalLimit] = useState('0');
   const [monthlyWithdrawalLimit, setMonthlyWithdrawalLimit] = useState('0');
+  const [accessTokenExpireMinutes, setAccessTokenExpireMinutes] = useState('30');
+  const [refreshTokenExpireDays, setRefreshTokenExpireDays] = useState('7');
   
   const updateMutation = useUpdateSystemSettings();
 
@@ -30,6 +32,8 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
       setDailyWithdrawalLimit(settings.daily_withdrawal_limit?.toString() || '0');
       setWeeklyWithdrawalLimit(settings.weekly_withdrawal_limit?.toString() || '0');
       setMonthlyWithdrawalLimit(settings.monthly_withdrawal_limit?.toString() || '0');
+      setAccessTokenExpireMinutes(settings.access_token_expire_minutes?.toString() || '30');
+      setRefreshTokenExpireDays(settings.refresh_token_expire_days?.toString() || '7');
     }
   }, [settings]);
 
@@ -41,6 +45,8 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
       daily_withdrawal_limit: dailyWithdrawalLimit,
       weekly_withdrawal_limit: weeklyWithdrawalLimit,
       monthly_withdrawal_limit: monthlyWithdrawalLimit,
+      access_token_expire_minutes: accessTokenExpireMinutes,
+      refresh_token_expire_days: refreshTokenExpireDays,
     });
   };
 
@@ -135,6 +141,43 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
                 }}
                 className="mt-2"
               />
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        <div className="space-y-4">
+          <h3 className="font-semibold">Token Configuration</h3>
+          <p className="text-sm text-muted-foreground">Configure JWT token expiration times</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Access Token Expiry (Minutes)</Label>
+              <Input
+                type="number"
+                min="1"
+                max="1440"
+                value={accessTokenExpireMinutes}
+                onChange={(e) => setAccessTokenExpireMinutes(e.target.value)}
+                className="mt-2"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                How long access tokens remain valid (1-1440 minutes)
+              </p>
+            </div>
+            <div>
+              <Label>Refresh Token Expiry (Days)</Label>
+              <Input
+                type="number"
+                min="1"
+                max="365"
+                value={refreshTokenExpireDays}
+                onChange={(e) => setRefreshTokenExpireDays(e.target.value)}
+                className="mt-2"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                How long refresh tokens remain valid (1-365 days)
+              </p>
             </div>
           </div>
         </div>
