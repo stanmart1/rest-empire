@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from app.core.database import get_db
-from app.api.deps import get_admin_user
+from app.api.deps import require_permission
 from app.models.user import User
 from app.models.promo_material import PromoMaterial, MaterialType
 
@@ -18,7 +18,7 @@ class PromoMaterialCreate(BaseModel):
 @router.post("/promo-materials")
 def create_promo_material(
     data: PromoMaterialCreate,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("content:write")),
     db: Session = Depends(get_db)
 ):
     """Create promotional material (admin only)"""
@@ -40,7 +40,7 @@ def create_promo_material(
 def update_promo_material(
     material_id: int,
     data: PromoMaterialCreate,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("content:write")),
     db: Session = Depends(get_db)
 ):
     """Update promotional material (admin only)"""
@@ -61,7 +61,7 @@ def update_promo_material(
 @router.delete("/promo-materials/{material_id}")
 def delete_promo_material(
     material_id: int,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("content:write")),
     db: Session = Depends(get_db)
 ):
     """Delete promotional material (admin only)"""

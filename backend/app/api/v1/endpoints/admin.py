@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
 from app.core.database import get_db
-from app.api.deps import get_admin_user
+from app.api.deps import require_permission
 from app.models.user import User
 from app.models.transaction import Transaction, TransactionType, TransactionStatus
 from app.models.payout import Payout, PayoutStatus
@@ -21,7 +21,7 @@ router = APIRouter()
 
 @router.get("/transactions/stats")
 def admin_get_transaction_stats(
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("transactions:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get transaction statistics by type"""
@@ -48,7 +48,7 @@ def admin_get_all_transactions(
     status: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("transactions:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all transactions with filters"""
@@ -70,7 +70,7 @@ def admin_get_all_transactions(
 @router.post("/transactions/manual")
 def admin_create_manual_transaction(
     transaction: ManualTransaction,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("transactions:write")),
     db: Session = Depends(get_db)
 ):
     """Admin: Create manual transaction (adjustment)"""
@@ -116,7 +116,7 @@ def admin_create_manual_transaction(
 def admin_refund_transaction(
     transaction_id: int,
     refund_request: RefundRequest,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("transactions:refund")),
     db: Session = Depends(get_db)
 ):
     """Admin: Refund a transaction"""
@@ -131,7 +131,7 @@ def admin_refund_transaction(
 def admin_fail_transaction(
     transaction_id: int,
     reason: str,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("transactions:write")),
     db: Session = Depends(get_db)
 ):
     """Admin: Mark transaction as failed"""
@@ -148,7 +148,7 @@ def admin_get_all_payouts(
     status: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("payouts:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all payout requests"""
@@ -167,7 +167,7 @@ def admin_get_all_payouts(
 @router.post("/payouts/{payout_id}/approve")
 def admin_approve_payout(
     payout_id: int,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("payouts:approve")),
     db: Session = Depends(get_db)
 ):
     """Admin: Approve a payout request"""
@@ -182,7 +182,7 @@ def admin_approve_payout(
 def admin_complete_payout(
     payout_id: int,
     completion: PayoutApproval,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("payouts:process")),
     db: Session = Depends(get_db)
 ):
     """Admin: Mark payout as completed"""
@@ -220,7 +220,7 @@ def admin_complete_payout(
 def admin_reject_payout(
     payout_id: int,
     rejection: PayoutRejection,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("payouts:reject")),
     db: Session = Depends(get_db)
 ):
     """Admin: Reject a payout request"""
@@ -236,7 +236,7 @@ def admin_get_verifications(
     status: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("transactions:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all KYC verifications"""
@@ -252,7 +252,7 @@ def admin_get_verifications(
 @router.post("/verifications/{verification_id}/approve")
 def admin_approve_verification(
     verification_id: int,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("transactions:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Approve KYC verification"""
@@ -287,7 +287,7 @@ def admin_approve_verification(
 def admin_reject_verification(
     verification_id: int,
     reason: str,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("transactions:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Reject KYC verification"""

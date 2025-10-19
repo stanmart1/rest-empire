@@ -2,9 +2,11 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
+from typing import List
 from app.core.config import settings
 from app.core.database import get_db
-from app.models.user import User, UserRole
+from app.models.user import User, UserRole as UserRoleEnum
+from app.core.rbac import has_permission, has_any_permission, has_role
 
 security = HTTPBearer()
 
@@ -40,14 +42,65 @@ def get_current_user(
     
     return user
 
-def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
-    """Require admin role"""
-    if current_user.role != UserRole.admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required"
-        )
-    return current_user
+def get_admin_user(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+) -> User:
+    """Require admin role (legacy - checks old role enum OR new RBAC roles)"""
+    # Check old enum-based role
+    if current_user.role == UserRoleEnum.admin:
+        return current_user
+    
+    # Check new RBAC roles
+    if has_role(db, current_user, 'super_admin'):
+        return current_user
+    
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Admin access required"
+    )
+
+def require_permission(permission: str):
+    """Dependency factory to require a specific permission"""
+    def _check_permission(
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+    ) -> User:
+        if not has_permission(db, current_user, permission):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Permission denied: {permission} required"
+            )
+        return current_user
+    return _check_permission
+
+def require_any_permission(permissions: List[str]):
+    """Dependency factory to require any of the specified permissions"""
+    def _check_permissions(
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+    ) -> User:
+        if not has_any_permission(db, current_user, permissions):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Permission denied: One of {permissions} required"
+            )
+        return current_user
+    return _check_permissions
+
+def require_role(role_name: str):
+    """Dependency factory to require a specific role"""
+    def _check_role(
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+    ) -> User:
+        if not has_role(db, current_user, role_name):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Role required: {role_name}"
+            )
+        return current_user
+    return _check_role
 
 def check_feature_access(feature_name: str):
     """Check if user has access to a specific feature"""

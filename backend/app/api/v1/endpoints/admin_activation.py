@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
 from app.core.database import get_db
-from app.api.deps import get_admin_user
+from app.api.deps import require_permission
 from app.models.user import User
 from app.models.activation import ActivationPackage, UserActivation
 from app.models.transaction import Transaction, TransactionType, TransactionStatus
@@ -20,7 +20,7 @@ router = APIRouter()
 
 @router.get("/", response_model=List[ActivationPackageResponse])
 def get_all_packages(
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(require_permission("packages:read")),
     db: Session = Depends(get_db)
 ):
     """Get all activation packages (admin only)"""
@@ -32,7 +32,7 @@ def get_all_packages(
 @router.post("/", response_model=ActivationPackageResponse)
 def create_package(
     package_data: ActivationPackageCreate,
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(require_permission("packages:read")),
     db: Session = Depends(get_db)
 ):
     """Create new activation package (admin only)"""
@@ -79,7 +79,7 @@ def create_package(
 def update_package(
     package_id: int,
     package_data: ActivationPackageUpdate,
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(require_permission("packages:read")),
     db: Session = Depends(get_db)
 ):
     """Update activation package (admin only)"""
@@ -121,7 +121,7 @@ def update_package(
 @router.delete("/{package_id}")
 def delete_package(
     package_id: int,
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(require_permission("packages:read")),
     db: Session = Depends(get_db)
 ):
     """Delete activation package and related records (admin only)"""
@@ -164,7 +164,7 @@ def delete_package(
 
 @router.get("/payments")
 def get_activation_payments(
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(require_permission("packages:read")),
     db: Session = Depends(get_db)
 ):
     """Get all activation payments"""
@@ -212,7 +212,7 @@ def get_activation_payments(
 @router.post("/payments/{transaction_id}/approve")
 def approve_activation_payment(
     transaction_id: int,
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(require_permission("packages:read")),
     db: Session = Depends(get_db)
 ):
     """Approve activation payment and activate user account"""
@@ -266,7 +266,7 @@ def approve_activation_payment(
 @router.post("/payments/{transaction_id}/reject")
 def reject_activation_payment(
     transaction_id: int,
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(require_permission("packages:read")),
     db: Session = Depends(get_db)
 ):
     """Reject activation payment"""
@@ -294,7 +294,7 @@ def reject_activation_payment(
 def assign_package_to_users(
     package_id: int,
     user_ids: list[int],
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(require_permission("packages:read")),
     db: Session = Depends(get_db)
 ):
     """Assign activation package to users"""

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, extract
 from datetime import datetime, timedelta
 from app.core.database import get_db
-from app.api.deps import get_admin_user
+from app.api.deps import require_permission
 from app.models.user import User
 from app.models.transaction import Transaction, TransactionStatus
 from app.models.bonus import Bonus, BonusStatus
@@ -15,7 +15,7 @@ router = APIRouter()
 
 @router.get("/analytics/dashboard")
 def admin_get_dashboard_analytics(
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("analytics:view")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get comprehensive dashboard analytics"""
@@ -66,7 +66,7 @@ def admin_get_dashboard_analytics(
 @router.get("/analytics/users")
 def admin_get_user_analytics(
     period: str = Query("30d", regex="^(7d|30d|90d|1y)$"),
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("analytics:view")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get user growth analytics"""
@@ -108,7 +108,7 @@ def admin_get_user_analytics(
 @router.get("/analytics/financial")
 def admin_get_financial_analytics(
     period: str = Query("30d", regex="^(7d|30d|90d|1y)$"),
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("analytics:view")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get financial analytics"""

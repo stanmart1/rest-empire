@@ -5,7 +5,7 @@ from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel
 from app.core.database import get_db
-from app.api.deps import get_admin_user
+from app.api.deps import require_permission
 from app.models.user import User, UserRole
 from app.schemas.user import UserResponse
 from app.utils.activity import log_activity
@@ -38,7 +38,7 @@ def admin_list_users(
     role: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("users:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: List all users with filters"""
@@ -72,7 +72,7 @@ def admin_list_users(
 @router.get("/users/{user_id}", response_model=UserResponse)
 def admin_get_user(
     user_id: int,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("users:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get user details"""
@@ -86,7 +86,7 @@ def admin_get_user(
 @router.post("/users/{user_id}/verify")
 def admin_verify_user(
     user_id: int,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("users:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Manually verify user"""
@@ -110,7 +110,7 @@ def admin_verify_user(
 def admin_suspend_user(
     user_id: int,
     reason: str,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("users:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Suspend user account"""
@@ -132,7 +132,7 @@ def admin_suspend_user(
 @router.post("/users/{user_id}/unsuspend")
 def admin_unsuspend_user(
     user_id: int,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("users:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Unsuspend user account"""
@@ -155,7 +155,7 @@ def admin_unsuspend_user(
 def admin_adjust_balance(
     user_id: int,
     adjustment: BalanceAdjustment,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("users:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Adjust user balance"""
@@ -195,7 +195,7 @@ def admin_adjust_balance(
 def admin_change_rank(
     user_id: int,
     rank_change: RankChange,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("users:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Manually change user rank"""
@@ -223,7 +223,7 @@ def admin_change_rank(
 
 @router.get("/stats/overview")
 def admin_get_overview_stats(
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("users:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get platform overview statistics"""
@@ -258,7 +258,7 @@ def admin_get_overview_stats(
 
 @router.get("/verifications")
 def admin_get_verifications(
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("users:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all verification requests"""

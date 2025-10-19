@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.core.database import get_db
-from app.api.deps import get_admin_user
+from app.api.deps import require_permission
 from app.models.user import User
 from app.models.book import Book
 from app.schemas.book import BookResponse
@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.get("/books", response_model=List[BookResponse])
 def get_all_books(
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("content:read")),
     db: Session = Depends(get_db)
 ):
     """Get all books (admin only)"""
@@ -27,7 +27,7 @@ async def create_book(
     author: str = Form(...),
     description: str = Form(...),
     cover_image: Optional[UploadFile] = File(None),
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("content:read")),
     db: Session = Depends(get_db)
 ):
     """Create a new book (admin only)"""
@@ -59,7 +59,7 @@ async def update_book(
     author: str = Form(...),
     description: str = Form(...),
     cover_image: Optional[UploadFile] = File(None),
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("content:read")),
     db: Session = Depends(get_db)
 ):
     """Update a book (admin only)"""
@@ -85,7 +85,7 @@ async def update_book(
 @router.delete("/books/{book_id}")
 def delete_book(
     book_id: int,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("content:read")),
     db: Session = Depends(get_db)
 ):
     """Delete a book (admin only)"""

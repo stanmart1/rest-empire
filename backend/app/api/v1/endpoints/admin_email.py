@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Dict, Any
 from pydantic import BaseModel, EmailStr
 from app.core.database import get_db
-from app.api.deps import get_admin_user
+from app.api.deps import require_permission
 from app.models.user import User
 from app.services.config_service import get_config
 from app.services.config_service import set_config
@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.get("/email-settings")
 def get_email_settings(
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:write")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get email settings"""
@@ -31,7 +31,7 @@ def get_email_settings(
 @router.put("/email-settings")
 def update_email_settings(
     settings: Dict[str, Any],
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:write")),
     db: Session = Depends(get_db)
 ):
     """Admin: Update email settings"""
@@ -47,7 +47,7 @@ class TestEmailRequest(BaseModel):
 @router.post("/test-email")
 async def send_test_email(
     request: TestEmailRequest,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:write")),
     db: Session = Depends(get_db)
 ):
     """Admin: Send test email"""

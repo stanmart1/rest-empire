@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Dict, List
 from pydantic import BaseModel
 from app.core.database import get_db
-from app.api.deps import get_admin_user
+from app.api.deps import require_permission
 from app.models.user import User
 from app.models.system_config import SystemConfig
 from app.models.payment_gateway import PaymentGateway
@@ -24,7 +24,7 @@ class ConfigValue(BaseModel):
 
 @router.get("/config")
 def admin_get_all_configs(
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:read")),
     db: Session = Depends(get_db)
 ) -> Dict[str, str]:
     """Admin: Get all system configurations"""
@@ -33,7 +33,7 @@ def admin_get_all_configs(
 @router.get("/config/{key}")
 def admin_get_config(
     key: str,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get specific configuration"""
@@ -47,7 +47,7 @@ def admin_get_config(
 @router.post("/config")
 def admin_create_config(
     config: ConfigUpdate,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Create or update configuration"""
@@ -77,7 +77,7 @@ def admin_create_config(
 def admin_update_config(
     key: str,
     config_value: ConfigValue,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Update configuration value"""
@@ -103,7 +103,7 @@ def admin_update_config(
 @router.delete("/config/{key}")
 def admin_delete_config(
     key: str,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Delete configuration"""
@@ -152,7 +152,7 @@ def get_public_system_settings(db: Session = Depends(get_db)):
 
 @router.get("/config/settings/platform")
 def admin_get_platform_settings(
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get platform settings"""
@@ -175,7 +175,7 @@ def admin_get_platform_settings(
 @router.put("/config/settings/platform")
 def admin_update_platform_settings(
     settings: Dict[str, str],
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Update platform settings"""
@@ -191,7 +191,7 @@ def admin_update_platform_settings(
 
 @router.get("/payment-gateways", response_model=List[PaymentGatewayResponse])
 def get_payment_gateways(
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all payment gateways"""
@@ -200,7 +200,7 @@ def get_payment_gateways(
 @router.post("/payment-gateways", response_model=PaymentGatewayResponse)
 def create_payment_gateway(
     gateway: PaymentGatewayCreate,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Create new payment gateway"""
@@ -215,7 +215,7 @@ def create_payment_gateway(
 def update_payment_gateway(
     gateway_id: str,
     gateway_update: PaymentGatewayUpdate,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Update payment gateway"""
@@ -234,7 +234,7 @@ def update_payment_gateway(
 @router.delete("/payment-gateways/{gateway_id}")
 def delete_payment_gateway(
     gateway_id: str,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("config:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Delete payment gateway"""

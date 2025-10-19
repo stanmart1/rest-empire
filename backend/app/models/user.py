@@ -57,3 +57,7 @@ class User(Base):
     bonuses = relationship("Bonus", back_populates="user", foreign_keys="Bonus.user_id")
     payouts = relationship("Payout", back_populates="user", foreign_keys="Payout.user_id")
     support_tickets = relationship("SupportTicket", back_populates="user", foreign_keys="SupportTicket.user_id")
+    
+    # RBAC relationships
+    user_roles = relationship("UserRole", foreign_keys="UserRole.user_id", back_populates="user", cascade="all, delete-orphan")
+    user_permissions = relationship("UserPermission", foreign_keys="UserPermission.user_id", back_populates="user", cascade="all, delete-orphan")

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import Dict
 from app.core.database import get_db
-from app.api.deps import get_admin_user
+from app.api.deps import require_permission
 from app.models.user import User
 from app.services.config_service import get_config, set_config
 from app.utils.activity import log_activity
@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.get("/bonus-settings")
 def get_bonus_settings(
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("bonuses:config")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get bonus settings"""
@@ -41,7 +41,7 @@ def get_bonus_settings(
 @router.put("/bonus-settings")
 def update_bonus_settings(
     settings: Dict,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("bonuses:config")),
     db: Session = Depends(get_db)
 ):
     """Admin: Update bonus settings"""

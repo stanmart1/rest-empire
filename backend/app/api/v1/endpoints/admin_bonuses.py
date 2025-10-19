@@ -5,7 +5,7 @@ from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel
 from app.core.database import get_db
-from app.api.deps import get_admin_user
+from app.api.deps import require_permission
 from app.models.user import User
 from app.models.bonus import Bonus, BonusType, BonusStatus
 from app.models.transaction import Transaction, TransactionType, TransactionStatus
@@ -28,7 +28,7 @@ def admin_get_all_bonuses(
     status: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("bonuses:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all bonuses with filters"""
@@ -50,7 +50,7 @@ def admin_get_all_bonuses(
 @router.post("/bonuses/manual")
 def admin_create_manual_bonus(
     bonus: ManualBonus,
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("bonuses:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Create manual bonus"""
@@ -103,7 +103,7 @@ def admin_create_manual_bonus(
 
 @router.get("/bonuses/analytics")
 def admin_get_bonus_analytics(
-    admin: User = Depends(get_admin_user),
+    admin: User = Depends(require_permission("bonuses:read")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get bonus analytics"""
