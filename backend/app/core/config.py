@@ -13,45 +13,10 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
-    
-    # Email
-    MAIL_USERNAME: str = ""
-    MAIL_PASSWORD: str = ""
-    MAIL_FROM: str = ""
-    MAIL_PORT: int = 587
-    MAIL_SERVER: str = ""
-    MAIL_TLS: bool = True
-    RESEND_API_KEY: str = ""
-    
+
     # Frontend
     FRONTEND_URL: str = "http://localhost:8080"
-    
-    # Payment Gateways - GTPay
-    GTPAY_MERCHANT_ID: str = ""
-    GTPAY_API_KEY: str = ""
-    GTPAY_HASH_KEY: str = ""
-    GTPAY_GATEWAY_URL: str = "https://gtweb.gtbank.com/GTPay/Tranx.aspx"
-    
-    # Payment Gateways - Providus Bank
-    PROVIDUS_MERCHANT_ID: str = ""
-    PROVIDUS_API_KEY: str = ""
-    PROVIDUS_ACCOUNT_NUMBER: str = ""
-    PROVIDUS_API_URL: str = "https://api.providusbank.com"
-    
-    # Payment Gateways - Paystack
-    PAYSTACK_SECRET_KEY: str = ""
-    PAYSTACK_PUBLIC_KEY: str = ""
-    
-    # Crypto
-    CRYPTO_WALLET_ADDRESS: str = ""
-    CRYPTO_API_KEY: str = ""
-    CRYPTO_NETWORK: str = "TRC20"
-    
-    # Bank Transfer
-    BANK_NAME: str = "Providus Bank"
-    BANK_ACCOUNT_NUMBER: str = ""
-    BANK_ACCOUNT_NAME: str = "Rest Empire"
-    
+
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
     CELERY_BROKER_URL: str = "redis://localhost:6379/0"
