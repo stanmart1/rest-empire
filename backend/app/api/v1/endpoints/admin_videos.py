@@ -27,7 +27,7 @@ class VideoUpdate(BaseModel):
 
 @router.get("/")
 def get_videos(
-    admin: User = Depends(require_permission("content:write")),
+    admin: User = Depends(require_permission("videos:create")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all videos"""
@@ -37,7 +37,7 @@ def get_videos(
 @router.post("/")
 def create_video(
     video: VideoCreate,
-    admin: User = Depends(require_permission("content:write")),
+    admin: User = Depends(require_permission("videos:create")),
     db: Session = Depends(get_db)
 ):
     """Admin: Create new video"""
@@ -54,7 +54,7 @@ def create_video(
 def update_video(
     video_id: int,
     video: VideoUpdate,
-    admin: User = Depends(require_permission("content:write")),
+    admin: User = Depends(require_permission("videos:create")),
     db: Session = Depends(get_db)
 ):
     """Admin: Update video"""
@@ -76,7 +76,7 @@ def update_video(
 @router.delete("/{video_id}/")
 def delete_video(
     video_id: int,
-    admin: User = Depends(require_permission("content:write")),
+    admin: User = Depends(require_permission("videos:create")),
     db: Session = Depends(get_db)
 ):
     """Admin: Delete video"""
@@ -95,7 +95,7 @@ def delete_video(
 @router.post("/upload-thumbnail")
 async def upload_thumbnail(
     file: UploadFile = File(...),
-    admin: User = Depends(require_permission("content:write"))
+    admin: User = Depends(require_permission("videos:create"))
 ):
     """Admin: Upload video thumbnail"""
     file_extension = os.path.splitext(file.filename)[1]

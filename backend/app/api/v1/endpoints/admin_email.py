@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.get("/email-settings")
 def get_email_settings(
-    admin: User = Depends(require_permission("config:write")),
+    admin: User = Depends(require_permission("config:email_settings")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get email settings"""
@@ -31,7 +31,7 @@ def get_email_settings(
 @router.put("/email-settings")
 def update_email_settings(
     settings: Dict[str, Any],
-    admin: User = Depends(require_permission("config:write")),
+    admin: User = Depends(require_permission("config:email_settings")),
     db: Session = Depends(get_db)
 ):
     """Admin: Update email settings"""
@@ -47,7 +47,7 @@ class TestEmailRequest(BaseModel):
 @router.post("/test-email")
 async def send_test_email(
     request: TestEmailRequest,
-    admin: User = Depends(require_permission("config:write")),
+    admin: User = Depends(require_permission("config:email_settings")),
     db: Session = Depends(get_db)
 ):
     """Admin: Send test email"""

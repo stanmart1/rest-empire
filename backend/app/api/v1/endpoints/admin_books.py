@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.get("/books", response_model=List[BookResponse])
 def get_all_books(
-    admin: User = Depends(require_permission("content:read")),
+    admin: User = Depends(require_permission("books:view_list")),
     db: Session = Depends(get_db)
 ):
     """Get all books (admin only)"""
@@ -27,7 +27,7 @@ async def create_book(
     author: str = Form(...),
     description: str = Form(...),
     cover_image: Optional[UploadFile] = File(None),
-    admin: User = Depends(require_permission("content:read")),
+    admin: User = Depends(require_permission("books:view_list")),
     db: Session = Depends(get_db)
 ):
     """Create a new book (admin only)"""
@@ -59,7 +59,7 @@ async def update_book(
     author: str = Form(...),
     description: str = Form(...),
     cover_image: Optional[UploadFile] = File(None),
-    admin: User = Depends(require_permission("content:read")),
+    admin: User = Depends(require_permission("books:view_list")),
     db: Session = Depends(get_db)
 ):
     """Update a book (admin only)"""
@@ -85,7 +85,7 @@ async def update_book(
 @router.delete("/books/{book_id}")
 def delete_book(
     book_id: int,
-    admin: User = Depends(require_permission("content:read")),
+    admin: User = Depends(require_permission("books:view_list")),
     db: Session = Depends(get_db)
 ):
     """Delete a book (admin only)"""

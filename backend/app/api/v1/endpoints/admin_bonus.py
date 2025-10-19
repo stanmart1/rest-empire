@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.get("/bonus-settings")
 def get_bonus_settings(
-    admin: User = Depends(require_permission("bonuses:config")),
+    admin: User = Depends(require_permission("bonuses:configure")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get bonus settings"""
@@ -41,7 +41,7 @@ def get_bonus_settings(
 @router.put("/bonus-settings")
 def update_bonus_settings(
     settings: Dict,
-    admin: User = Depends(require_permission("bonuses:config")),
+    admin: User = Depends(require_permission("bonuses:configure")),
     db: Session = Depends(get_db)
 ):
     """Admin: Update bonus settings"""
