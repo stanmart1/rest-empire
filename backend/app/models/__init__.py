@@ -1,4 +1,4 @@
-from app.models.user import User, UserRole as UserRoleEnum
+from app.models.user import User
 from app.models.transaction import Transaction, TransactionType, TransactionStatus
 from app.models.bonus import Bonus, BonusType, BonusStatus
 from app.models.rank import Rank
@@ -19,7 +19,7 @@ from app.models.user_role import UserRole
 from app.models.user_permission import UserPermission
 
 __all__ = [
-    "User", "UserRoleEnum",
+    "User",
     "Transaction", "TransactionType", "TransactionStatus",
     "Bonus", "BonusType", "BonusStatus",
     "Rank",

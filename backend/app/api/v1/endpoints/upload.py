@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from app.api import deps
-from app.models.user import UserRole
 from app.core.storage import save_file, delete_file, get_file_url
 import uuid
 
@@ -26,7 +25,8 @@ async def delete_uploaded_file(
     file_path: str,
     current_user = Depends(deps.get_current_user)
 ):
-    if current_user.role != UserRole.admin:
+    from app.core.rbac import has_role
+    if not has_role(db, current_user, "super_admin"):
         raise HTTPException(status_code=403, detail="Not authorized")
     
     success = delete_file(file_path)

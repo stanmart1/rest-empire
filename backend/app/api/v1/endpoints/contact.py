@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from app.api import deps
 from app.models.contact import Contact
 from app.schemas.contact import ContactResponse, ContactUpdate
-from app.models.user import UserRole
 
 router = APIRouter()
 
@@ -20,7 +19,8 @@ def update_contact(
     db: Session = Depends(deps.get_db),
     current_user = Depends(deps.get_current_user)
 ):
-    if current_user.role != UserRole.admin:
+    from app.core.rbac import has_role
+    if not has_role(db, current_user, "super_admin"):
         raise HTTPException(status_code=403, detail="Not authorized")
     
     contact = db.query(Contact).first()

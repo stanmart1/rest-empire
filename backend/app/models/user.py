@@ -1,12 +1,7 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Numeric, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Numeric, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
-import enum
 from app.core.database import Base
-
-class UserRole(enum.Enum):
-    user = "user"
-    admin = "admin"
 
 class User(Base):
     __tablename__ = "users"
@@ -27,8 +22,6 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     is_inactive = Column(Boolean, default=False)
     deactivated_at = Column(DateTime, nullable=True)
-    
-    role = Column(Enum(UserRole), default=UserRole.user, index=True)
     
     sponsor_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     referral_code = Column(String, unique=True, index=True)

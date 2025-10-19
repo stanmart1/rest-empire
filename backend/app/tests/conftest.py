@@ -9,7 +9,7 @@ from sqlalchemy.pool import StaticPool
 from app.main import app
 from app.core.database import Base, get_db
 from app.core.config import settings
-from app.models.user import User, UserRole
+from app.models.user import User
 from app.models.rank import Rank
 from app.models.transaction import Transaction, TransactionType, TransactionStatus
 from app.models.bonus import Bonus, BonusType, BonusStatus
@@ -69,7 +69,6 @@ def create_user():
         email: str = None,
         password: str = "testpass123",
         full_name: str = "Test User",
-        role: UserRole = UserRole.user,
         is_verified: bool = True,
         is_active: bool = True,
         sponsor_id: int = None,
@@ -82,7 +81,6 @@ def create_user():
             email=email,
             hashed_password=get_password_hash(password),
             full_name=full_name,
-            role=role,
             is_verified=is_verified,
             is_active=is_active,
             sponsor_id=sponsor_id,
@@ -249,12 +247,23 @@ def test_user(test_db, create_user):
 @pytest.fixture
 def test_admin(test_db, create_user):
     """Create a test admin user."""
-    return create_user(
+    from app.models.role import Role
+    from app.models.user_role import UserRole
+    
+    admin_user = create_user(
         test_db, 
-        email="admin@example.com", 
-        role=UserRole.admin,
+        email="admin@example.com",
         full_name="Test Admin"
     )
+    
+    # Assign super_admin role
+    super_admin_role = test_db.query(Role).filter(Role.name == 'super_admin').first()
+    if super_admin_role:
+        user_role = UserRole(user_id=admin_user.id, role_id=super_admin_role.id)
+        test_db.add(user_role)
+        test_db.commit()
+    
+    return admin_user
 
 @pytest.fixture
 def auth_headers(test_user):

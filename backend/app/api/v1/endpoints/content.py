@@ -4,7 +4,6 @@ from typing import List
 from app.api import deps
 from app.models.content import Content
 from app.schemas.content import ContentResponse, ContentUpdate
-from app.models.user import UserRole
 
 router = APIRouter()
 
@@ -26,7 +25,8 @@ def update_content(
     db: Session = Depends(deps.get_db),
     current_user = Depends(deps.get_current_user)
 ):
-    if current_user.role != UserRole.admin:
+    from app.core.rbac import has_role
+    if not has_role(db, current_user, "super_admin"):
         raise HTTPException(status_code=403, detail="Not authorized")
     
     content = db.query(Content).filter(Content.page == page).first()

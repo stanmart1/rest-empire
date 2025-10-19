@@ -19,7 +19,7 @@ router = APIRouter()
 
 @router.get("/permissions", response_model=List[PermissionResponse])
 def get_all_permissions(
-    current_user: User = Depends(require_permission("roles:view_list")),
+    current_user: User = Depends(require_permission("roles:list")),
     db: Session = Depends(get_db)
 ):
     """Get all permissions"""
@@ -29,7 +29,7 @@ def get_all_permissions(
 
 @router.get("/roles", response_model=List[RoleResponse])
 def get_all_roles(
-    current_user: User = Depends(require_permission("roles:view_list")),
+    current_user: User = Depends(require_permission("roles:list")),
     db: Session = Depends(get_db)
 ):
     """Get all roles with their permissions"""
@@ -58,7 +58,7 @@ def get_all_roles(
 @router.get("/roles/{role_id}", response_model=RoleResponse)
 def get_role(
     role_id: int,
-    current_user: User = Depends(require_permission("roles:view_details")),
+    current_user: User = Depends(require_permission("roles:view")),
     db: Session = Depends(get_db)
 ):
     """Get role details"""
@@ -215,7 +215,7 @@ def delete_role(
 @router.get("/users/{user_id}/roles", response_model=List[RoleResponse])
 def get_user_roles(
     user_id: int,
-    current_user: User = Depends(require_permission("users:view_details")),
+    current_user: User = Depends(require_permission("users:view")),
     db: Session = Depends(get_db)
 ):
     """Get roles assigned to a user"""

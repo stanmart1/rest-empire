@@ -4,7 +4,6 @@ from typing import List
 from app.api import deps
 from app.models.blog import Blog
 from app.schemas.blog import BlogResponse, BlogCreate, BlogUpdate
-from app.models.user import UserRole
 
 router = APIRouter()
 
@@ -25,7 +24,8 @@ def create_blog(
     db: Session = Depends(deps.get_db),
     current_user = Depends(deps.get_current_user)
 ):
-    if current_user.role != UserRole.admin:
+    from app.core.rbac import has_role
+    if not has_role(db, current_user, "super_admin"):
         raise HTTPException(status_code=403, detail="Not authorized")
     
     db_blog = Blog(**blog.dict())
@@ -41,7 +41,8 @@ def update_blog(
     db: Session = Depends(deps.get_db),
     current_user = Depends(deps.get_current_user)
 ):
-    if current_user.role != UserRole.admin:
+    from app.core.rbac import has_role
+    if not has_role(db, current_user, "super_admin"):
         raise HTTPException(status_code=403, detail="Not authorized")
     
     db_blog = db.query(Blog).filter(Blog.id == blog_id).first()
@@ -61,7 +62,8 @@ def delete_blog(
     db: Session = Depends(deps.get_db),
     current_user = Depends(deps.get_current_user)
 ):
-    if current_user.role != UserRole.admin:
+    from app.core.rbac import has_role
+    if not has_role(db, current_user, "super_admin"):
         raise HTTPException(status_code=403, detail="Not authorized")
     
     db_blog = db.query(Blog).filter(Blog.id == blog_id).first()

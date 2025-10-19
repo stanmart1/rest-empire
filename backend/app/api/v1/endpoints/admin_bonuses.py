@@ -28,7 +28,7 @@ def admin_get_all_bonuses(
     status: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    admin: User = Depends(require_permission("bonuses:view_list")),
+    admin: User = Depends(require_permission("bonuses:list")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all bonuses with filters"""
@@ -50,7 +50,7 @@ def admin_get_all_bonuses(
 @router.post("/bonuses/manual")
 def admin_create_manual_bonus(
     bonus: ManualBonus,
-    admin: User = Depends(require_permission("bonuses:view_list")),
+    admin: User = Depends(require_permission("bonuses:list")),
     db: Session = Depends(get_db)
 ):
     """Admin: Create manual bonus"""
@@ -103,7 +103,7 @@ def admin_create_manual_bonus(
 
 @router.get("/bonuses/analytics")
 def admin_get_bonus_analytics(
-    admin: User = Depends(require_permission("bonuses:view_list")),
+    admin: User = Depends(require_permission("bonuses:list")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get bonus analytics"""

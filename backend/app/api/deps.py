@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from app.core.config import settings
 from app.core.database import get_db
-from app.models.user import User, UserRole as UserRoleEnum
+from app.models.user import User
 from app.core.rbac import has_permission, has_any_permission, has_role
 
 security = HTTPBearer()
@@ -46,12 +46,7 @@ def get_admin_user(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ) -> User:
-    """Require admin role (legacy - checks old role enum OR new RBAC roles)"""
-    # Check old enum-based role
-    if current_user.role == UserRoleEnum.admin:
-        return current_user
-    
-    # Check new RBAC roles
+    """Require admin role using RBAC"""
     if has_role(db, current_user, 'super_admin'):
         return current_user
     

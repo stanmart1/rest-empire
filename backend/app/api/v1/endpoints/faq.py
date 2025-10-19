@@ -4,7 +4,6 @@ from typing import List
 from app.api import deps
 from app.models.faq import FAQ
 from app.schemas.faq import FAQResponse, FAQCreate, FAQUpdate
-from app.models.user import UserRole
 
 router = APIRouter()
 
@@ -18,7 +17,8 @@ def create_faq(
     db: Session = Depends(deps.get_db),
     current_user = Depends(deps.get_current_user)
 ):
-    if current_user.role != UserRole.admin:
+    from app.core.rbac import has_role
+    if not has_role(db, current_user, "super_admin"):
         raise HTTPException(status_code=403, detail="Not authorized")
     
     db_faq = FAQ(**faq.dict())
@@ -34,7 +34,8 @@ def update_faq(
     db: Session = Depends(deps.get_db),
     current_user = Depends(deps.get_current_user)
 ):
-    if current_user.role != UserRole.admin:
+    from app.core.rbac import has_role
+    if not has_role(db, current_user, "super_admin"):
         raise HTTPException(status_code=403, detail="Not authorized")
     
     db_faq = db.query(FAQ).filter(FAQ.id == faq_id).first()
@@ -54,7 +55,8 @@ def delete_faq(
     db: Session = Depends(deps.get_db),
     current_user = Depends(deps.get_current_user)
 ):
-    if current_user.role != UserRole.admin:
+    from app.core.rbac import has_role
+    if not has_role(db, current_user, "super_admin"):
         raise HTTPException(status_code=403, detail="Not authorized")
     
     db_faq = db.query(FAQ).filter(FAQ.id == faq_id).first()

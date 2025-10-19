@@ -33,7 +33,6 @@ class UserResponse(UserBase):
     id: int
     is_verified: bool
     is_active: bool
-    role: str
     current_rank: Optional[str] = "Amber"
     balance_ngn: Optional[float] = 0.0
     balance_usdt: Optional[float] = 0.0

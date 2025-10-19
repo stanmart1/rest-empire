@@ -21,7 +21,7 @@ router = APIRouter()
 
 @router.get("/transactions/stats")
 def admin_get_transaction_stats(
-    admin: User = Depends(require_permission("transactions:view_list")),
+    admin: User = Depends(require_permission("transactions:list")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get transaction statistics by type"""
@@ -48,7 +48,7 @@ def admin_get_all_transactions(
     status: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    admin: User = Depends(require_permission("transactions:view_list")),
+    admin: User = Depends(require_permission("transactions:list")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all transactions with filters"""
@@ -70,7 +70,7 @@ def admin_get_all_transactions(
 @router.post("/transactions/manual")
 def admin_create_manual_transaction(
     transaction: ManualTransaction,
-    admin: User = Depends(require_permission("transactions:create_manual")),
+    admin: User = Depends(require_permission("transactions:create")),
     db: Session = Depends(get_db)
 ):
     """Admin: Create manual transaction (adjustment)"""
@@ -131,7 +131,7 @@ def admin_refund_transaction(
 def admin_fail_transaction(
     transaction_id: int,
     reason: str,
-    admin: User = Depends(require_permission("transactions:create_manual")),
+    admin: User = Depends(require_permission("transactions:approve")),
     db: Session = Depends(get_db)
 ):
     """Admin: Mark transaction as failed"""
@@ -148,7 +148,7 @@ def admin_get_all_payouts(
     status: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    admin: User = Depends(require_permission("payouts:read")),
+    admin: User = Depends(require_permission("payouts:list")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all payout requests"""
@@ -236,7 +236,7 @@ def admin_get_verifications(
     status: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    admin: User = Depends(require_permission("transactions:view_list")),
+    admin: User = Depends(require_permission("verification:list")),
     db: Session = Depends(get_db)
 ):
     """Admin: Get all KYC verifications"""
@@ -252,7 +252,7 @@ def admin_get_verifications(
 @router.post("/verifications/{verification_id}/approve")
 def admin_approve_verification(
     verification_id: int,
-    admin: User = Depends(require_permission("transactions:view_list")),
+    admin: User = Depends(require_permission("verification:approve")),
     db: Session = Depends(get_db)
 ):
     """Admin: Approve KYC verification"""
@@ -287,7 +287,7 @@ def admin_approve_verification(
 def admin_reject_verification(
     verification_id: int,
     reason: str,
-    admin: User = Depends(require_permission("transactions:view_list")),
+    admin: User = Depends(require_permission("verification:reject")),
     db: Session = Depends(get_db)
 ):
     """Admin: Reject KYC verification"""
