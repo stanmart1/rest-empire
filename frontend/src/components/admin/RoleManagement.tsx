@@ -11,6 +11,7 @@ import { Settings, Trash2, Plus, X, Edit, Save } from 'lucide-react';
 import { Role, Permission } from '@/types/rbac';
 import { useRoles, usePermissions, useCreateRole, useDeleteRole, useUpdateRolePermissions } from '@/hooks/useRbac';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePermission } from '@/hooks/usePermission';
 import { forwardRef, useImperativeHandle } from 'react';
 
 interface RoleManagementProps {
@@ -26,6 +27,7 @@ export interface RoleManagementRef {
 }
 
 const RoleManagement = forwardRef<RoleManagementRef, RoleManagementProps>(({ deleteMode, setDeleteMode, selectedRoles, setSelectedRoles }, ref) => {
+  const { hasPermission } = usePermission();
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [permissionsModalOpen, setPermissionsModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -44,6 +46,9 @@ const RoleManagement = forwardRef<RoleManagementRef, RoleManagementProps>(({ del
 
   const isSuperAdmin = user?.role === 'super_admin' || user?.role === 'superadmin';
   const roles = allRoles?.filter(role => isSuperAdmin || role.name !== 'super_admin');
+  const canCreateRoles = hasPermission('roles:create');
+  const canDeleteRoles = hasPermission('roles:delete');
+  const canUpdateRoles = hasPermission('roles:update');
 
   const handleOpenPermissions = (role: Role) => {
     setSelectedRole(role);
@@ -157,15 +162,17 @@ const RoleManagement = forwardRef<RoleManagementRef, RoleManagementProps>(({ del
                       </div>
                       {!deleteMode && (
                         <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleOpenPermissions(role)}
-                            className="h-8 w-8"
-                          >
-                            <Settings className="h-4 w-4" />
-                          </Button>
-                          {role.name !== 'super_admin' && (
+                          {canUpdateRoles && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleOpenPermissions(role)}
+                              className="h-8 w-8"
+                            >
+                              <Settings className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {canDeleteRoles && role.name !== 'super_admin' && (
                             <Button
                               variant="ghost"
                               size="icon"

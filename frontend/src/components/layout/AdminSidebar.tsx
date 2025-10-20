@@ -22,12 +22,14 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePermission } from '@/hooks/usePermission';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const AdminSidebar = () => {
   const { user } = useAuth();
+  const { hasPermission, hasAnyPermission } = usePermission();
   const [open, setOpen] = useState(false);
 
   const getInitials = (name: string) => {
@@ -39,23 +41,30 @@ const AdminSidebar = () => {
   };
 
   const adminLinks = [
-    { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/admin/users', icon: Users, label: 'Users' },
-    { to: '/admin/transactions', icon: Receipt, label: 'Transactions' },
-    { to: '/admin/verifications', icon: CheckCircle, label: 'Verifications' },
-    { to: '/admin/payouts', icon: CreditCard, label: 'Payouts' },
-    { to: '/admin/finance', icon: DollarSign, label: 'Finance' },
-    { to: '/admin/bonuses', icon: Gift, label: 'Bonuses' },
-    { to: '/admin/activation-packages', icon: Package, label: 'Activation Packages' },
-    { to: '/admin/crypto-signals', icon: TrendingUp, label: 'Crypto Signals' },
-    { to: '/admin/books', icon: BookOpen, label: 'Books' },
-    { to: '/admin/events', icon: Calendar, label: 'Events' },
-    { to: '/admin/promo-materials', icon: FileText, label: 'Promo Materials' },
-    { to: '/admin/video-gallery', icon: Video, label: 'Video Gallery' },
-    { to: '/admin/content-management', icon: FileEdit, label: 'Content Management' },
-    { to: '/admin/support', icon: HelpCircle, label: 'Support' },
-    { to: '/admin/settings', icon: Settings, label: 'Settings' },
+    { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard', permission: 'admin_dashboard:view' },
+    { to: '/admin/users', icon: Users, label: 'Users', permission: 'users:list' },
+    { to: '/admin/transactions', icon: Receipt, label: 'Transactions', permission: 'transactions:list' },
+    { to: '/admin/verifications', icon: CheckCircle, label: 'Verifications', permission: 'verification:list' },
+    { to: '/admin/payouts', icon: CreditCard, label: 'Payouts', permission: 'payouts:list' },
+    { to: '/admin/finance', icon: DollarSign, label: 'Finance', permission: 'finance:view' },
+    { to: '/admin/bonuses', icon: Gift, label: 'Bonuses', permission: 'bonuses:list' },
+    { to: '/admin/activation-packages', icon: Package, label: 'Activation Packages', permission: 'packages:list' },
+    { to: '/admin/crypto-signals', icon: TrendingUp, label: 'Crypto Signals', permission: 'crypto_signals:list' },
+    { to: '/admin/books', icon: BookOpen, label: 'Books', permission: 'books:list' },
+    { to: '/admin/events', icon: Calendar, label: 'Events', permission: 'events:list' },
+    { to: '/admin/promo-materials', icon: FileText, label: 'Promo Materials', permission: 'promo_materials:list' },
+    { to: '/admin/video-gallery', icon: Video, label: 'Video Gallery', permission: 'videos:list' },
+    { to: '/admin/content-management', icon: FileEdit, label: 'Content Management', permission: 'content:list' },
+    { to: '/admin/support', icon: HelpCircle, label: 'Support', permission: 'support:list' },
+    { to: '/admin/settings', icon: Settings, label: 'Settings', permission: 'settings' },
   ];
+
+  const visibleLinks = adminLinks.filter(link => {
+    if (link.permission === 'settings') {
+      return hasAnyPermission(['config:view', 'config:payment_gateways', 'config:bonus_settings', 'config:email_settings']);
+    }
+    return hasPermission(link.permission);
+  });
 
   const SidebarContent = () => (
     <>
@@ -74,7 +83,7 @@ const AdminSidebar = () => {
       </div>
 
       <nav className="p-3 space-y-1 bg-sidebar">
-        {adminLinks.map((link) => (
+        {visibleLinks.map((link) => (
           <NavLink
             key={link.to}
             to={link.to}

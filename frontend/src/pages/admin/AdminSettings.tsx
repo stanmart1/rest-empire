@@ -10,12 +10,14 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Settings } from 'lucide-react';
 import api from '@/lib/api';
+import { usePermission } from '@/hooks/usePermission';
 import PaymentGatewayModal from '@/components/admin/PaymentGatewayModal';
 import BonusConfiguration from '@/components/admin/BonusConfiguration';
 import EmailConfiguration from '@/components/admin/EmailConfiguration';
 import SystemConfiguration from '@/components/admin/SystemConfiguration';
 
 const AdminSettings = () => {
+  const { hasPermission } = usePermission();
   const [minPayoutNGN, setMinPayoutNGN] = useState('5000');
   const [minPayoutUSDT, setMinPayoutUSDT] = useState('10');
   const [payoutFeeNGN, setPayoutFeeNGN] = useState('1.5');
@@ -180,15 +182,15 @@ const AdminSettings = () => {
 
       <Tabs defaultValue="payout">
         <TabsList>
-          <TabsTrigger value="payout">Payout Settings</TabsTrigger>
-          <TabsTrigger value="payment">Payment Gateways</TabsTrigger>
-          <TabsTrigger value="bonus">Bonus Settings</TabsTrigger>
-          <TabsTrigger value="email">Email Settings</TabsTrigger>
-          <TabsTrigger value="system">System Settings</TabsTrigger>
-          <TabsTrigger value="referral">Referral Settings</TabsTrigger>
+          {hasPermission('config:view') && <TabsTrigger value="payout">Payout Settings</TabsTrigger>}
+          {hasPermission('config:payment_gateways') && <TabsTrigger value="payment">Payment Gateways</TabsTrigger>}
+          {hasPermission('config:bonus_settings') && <TabsTrigger value="bonus">Bonus Settings</TabsTrigger>}
+          {hasPermission('config:email_settings') && <TabsTrigger value="email">Email Settings</TabsTrigger>}
+          {hasPermission('config:view') && <TabsTrigger value="system">System Settings</TabsTrigger>}
+          {hasPermission('config:view') && <TabsTrigger value="referral">Referral Settings</TabsTrigger>}
         </TabsList>
 
-        <TabsContent value="payout" className="space-y-4">
+        {hasPermission('config:view') && <TabsContent value="payout" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Payout Configuration</CardTitle>
@@ -256,9 +258,9 @@ const AdminSettings = () => {
               </Button>
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent>}
 
-        <TabsContent value="payment" className="space-y-4">
+        {hasPermission('config:payment_gateways') && <TabsContent value="payment" className="space-y-4">
           {isLoadingGateways ? (
             <div className="flex items-center justify-center h-40">
               <p className="text-muted-foreground">Loading payment gateways...</p>
@@ -318,21 +320,21 @@ const AdminSettings = () => {
             onSave={handleSavePaymentGateways}
             isSaving={paymentGatewayMutation.isPending}
           />
-        </TabsContent>
+        </TabsContent>}
 
-        <TabsContent value="bonus">
+        {hasPermission('config:bonus_settings') && <TabsContent value="bonus">
           <BonusConfiguration />
-        </TabsContent>
+        </TabsContent>}
 
-        <TabsContent value="email">
+        {hasPermission('config:email_settings') && <TabsContent value="email">
           <EmailConfiguration />
-        </TabsContent>
+        </TabsContent>}
 
-        <TabsContent value="system" className="space-y-4">
+        {hasPermission('config:view') && <TabsContent value="system" className="space-y-4">
           <SystemConfiguration settings={settings} />
-        </TabsContent>
+        </TabsContent>}
 
-        <TabsContent value="referral" className="space-y-4">
+        {hasPermission('config:view') && <TabsContent value="referral" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Referral Configuration</CardTitle>
@@ -358,7 +360,7 @@ const AdminSettings = () => {
               </Button>
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent>}
       </Tabs>
     </div>
   );

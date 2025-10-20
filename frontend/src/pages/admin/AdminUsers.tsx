@@ -12,12 +12,16 @@ import api from '@/lib/api';
 import { AdminUser } from '@/lib/admin-types';
 import UserDetailsModal from '@/components/admin/UserDetailsModal';
 import RoleManagement, { RoleManagementRef } from '@/components/admin/RoleManagement';
+import { usePermission } from '@/hooks/usePermission';
 
 const AdminUsers = () => {
+  const { hasPermission } = usePermission();
   const [activeTab, setActiveTab] = useState('users');
   const [deleteMode, setDeleteMode] = useState(false);
   const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
   const roleManagementRef = useRef<RoleManagementRef>(null);
+  const canManageRoles = hasPermission('roles:list');
+  const canDeleteUsers = hasPermission('users:delete');
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -74,7 +78,7 @@ const AdminUsers = () => {
           <div className="flex justify-between items-center">
             <TabsList>
               <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="roles">Role Management</TabsTrigger>
+              {canManageRoles && <TabsTrigger value="roles">Role Management</TabsTrigger>}
             </TabsList>
             {activeTab === 'roles' && (
               <div className="flex gap-2">
@@ -153,14 +157,16 @@ const AdminUsers = () => {
                   <TableCell>₦{user.balance_ngn.toLocaleString()}</TableCell>
                   <TableCell>{new Date(user.registration_date).toLocaleDateString()}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => handleDeleteClick(e, user)}
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {canDeleteUsers && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => handleDeleteClick(e, user)}
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
@@ -187,14 +193,16 @@ const AdminUsers = () => {
                     <p className="font-medium">{user.full_name}</p>
                     <p className="text-sm text-muted-foreground">{user.email}</p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => handleDeleteClick(e, user)}
-                    className="h-8 w-8 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  {canDeleteUsers && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => handleDeleteClick(e, user)}
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Rank:</span>
@@ -220,15 +228,17 @@ const AdminUsers = () => {
         </div>
           </TabsContent>
           
-          <TabsContent value="roles" className="mt-6">
-            <RoleManagement 
-              ref={roleManagementRef}
-              deleteMode={deleteMode}
-              setDeleteMode={setDeleteMode}
-              selectedRoles={selectedRoles}
-              setSelectedRoles={setSelectedRoles}
-            />
-          </TabsContent>
+          {canManageRoles && (
+            <TabsContent value="roles" className="mt-6">
+              <RoleManagement 
+                ref={roleManagementRef}
+                deleteMode={deleteMode}
+                setDeleteMode={setDeleteMode}
+                selectedRoles={selectedRoles}
+                setSelectedRoles={setSelectedRoles}
+              />
+            </TabsContent>
+          )}
         </Tabs>
       </CardContent>
       <UserDetailsModal 
