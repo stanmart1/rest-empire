@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { Settings } from 'lucide-react';
 import api from '@/lib/api';
 import { usePermission } from '@/hooks/usePermission';
+import { useAuth } from '@/contexts/AuthContext';
 import PaymentGatewayModal from '@/components/admin/PaymentGatewayModal';
 import BonusConfiguration from '@/components/admin/BonusConfiguration';
 import EmailConfiguration from '@/components/admin/EmailConfiguration';
@@ -18,6 +19,7 @@ import SystemConfiguration from '@/components/admin/SystemConfiguration';
 
 const AdminSettings = () => {
   const { hasPermission } = usePermission();
+  const { refreshUser } = useAuth();
   const [minPayoutNGN, setMinPayoutNGN] = useState('5000');
   const [minPayoutUSDT, setMinPayoutUSDT] = useState('10');
   const [payoutFeeNGN, setPayoutFeeNGN] = useState('1.5');
