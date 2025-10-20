@@ -14,7 +14,8 @@ export const RootRedirect = () => {
   }
 
   if (isAuthenticated) {
-    return <Navigate to={user?.role === 'admin' ? "/admin/dashboard" : "/dashboard"} replace />;
+    const hasAdminDashboard = user?.permissions?.includes('admin_dashboard:view');
+    return <Navigate to={hasAdminDashboard ? "/admin/dashboard" : "/dashboard"} replace />;
   }
 
   return <Navigate to="/home" replace />;

@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import RankBadge from '@/components/common/RankBadge';
 import { useDashboardStats } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 
@@ -16,6 +16,11 @@ const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data: dashboardStats, isLoading: statsLoading, error: statsError } = useDashboardStats();
+  
+  // Redirect users with admin dashboard permission
+  if (user?.permissions?.includes('admin_dashboard:view')) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
   
   const { data: bonusConfig } = useQuery({
     queryKey: ['bonusConfig'],

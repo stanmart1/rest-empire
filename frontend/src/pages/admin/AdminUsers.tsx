@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { AdminUser } from '@/lib/admin-types';
 import UserDetailsModal from '@/components/admin/UserDetailsModal';
 
 const AdminUsers = () => {
+  const [activeTab, setActiveTab] = useState('users');
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -64,6 +66,13 @@ const AdminUsers = () => {
         <CardTitle>User Management</CardTitle>
       </CardHeader>
       <CardContent>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList>
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="roles">Role Management</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="users" className="mt-6">
         {/* Desktop Table */}
         <div className="hidden md:block">
           <Table>
@@ -172,6 +181,14 @@ const AdminUsers = () => {
             ))
           )}
         </div>
+          </TabsContent>
+          
+          <TabsContent value="roles" className="mt-6">
+            <div className="text-center py-8 text-muted-foreground">
+              Role Management coming soon
+            </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
       <UserDetailsModal 
         user={selectedUser} 

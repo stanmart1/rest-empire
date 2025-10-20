@@ -19,8 +19,25 @@ from app.core.config import settings
 router = APIRouter()
 
 @router.get("/me", response_model=UserResponse)
-def get_current_user_info(current_user: User = Depends(get_current_user)):
-    return current_user
+def get_current_user_info(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    from app.models.user_role import UserRole
+    from app.models.role_permission import RolePermission
+    from app.models.permission import Permission
+    
+    # Get user permissions
+    permissions = db.query(Permission.name).join(
+        RolePermission, RolePermission.permission_id == Permission.id
+    ).join(
+        UserRole, UserRole.role_id == RolePermission.role_id
+    ).filter(
+        UserRole.user_id == current_user.id
+    ).distinct().all()
+    
+    user_dict = {
+        **current_user.__dict__,
+        "permissions": [p[0] for p in permissions]
+    }
+    return user_dict
 
 @router.put("/profile", response_model=UserResponse)
 def update_profile(

@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.permissions?.includes('admin_dashboard:view');
 
   return (
     <div className="flex min-h-screen w-full bg-background">

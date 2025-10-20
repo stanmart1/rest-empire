@@ -45,6 +45,8 @@ class UserResponse(UserBase):
     occupation: Optional[str] = None
     registration_date: Optional[datetime] = None
     created_at: Optional[datetime] = None
+    role: Optional[str] = "user"
+    permissions: Optional[list[str]] = []
     
     class Config:
         from_attributes = True

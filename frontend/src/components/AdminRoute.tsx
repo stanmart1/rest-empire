@@ -17,7 +17,8 @@ export const AdminRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (user?.role !== 'admin') {
+  const hasAdminDashboard = user?.permissions?.includes('admin_dashboard:view');
+  if (!hasAdminDashboard) {
     return <Navigate to="/dashboard" replace />;
   }
 

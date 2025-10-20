@@ -44,7 +44,8 @@ const Login = () => {
   
   // Redirect after user state is updated
   if (loginSuccess && user) {
-    const redirectPath = user.role === 'admin' ? '/admin/dashboard' : '/dashboard';
+    const hasAdminDashboard = user.permissions?.includes('admin_dashboard:view');
+    const redirectPath = hasAdminDashboard ? '/admin/dashboard' : '/dashboard';
     setTimeout(() => navigate(redirectPath), 500);
   }
 
