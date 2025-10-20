@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Settings, Trash2, Plus, X } from 'lucide-react';
+import { Settings, Trash2, Plus, X, Edit, Save } from 'lucide-react';
 import { Role, Permission } from '@/types/rbac';
 import { useRoles, usePermissions, useCreateRole, useDeleteRole, useUpdateRolePermissions } from '@/hooks/useRbac';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,6 +33,7 @@ const RoleManagement = forwardRef<RoleManagementRef, RoleManagementProps>(({ del
   const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
   const [newRole, setNewRole] = useState({ name: '', display_name: '', description: '', permission_ids: [] as number[] });
   const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
+  const [isEditingPermissions, setIsEditingPermissions] = useState(false);
 
   const { user } = useAuth();
   const { data: allRoles, isLoading: rolesLoading } = useRoles();
@@ -47,6 +48,7 @@ const RoleManagement = forwardRef<RoleManagementRef, RoleManagementProps>(({ del
   const handleOpenPermissions = (role: Role) => {
     setSelectedRole(role);
     setSelectedPermissions(role.permissions?.map(p => p.id) || []);
+    setIsEditingPermissions(false);
     setPermissionsModalOpen(true);
   };
 
@@ -94,6 +96,25 @@ const RoleManagement = forwardRef<RoleManagementRef, RoleManagementProps>(({ del
         ? prev.filter(p => p !== permissionId)
         : [...prev, permissionId]
     );
+  };
+
+  const selectAllPermissions = () => {
+    setSelectedPermissions(permissions?.map(p => p.id) || []);
+  };
+
+  const deselectAllPermissions = () => {
+    setSelectedPermissions([]);
+  };
+
+  const toggleCategoryPermissions = (categoryPerms: Permission[]) => {
+    const categoryIds = categoryPerms.map(p => p.id);
+    const allSelected = categoryIds.every(id => selectedPermissions.includes(id));
+    
+    if (allSelected) {
+      setSelectedPermissions(prev => prev.filter(id => !categoryIds.includes(id)));
+    } else {
+      setSelectedPermissions(prev => [...new Set([...prev, ...categoryIds])]);
+    }
   };
 
   const groupedPermissions = permissions?.reduce((acc, perm) => {
@@ -225,25 +246,63 @@ const RoleManagement = forwardRef<RoleManagementRef, RoleManagementProps>(({ del
 
       {/* Permissions Modal */}
       <Dialog open={permissionsModalOpen} onOpenChange={setPermissionsModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Manage Permissions - {selectedRole?.display_name}</DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle>Manage Permissions - {selectedRole?.display_name}</DialogTitle>
+              <div className="flex gap-2">
+                {isEditingPermissions && (
+                  <>
+                    <Button variant="outline" size="sm" onClick={selectAllPermissions}>
+                      Select All
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={deselectAllPermissions}>
+                      Deselect All
+                    </Button>
+                  </>
+                )}
+                {!isEditingPermissions ? (
+                  <Button variant="outline" size="sm" onClick={() => setIsEditingPermissions(true)}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" onClick={() => setIsEditingPermissions(false)}>
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel Edit
+                  </Button>
+                )}
+              </div>
+            </div>
           </DialogHeader>
-          <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-6">
             {groupedPermissions && Object.entries(groupedPermissions).map(([resource, perms]) => (
               <div key={resource}>
-                <h3 className="font-semibold mb-3 capitalize">{resource}</h3>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold capitalize">{resource}</h3>
+                  {isEditingPermissions && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => toggleCategoryPermissions(perms)}
+                      className="h-7 text-xs"
+                    >
+                      {perms.every(p => selectedPermissions.includes(p.id)) ? 'Deselect' : 'Select'} All
+                    </Button>
+                  )}
+                </div>
                 <div className="space-y-2">
                   {perms.map((perm) => (
                     <div key={perm.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={`perm-${perm.id}`}
                         checked={selectedPermissions.includes(perm.id)}
-                        onCheckedChange={() => togglePermission(perm.id)}
+                        onCheckedChange={() => isEditingPermissions && togglePermission(perm.id)}
+                        disabled={!isEditingPermissions}
                       />
                       <label
                         htmlFor={`perm-${perm.id}`}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        className={`text-sm font-medium leading-none ${isEditingPermissions ? 'cursor-pointer' : 'cursor-default'} ${!isEditingPermissions && 'opacity-70'}`}
                       >
                         {perm.name}
                         <span className="text-muted-foreground ml-2">- {perm.description}</span>
@@ -255,8 +314,13 @@ const RoleManagement = forwardRef<RoleManagementRef, RoleManagementProps>(({ del
             ))}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPermissionsModalOpen(false)}>Cancel</Button>
-            <Button onClick={handleSavePermissions}>Save Changes</Button>
+            <Button variant="outline" onClick={() => setPermissionsModalOpen(false)}>Close</Button>
+            {isEditingPermissions && (
+              <Button onClick={handleSavePermissions}>
+                <Save className="h-4 w-4 mr-2" />
+                Save Changes
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
