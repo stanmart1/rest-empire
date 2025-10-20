@@ -47,6 +47,8 @@ const Sidebar = () => {
       return new Date(dashboardStats.activated_at).toLocaleDateString('en-GB');
     } else if (!dashboardStats?.is_active && dashboardStats?.deactivated_at) {
       return new Date(dashboardStats.deactivated_at).toLocaleDateString('en-GB');
+    } else if (dashboardStats?.registration_date) {
+      return new Date(dashboardStats.registration_date).toLocaleDateString('en-GB');
     }
     return 'N/A';
   };

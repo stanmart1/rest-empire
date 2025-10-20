@@ -103,62 +103,13 @@ const Index = () => {
             </div>
             
             <div className="lg:w-1/2 flex justify-center">
-              <div className="relative w-full max-w-lg hidden sm:block">
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
-                  <div className="bg-white rounded-xl p-6 shadow-lg">
-                    <div className="flex justify-between items-center mb-6">
-                      <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                          <Globe className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <p className="font-bold text-primary">Rest Empire</p>
-                          <p className="text-xs text-gray-600">Network Marketing</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 text-success">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-xs">Live</span>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center pb-3 border-b">
-                        <span className="text-gray-600">Current Rank</span>
-                        <span className="font-semibold">Pearl</span>
-                      </div>
-                      <div className="flex justify-between items-center pb-3 border-b">
-                        <span className="text-gray-600">Team Size</span>
-                        <span className="font-semibold">12 Members</span>
-                      </div>
-                      <div className="flex justify-between items-center pb-3 border-b">
-                        <span className="text-gray-600">This Month</span>
-                        <span className="font-semibold text-success">€1,240</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Total Earnings</span>
-                        <span className="font-semibold">€8,750</span>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-6 pt-4 border-t">
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm text-gray-600">Progress to Sapphire</span>
-                        <span className="text-sm font-medium">42%</span>
-                      </div>
-                      <div className="w-full bg-secondary rounded-full h-2.5">
-                        <div className="bg-primary h-2.5 rounded-full" style={{ width: '42%' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Floating elements */}
-                <div className="absolute -top-6 -right-6 bg-white rounded-full p-3 shadow-lg border">
-                  <Shield className="w-6 h-6 text-primary" />
-                </div>
-                <div className="absolute -bottom-6 -left-6 bg-white rounded-full p-3 shadow-lg border">
-                  <Award className="w-6 h-6 text-primary" />
+              <div className="relative w-full max-w-xl hidden sm:block">
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 border border-white/20 shadow-2xl">
+                  <img 
+                    src="/dashbaord-preview.png" 
+                    alt="Rest Empire Dashboard Preview"
+                    className="w-full h-auto"
+                  />
                 </div>
               </div>
             </div>

@@ -212,6 +212,7 @@ def get_dashboard_stats(
         is_active=current_user.is_active,
         activated_at=activation.activated_at if activation else None,
         deactivated_at=current_user.deactivated_at,
+        registration_date=current_user.registration_date,
         rank_progress={
             "percentage": max(0, progress_percentage),
             "current_turnover": user_turnover,

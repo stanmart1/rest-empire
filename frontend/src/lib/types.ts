@@ -32,6 +32,7 @@ export interface DashboardStats {
   is_active: boolean;
   activated_at?: string;
   deactivated_at?: string;
+  registration_date: string;
   rank_progress?: {
     current_rank: string;
     next_rank?: string;

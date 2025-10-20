@@ -31,6 +31,7 @@ class DashboardStats(BaseModel):
     is_active: bool
     activated_at: Optional[datetime]
     deactivated_at: Optional[datetime]
+    registration_date: datetime
     rank_progress: RankProgress
     
 class ReferralInfo(BaseModel):
