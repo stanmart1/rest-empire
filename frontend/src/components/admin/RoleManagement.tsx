@@ -7,11 +7,25 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Settings, Trash2, Plus } from 'lucide-react';
+import { Settings, Trash2, Plus, X } from 'lucide-react';
 import { Role, Permission } from '@/types/rbac';
 import { useRoles, usePermissions, useCreateRole, useDeleteRole, useUpdateRolePermissions } from '@/hooks/useRbac';
+import { useAuth } from '@/contexts/AuthContext';
+import { forwardRef, useImperativeHandle } from 'react';
 
-const RoleManagement = () => {
+interface RoleManagementProps {
+  deleteMode: boolean;
+  setDeleteMode: (value: boolean) => void;
+  selectedRoles: number[];
+  setSelectedRoles: (value: number[]) => void;
+}
+
+export interface RoleManagementRef {
+  openCreateModal: () => void;
+  openBulkDeleteDialog: () => void;
+}
+
+const RoleManagement = forwardRef<RoleManagementRef, RoleManagementProps>(({ deleteMode, setDeleteMode, selectedRoles, setSelectedRoles }, ref) => {
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [permissionsModalOpen, setPermissionsModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -20,11 +34,15 @@ const RoleManagement = () => {
   const [newRole, setNewRole] = useState({ name: '', display_name: '', description: '', permission_ids: [] as number[] });
   const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
 
-  const { data: roles, isLoading: rolesLoading } = useRoles();
+  const { user } = useAuth();
+  const { data: allRoles, isLoading: rolesLoading } = useRoles();
   const { data: permissions } = usePermissions();
   const createRoleMutation = useCreateRole();
   const deleteRoleMutation = useDeleteRole();
   const updatePermissionsMutation = useUpdateRolePermissions();
+
+  const isSuperAdmin = user?.role === 'super_admin' || user?.role === 'superadmin';
+  const roles = allRoles?.filter(role => isSuperAdmin || role.name !== 'super_admin');
 
   const handleOpenPermissions = (role: Role) => {
     setSelectedRole(role);
@@ -35,6 +53,30 @@ const RoleManagement = () => {
   const handleDeleteClick = (role: Role) => {
     setRoleToDelete(role);
     setDeleteDialogOpen(true);
+  };
+
+  const toggleRoleSelection = (roleId: number) => {
+    setSelectedRoles(prev =>
+      prev.includes(roleId) ? prev.filter(id => id !== roleId) : [...prev, roleId]
+    );
+  };
+
+  const handleBulkDelete = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  useImperativeHandle(ref, () => ({
+    openCreateModal: () => setCreateModalOpen(true),
+    openBulkDeleteDialog: handleBulkDelete
+  }));
+
+  const confirmBulkDelete = async () => {
+    for (const roleId of selectedRoles) {
+      await deleteRoleMutation.mutateAsync(roleId);
+    }
+    setSelectedRoles([]);
+    setDeleteMode(false);
+    setDeleteDialogOpen(false);
   };
 
   const handleSavePermissions = () => {
@@ -61,46 +103,61 @@ const RoleManagement = () => {
   }, {} as Record<string, Permission[]>);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-end">
-        <Button onClick={() => setCreateModalOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Role
-        </Button>
-      </div>
+    <div className="space-y-4">
 
       {rolesLoading ? (
         <div className="text-center py-8">Loading...</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {roles?.map((role) => (
-            <Card key={role.id}>
+            <Card 
+              key={role.id}
+              className={deleteMode && selectedRoles.includes(role.id) ? 'ring-2 ring-primary' : ''}
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">{role.display_name}</CardTitle>
-                    <p className="text-sm text-muted-foreground mt-1">{role.description}</p>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleOpenPermissions(role)}
-                      className="h-8 w-8"
-                    >
-                      <Settings className="h-4 w-4" />
-                    </Button>
-                    {!role.is_system && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteClick(role)}
-                        className="h-8 w-8 text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
+                  {deleteMode && role.name !== 'super_admin' ? (
+                    <div className="flex items-start gap-3 flex-1">
+                      <Checkbox
+                        checked={selectedRoles.includes(role.id)}
+                        onCheckedChange={() => toggleRoleSelection(role.id)}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{role.display_name}</CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">{role.description}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{role.display_name}</CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">{role.description}</p>
+                      </div>
+                      {!deleteMode && (
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleOpenPermissions(role)}
+                            className="h-8 w-8"
+                          >
+                            <Settings className="h-4 w-4" />
+                          </Button>
+                          {role.name !== 'super_admin' && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteClick(role)}
+                              className="h-8 w-8 text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
@@ -208,20 +265,30 @@ const RoleManagement = () => {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Role</AlertDialogTitle>
+            <AlertDialogTitle>Delete Role{selectedRoles.length > 1 ? 's' : ''}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete the role "{roleToDelete?.display_name}"? This action cannot be undone.
+              {selectedRoles.length > 0 ? (
+                `Are you sure you want to delete ${selectedRoles.length} role(s)? This action cannot be undone.`
+              ) : (
+                `Are you sure you want to delete the role "${roleToDelete?.display_name}"? This action cannot be undone.`
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => roleToDelete && deleteRoleMutation.mutate(roleToDelete.id, {
-                onSuccess: () => {
-                  setDeleteDialogOpen(false);
-                  setRoleToDelete(null);
+              onClick={() => {
+                if (selectedRoles.length > 0) {
+                  confirmBulkDelete();
+                } else if (roleToDelete) {
+                  deleteRoleMutation.mutate(roleToDelete.id, {
+                    onSuccess: () => {
+                      setDeleteDialogOpen(false);
+                      setRoleToDelete(null);
+                    }
+                  });
                 }
-              })}
+              }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
@@ -231,6 +298,6 @@ const RoleManagement = () => {
       </AlertDialog>
     </div>
   );
-};
+});
 
 export default RoleManagement;

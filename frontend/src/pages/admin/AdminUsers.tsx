@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,15 +6,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { AdminUser } from '@/lib/admin-types';
 import UserDetailsModal from '@/components/admin/UserDetailsModal';
-import RoleManagement from '@/components/admin/RoleManagement';
+import RoleManagement, { RoleManagementRef } from '@/components/admin/RoleManagement';
 
 const AdminUsers = () => {
   const [activeTab, setActiveTab] = useState('users');
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
+  const roleManagementRef = useRef<RoleManagementRef>(null);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -68,10 +71,43 @@ const AdminUsers = () => {
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="roles">Role Management</TabsTrigger>
-          </TabsList>
+          <div className="flex justify-between items-center">
+            <TabsList>
+              <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="roles">Role Management</TabsTrigger>
+            </TabsList>
+            {activeTab === 'roles' && (
+              <div className="flex gap-2">
+                {!deleteMode ? (
+                  <>
+                    <Button variant="outline" onClick={() => setDeleteMode(true)}>
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Roles
+                    </Button>
+                    <Button onClick={() => roleManagementRef.current?.openCreateModal()}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Role
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" onClick={() => { setDeleteMode(false); setSelectedRoles([]); }}>
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      onClick={() => roleManagementRef.current?.openBulkDeleteDialog()}
+                      disabled={selectedRoles.length === 0}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Selected ({selectedRoles.length})
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
           
           <TabsContent value="users" className="mt-6">
         {/* Desktop Table */}
@@ -185,7 +221,13 @@ const AdminUsers = () => {
           </TabsContent>
           
           <TabsContent value="roles" className="mt-6">
-            <RoleManagement />
+            <RoleManagement 
+              ref={roleManagementRef}
+              deleteMode={deleteMode}
+              setDeleteMode={setDeleteMode}
+              selectedRoles={selectedRoles}
+              setSelectedRoles={setSelectedRoles}
+            />
           </TabsContent>
         </Tabs>
       </CardContent>

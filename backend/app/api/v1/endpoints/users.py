@@ -23,6 +23,7 @@ def get_current_user_info(current_user: User = Depends(get_current_user), db: Se
     from app.models.user_role import UserRole
     from app.models.role_permission import RolePermission
     from app.models.permission import Permission
+    from app.models.role import Role
     
     # Get user permissions
     permissions = db.query(Permission.name).join(
@@ -33,9 +34,17 @@ def get_current_user_info(current_user: User = Depends(get_current_user), db: Se
         UserRole.user_id == current_user.id
     ).distinct().all()
     
+    # Get user role
+    role = db.query(Role.name).join(
+        UserRole, UserRole.role_id == Role.id
+    ).filter(
+        UserRole.user_id == current_user.id
+    ).first()
+    
     user_dict = {
         **current_user.__dict__,
-        "permissions": [p[0] for p in permissions]
+        "permissions": [p[0] for p in permissions],
+        "role": role[0] if role else None
     }
     return user_dict
 
