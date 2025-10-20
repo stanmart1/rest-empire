@@ -27,9 +27,7 @@ const Topbar = () => {
     <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4 sm:px-6">
       {/* Left: Logo */}
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-          <span className="text-primary-foreground font-bold text-sm">OS</span>
-        </div>
+        <img src="/favicon.png" alt="Logo" className="w-8 h-8" />
         <span className="font-bold text-lg hidden sm:block text-foreground">
           <span className="text-primary">Opened Seal</span>
           <span className="font-normal"> and Rest Empire</span>

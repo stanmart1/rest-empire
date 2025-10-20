@@ -21,9 +21,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">OS</span>
-              </div>
+              <img src="/favicon.png" alt="Logo" className="w-10 h-10" />
               <span className="font-bold text-xl text-white">
                 Opened Seal and Rest Empire
               </span>
