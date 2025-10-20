@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import api from '@/lib/api';
 import { AdminUser } from '@/lib/admin-types';
 import UserDetailsModal from '@/components/admin/UserDetailsModal';
+import RoleManagement from '@/components/admin/RoleManagement';
 
 const AdminUsers = () => {
   const [activeTab, setActiveTab] = useState('users');
@@ -184,9 +185,7 @@ const AdminUsers = () => {
           </TabsContent>
           
           <TabsContent value="roles" className="mt-6">
-            <div className="text-center py-8 text-muted-foreground">
-              Role Management coming soon
-            </div>
+            <RoleManagement />
           </TabsContent>
         </Tabs>
       </CardContent>
