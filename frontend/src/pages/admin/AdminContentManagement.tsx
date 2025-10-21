@@ -48,6 +48,13 @@ const AdminContentManagement = () => {
     business_hours: ''
   });
   const [contactInitialized, setContactInitialized] = useState(false);
+  const [socialLinks, setSocialLinks] = useState({
+    facebook: '',
+    instagram: '',
+    twitter: '',
+    linkedin: ''
+  });
+  const [socialInitialized, setSocialInitialized] = useState(false);
 
   const { data: faqs, isLoading } = useQuery({
     queryKey: ['faqs'],
@@ -104,6 +111,29 @@ const AdminContentManagement = () => {
     setContactInitialized(true);
   }
 
+  const { data: socialData } = useQuery({
+    queryKey: ['social-links'],
+    queryFn: async () => {
+      const response = await api.get('/social/');
+      return response.data;
+    },
+  });
+
+  if (socialData && !socialInitialized) {
+    try {
+      const parsed = JSON.parse(socialData.content);
+      setSocialLinks(parsed);
+    } catch {
+      setSocialLinks({
+        facebook: '',
+        instagram: '',
+        twitter: '',
+        linkedin: ''
+      });
+    }
+    setSocialInitialized(true);
+  }
+
   const updateContactMutation = useMutation({
     mutationFn: async (content: any) => {
       await api.put('/contact/', { content: JSON.stringify(content) });
@@ -116,6 +146,20 @@ const AdminContentManagement = () => {
 
   const handleContactSave = () => {
     updateContactMutation.mutate(contactContent);
+  };
+
+  const updateSocialMutation = useMutation({
+    mutationFn: async (content: any) => {
+      await api.put('/social/', { content: JSON.stringify(content) });
+    },
+    onSuccess: () => {
+      toast({ title: 'Success', description: 'Social links updated successfully' });
+      queryClient.invalidateQueries({ queryKey: ['social-links'] });
+    },
+  });
+
+  const handleSocialSave = () => {
+    updateSocialMutation.mutate(socialLinks);
   };
 
   const updateAboutMutation = useMutation({
@@ -263,11 +307,12 @@ const AdminContentManagement = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="blog">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="blog">Blog</TabsTrigger>
               <TabsTrigger value="faq">FAQ</TabsTrigger>
               <TabsTrigger value="about">About</TabsTrigger>
               <TabsTrigger value="contact">Contact</TabsTrigger>
+              <TabsTrigger value="social">Social Links</TabsTrigger>
             </TabsList>
 
             <TabsContent value="blog" className="space-y-4">
@@ -503,6 +548,47 @@ const AdminContentManagement = () => {
               </div>
               <Button onClick={handleContactSave} disabled={updateContactMutation.isPending}>
                 {updateContactMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Save Changes
+              </Button>
+            </TabsContent>
+
+            <TabsContent value="social" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>Facebook URL</Label>
+                  <Input
+                    value={socialLinks.facebook}
+                    onChange={(e) => setSocialLinks({ ...socialLinks, facebook: e.target.value })}
+                    placeholder="https://facebook.com/yourpage"
+                  />
+                </div>
+                <div>
+                  <Label>Instagram URL</Label>
+                  <Input
+                    value={socialLinks.instagram}
+                    onChange={(e) => setSocialLinks({ ...socialLinks, instagram: e.target.value })}
+                    placeholder="https://instagram.com/yourpage"
+                  />
+                </div>
+                <div>
+                  <Label>Twitter URL</Label>
+                  <Input
+                    value={socialLinks.twitter}
+                    onChange={(e) => setSocialLinks({ ...socialLinks, twitter: e.target.value })}
+                    placeholder="https://twitter.com/yourpage"
+                  />
+                </div>
+                <div>
+                  <Label>LinkedIn URL</Label>
+                  <Input
+                    value={socialLinks.linkedin}
+                    onChange={(e) => setSocialLinks({ ...socialLinks, linkedin: e.target.value })}
+                    placeholder="https://linkedin.com/company/yourpage"
+                  />
+                </div>
+              </div>
+              <Button onClick={handleSocialSave} disabled={updateSocialMutation.isPending}>
+                {updateSocialMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Save Changes
               </Button>
             </TabsContent>
