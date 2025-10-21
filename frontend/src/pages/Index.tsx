@@ -73,7 +73,7 @@ const Index = () => {
               <p className="text-xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto lg:mx-0">
                 Join over 10,000 entrepreneurs who are building sustainable income streams with our powerful MLM platform.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button asChild size="lg" className="text-lg px-8 py-6 bg-white text-primary hover:bg-white/90">
                   <Link to="/register">
                     Create Account <ArrowRight className="ml-2 h-5 w-5" />
@@ -84,21 +84,6 @@ const Index = () => {
                     Login to Account
                   </Link>
                 </Button>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-8 max-w-md mx-auto lg:mx-0">
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-primary-foreground">10K+</p>
-                  <p className="text-primary-foreground/80 text-sm">Active Users</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-primary-foreground">$2M+</p>
-                  <p className="text-primary-foreground/80 text-sm">Paid Out</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-primary-foreground">14</p>
-                  <p className="text-primary-foreground/80 text-sm">Rank Levels</p>
-                </div>
               </div>
             </div>
             
