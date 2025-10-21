@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Trash2, Download, Pencil, Loader2 } from 'lucide-react';
 import { PromoMaterial } from '@/types/admin-promo';
 import { usePromoMaterials, useCreatePromoMaterial, useUpdatePromoMaterial, useDeletePromoMaterial } from '@/hooks/useAdminPromo';
+import api from '@/lib/api';
 
 const AdminPromoMaterials = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -24,8 +25,8 @@ const AdminPromoMaterials = () => {
     description: '',
     material_type: 'document',
     file_url: '',
-    language: 'en',
   });
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
   const createMutation = useCreatePromoMaterial({
     onSuccess: () => {
       setCreateDialogOpen(false);
@@ -34,8 +35,8 @@ const AdminPromoMaterials = () => {
         description: '',
         material_type: 'document',
         file_url: '',
-        language: 'en',
       });
+      setUploadFile(null);
     },
   });
   const updateMutation = useUpdatePromoMaterial({
@@ -63,9 +64,30 @@ const AdminPromoMaterials = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate(formData);
+    
+    if (!uploadFile) {
+      return;
+    }
+    
+    try {
+      // Upload file first
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', uploadFile);
+      
+      const uploadResponse = await api.post('/upload/', uploadFormData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      
+      // Create material with uploaded file URL
+      createMutation.mutate({
+        ...formData,
+        file_url: uploadResponse.data.file_url,
+      });
+    } catch (error) {
+      console.error('File upload failed:', error);
+    }
   };
 
   const handleEditClick = (material: PromoMaterial) => {
@@ -75,16 +97,38 @@ const AdminPromoMaterials = () => {
       description: material.description,
       material_type: material.material_type,
       file_url: material.file_url,
-      language: material.language,
     });
+    setUploadFile(null);
     setEditDialogOpen(true);
   };
 
-  const handleEditSubmit = (e: React.FormEvent) => {
+  const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingMaterial) {
-      updateMutation.mutate({ materialId: editingMaterial.id, data: formData });
+    if (!editingMaterial) return;
+    
+    let fileUrl = formData.file_url;
+    
+    // Upload new file if provided
+    if (uploadFile) {
+      try {
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', uploadFile);
+        
+        const uploadResponse = await api.post('/upload/', uploadFormData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        
+        fileUrl = uploadResponse.data.file_url;
+      } catch (error) {
+        console.error('File upload failed:', error);
+        return;
+      }
     }
+    
+    updateMutation.mutate({ 
+      materialId: editingMaterial.id, 
+      data: { ...formData, file_url: fileUrl } 
+    });
   };
 
   const formatFileSize = (bytes?: number) => {
@@ -131,47 +175,36 @@ const AdminPromoMaterials = () => {
                   rows={3}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="material_type">Material Type</Label>
-                  <Select value={formData.material_type} onValueChange={(value) => setFormData({ ...formData, material_type: value })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="presentation">Presentation</SelectItem>
-                      <SelectItem value="calculator">Calculator</SelectItem>
-                      <SelectItem value="brochure">Brochure</SelectItem>
-                      <SelectItem value="video">Video</SelectItem>
-                      <SelectItem value="image">Image</SelectItem>
-                      <SelectItem value="document">Document</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="language">Language</Label>
-                  <Select value={formData.language} onValueChange={(value) => setFormData({ ...formData, language: value })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="es">Spanish</SelectItem>
-                      <SelectItem value="fr">French</SelectItem>
-                      <SelectItem value="de">German</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div>
+                <Label htmlFor="material_type">Material Type</Label>
+                <Select value={formData.material_type} onValueChange={(value) => setFormData({ ...formData, material_type: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="presentation">Presentation</SelectItem>
+                    <SelectItem value="brochure">Brochure</SelectItem>
+                    <SelectItem value="video">Video</SelectItem>
+                    <SelectItem value="image">Image</SelectItem>
+                    <SelectItem value="document">Document</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
-                <Label htmlFor="file_url">File URL</Label>
-                <Input
-                  id="file_url"
-                  value={formData.file_url}
-                  onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
-                  placeholder="https://..."
-                  required
-                />
+                <Label htmlFor="file_upload">Upload File</Label>
+                <div className="mt-2">
+                  <label htmlFor="file_upload" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 cursor-pointer">
+                    Choose File
+                  </label>
+                  <input
+                    id="file_upload"
+                    type="file"
+                    onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                    className="hidden"
+                    required
+                  />
+                  {uploadFile && <p className="text-sm text-muted-foreground mt-2">{uploadFile.name}</p>}
+                </div>
               </div>
               <Button type="submit" className="w-full" disabled={createMutation.isPending}>
                 {createMutation.isPending ? 'Adding...' : 'Add Material'}
@@ -328,47 +361,35 @@ const AdminPromoMaterials = () => {
                 rows={3}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="edit-material_type">Material Type</Label>
-                <Select value={formData.material_type} onValueChange={(value) => setFormData({ ...formData, material_type: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="presentation">Presentation</SelectItem>
-                    <SelectItem value="calculator">Calculator</SelectItem>
-                    <SelectItem value="brochure">Brochure</SelectItem>
-                    <SelectItem value="video">Video</SelectItem>
-                    <SelectItem value="image">Image</SelectItem>
-                    <SelectItem value="document">Document</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="edit-language">Language</Label>
-                <Select value={formData.language} onValueChange={(value) => setFormData({ ...formData, language: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Spanish</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                    <SelectItem value="de">German</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div>
+              <Label htmlFor="edit-material_type">Material Type</Label>
+              <Select value={formData.material_type} onValueChange={(value) => setFormData({ ...formData, material_type: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="presentation">Presentation</SelectItem>
+                  <SelectItem value="brochure">Brochure</SelectItem>
+                  <SelectItem value="video">Video</SelectItem>
+                  <SelectItem value="image">Image</SelectItem>
+                  <SelectItem value="document">Document</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
-              <Label htmlFor="edit-file_url">File URL</Label>
-              <Input
-                id="edit-file_url"
-                value={formData.file_url}
-                onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
-                placeholder="https://..."
-                required
-              />
+              <Label htmlFor="edit-file_upload">Upload New File (Optional)</Label>
+              <div className="mt-2">
+                <label htmlFor="edit-file_upload" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 cursor-pointer">
+                  Choose File
+                </label>
+                <input
+                  id="edit-file_upload"
+                  type="file"
+                  onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                  className="hidden"
+                />
+                {uploadFile && <p className="text-sm text-muted-foreground mt-2">{uploadFile.name}</p>}
+              </div>
             </div>
             <Button type="submit" className="w-full" disabled={updateMutation.isPending}>
               {updateMutation.isPending ? 'Updating...' : 'Update Material'}

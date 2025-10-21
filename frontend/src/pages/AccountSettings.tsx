@@ -164,9 +164,9 @@ const AccountSettings = () => {
       <h2 className="text-2xl font-bold">Account Settings</h2>
 
       <Tabs defaultValue="verification" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="verification">Verification</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 bg-muted p-1">
+          <TabsTrigger value="verification" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Verification</TabsTrigger>
+          <TabsTrigger value="security" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Security</TabsTrigger>
         </TabsList>
 
         <TabsContent value="security">

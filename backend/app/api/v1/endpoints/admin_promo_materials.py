@@ -8,6 +8,15 @@ from app.models.promo_material import PromoMaterial, MaterialType
 
 router = APIRouter()
 
+@router.get("/promo-materials")
+def get_all_promo_materials(
+    admin: User = Depends(require_permission("promo_materials:list")),
+    db: Session = Depends(get_db)
+):
+    """Get all promotional materials (admin only)"""
+    materials = db.query(PromoMaterial).order_by(PromoMaterial.created_at.desc()).all()
+    return materials
+
 class PromoMaterialCreate(BaseModel):
     title: str
     description: str

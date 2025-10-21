@@ -7,7 +7,7 @@ export const usePromoMaterials = () => {
   return useQuery<PromoMaterial[]>({
     queryKey: ['adminPromoMaterials'],
     queryFn: async () => {
-      const response = await api.get('/promo-materials/');
+      const response = await api.get('/admin/promo-materials');
       return response.data;
     },
   });
