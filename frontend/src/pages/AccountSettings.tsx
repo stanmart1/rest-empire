@@ -20,6 +20,19 @@ const AccountSettings = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmittingVerification, setIsSubmittingVerification] = useState(false);
   const [verificationStep, setVerificationStep] = useState(1);
+  const [verificationStatus, setVerificationStatus] = useState<any>(null);
+  
+  useEffect(() => {
+    const fetchVerificationStatus = async () => {
+      try {
+        const response = await api.get('/verification/status');
+        setVerificationStatus(response.data);
+      } catch (error) {
+        console.error('Failed to fetch verification status:', error);
+      }
+    };
+    fetchVerificationStatus();
+  }, []);
   
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -91,6 +104,15 @@ const AccountSettings = () => {
   };
 
   const handleSubmitVerification = async () => {
+    if (!documentFile) {
+      toast({
+        title: "Error",
+        description: "Please upload a document file",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsSubmittingVerification(true);
     try {
       const formData = new FormData();
@@ -120,6 +142,11 @@ const AccountSettings = () => {
         title: "Success",
         description: "Verification information submitted successfully",
       });
+      
+      // Refresh verification status
+      const response = await api.get('/verification/status');
+      setVerificationStatus(response.data);
+      setVerificationStep(1);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -236,10 +263,53 @@ const AccountSettings = () => {
 
         <TabsContent value="verification">
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-900 font-medium">Please Note</p>
-              <p className="text-sm text-blue-800 mt-1">The information you enter should match the information in your identification document</p>
-            </div>
+            {verificationStatus && verificationStatus.status !== 'not_submitted' && (
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold text-lg">Verification Status</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Submitted on {new Date(verificationStatus.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div>
+                      {verificationStatus.status === 'pending' && (
+                        <div className="flex items-center gap-2 text-yellow-600">
+                          <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse" />
+                          <span className="font-medium">Pending Review</span>
+                        </div>
+                      )}
+                      {verificationStatus.status === 'approved' && (
+                        <div className="flex items-center gap-2 text-green-600">
+                          <CheckCircle className="w-5 h-5" />
+                          <span className="font-medium">Approved</span>
+                        </div>
+                      )}
+                      {verificationStatus.status === 'rejected' && (
+                        <div className="flex items-center gap-2 text-red-600">
+                          <XCircle className="w-5 h-5" />
+                          <span className="font-medium">Rejected</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {verificationStatus.status === 'rejected' && verificationStatus.rejection_reason && (
+                    <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-sm font-medium text-red-900">Rejection Reason:</p>
+                      <p className="text-sm text-red-800 mt-1">{verificationStatus.rejection_reason}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+            
+            {(!verificationStatus || verificationStatus.status === 'not_submitted' || verificationStatus.status === 'rejected') && (
+              <>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-900 font-medium">Please Note</p>
+                  <p className="text-sm text-blue-800 mt-1">The information you enter should match the information in your identification document</p>
+                </div>
 
             {/* Step 1: Personal Info & Documents */}
             {verificationStep === 1 && (
@@ -445,6 +515,8 @@ const AccountSettings = () => {
                   </div>
                 </CardContent>
               </Card>
+            )}
+              </>
             )}
           </div>
         </TabsContent>

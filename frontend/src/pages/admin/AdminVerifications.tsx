@@ -16,6 +16,7 @@ const AdminVerifications = () => {
   const [selectedVerification, setSelectedVerification] = useState<AdminVerification | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [documentOpen, setDocumentOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: verifications, isLoading } = useQuery<AdminVerification[]>({
@@ -207,6 +208,22 @@ const AdminVerifications = () => {
                 </div>
               </div>
 
+              {selectedVerification.document_file_path && (
+                <div className="mt-4">
+                  <Label className="text-muted-foreground">Document File</Label>
+                  <div className="mt-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setDocumentOpen(true)}
+                      className="w-full"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Document
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {selectedVerification.rejection_reason && (
                 <div>
                   <Label className="text-muted-foreground">Rejection Reason</Label>
@@ -238,6 +255,31 @@ const AdminVerifications = () => {
                     </Button>
                   </div>
                 </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={documentOpen} onOpenChange={setDocumentOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>Verification Document</DialogTitle>
+          </DialogHeader>
+          {selectedVerification?.document_file_path && (
+            <div className="w-full h-[70vh] overflow-auto">
+              {selectedVerification.document_file_path.toLowerCase().endsWith('.pdf') ? (
+                <iframe
+                  src={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/uploads/${selectedVerification.document_file_path}`}
+                  className="w-full h-full border-0"
+                  title="Verification Document"
+                />
+              ) : (
+                <img
+                  src={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/uploads/${selectedVerification.document_file_path}`}
+                  alt="Verification Document"
+                  className="w-full h-auto"
+                />
               )}
             </div>
           )}

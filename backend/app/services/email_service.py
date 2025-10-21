@@ -243,3 +243,44 @@ async def send_payout_request_email(email: str, amount: float, db: Session):
             "subject": "📤 Payout Request Received - Opened Seal and Rest Empire",
             "html": html_content
         })
+
+async def send_kyc_approved_email(email: str, user_name: str, db: Session):
+    dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
+    html_content = load_template(
+        "kyc_approved.html",
+        user_name=user_name,
+        dashboard_url=dashboard_url
+    )
+    
+    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
+    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    
+    if api_key:
+        resend.api_key = api_key
+        resend.Emails.send({
+            "from": from_email,
+            "to": email,
+            "subject": "✅ KYC Verification Approved - Opened Seal and Rest Empire",
+            "html": html_content
+        })
+
+async def send_kyc_rejected_email(email: str, user_name: str, reason: str, db: Session):
+    settings_url = f"{settings.FRONTEND_URL}/settings"
+    html_content = load_template(
+        "kyc_rejected.html",
+        user_name=user_name,
+        reason=reason,
+        settings_url=settings_url
+    )
+    
+    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
+    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    
+    if api_key:
+        resend.api_key = api_key
+        resend.Emails.send({
+            "from": from_email,
+            "to": email,
+            "subject": "❌ KYC Verification Rejected - Opened Seal and Rest Empire",
+            "html": html_content
+        })

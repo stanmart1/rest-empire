@@ -247,10 +247,29 @@ def admin_get_verifications(
     
     verifications = query.order_by(UserVerification.created_at.desc()).offset(skip).limit(limit).all()
     
-    return verifications
+    # Add user info to each verification
+    result = []
+    for v in verifications:
+        user = db.query(User).filter(User.id == v.user_id).first()
+        verification_dict = {
+            "id": v.id,
+            "user_id": v.user_id,
+            "user_email": user.email if user else "Unknown",
+            "user_name": user.full_name if user else "Unknown",
+            "full_name": v.full_name,
+            "document_type": v.document_type,
+            "document_number": v.document_number,
+            "document_file_path": v.document_file_path,
+            "status": v.status.value,
+            "created_at": v.created_at,
+            "rejection_reason": v.rejection_reason
+        }
+        result.append(verification_dict)
+    
+    return result
 
 @router.post("/verifications/{verification_id}/approve")
-def admin_approve_verification(
+async def admin_approve_verification(
     verification_id: int,
     admin: User = Depends(require_permission("verification:approve")),
     db: Session = Depends(get_db)
@@ -281,10 +300,15 @@ def admin_approve_verification(
         details={"admin_id": admin.id}
     )
     
+    # Send approval email
+    if user:
+        from app.services.email_service import send_kyc_approved_email
+        await send_kyc_approved_email(user.email, user.full_name or "User", db)
+    
     return {"message": "Verification approved successfully"}
 
 @router.post("/verifications/{verification_id}/reject")
-def admin_reject_verification(
+async def admin_reject_verification(
     verification_id: int,
     reason: str,
     admin: User = Depends(require_permission("verification:reject")),
@@ -310,5 +334,11 @@ def admin_reject_verification(
         db, verification.user_id, "kyc_rejected",
         details={"admin_id": admin.id, "reason": reason}
     )
+    
+    # Send rejection email
+    user = db.query(User).filter(User.id == verification.user_id).first()
+    if user:
+        from app.services.email_service import send_kyc_rejected_email
+        await send_kyc_rejected_email(user.email, user.full_name or "User", reason, db)
     
     return {"message": "Verification rejected successfully"}

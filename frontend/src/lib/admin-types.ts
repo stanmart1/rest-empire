@@ -31,6 +31,7 @@ export interface AdminVerification {
   full_name: string;
   document_type: string;
   document_number: string;
+  document_file_path?: string;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
   rejection_reason?: string;

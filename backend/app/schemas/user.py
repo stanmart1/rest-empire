@@ -47,6 +47,8 @@ class UserResponse(UserBase):
     created_at: Optional[datetime] = None
     role: Optional[str] = "user"
     permissions: Optional[list[str]] = []
+    kyc_verified: Optional[bool] = False
+    kyc_verified_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True
