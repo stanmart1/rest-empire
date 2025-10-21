@@ -38,6 +38,7 @@ async def submit_verification(
     file_name = f"{current_user.id}_{datetime.utcnow().timestamp()}{file_extension}"
     file_data = await document_file.read()
     file_path = save_file(file_data, file_name, "verifications")
+    file_url = get_file_url(file_path)
     
     # Create verification record
     verification = UserVerification(
@@ -51,7 +52,7 @@ async def submit_verification(
         document_number=document_number,
         document_issue_date=datetime.fromisoformat(document_issue_date) if document_issue_date else None,
         document_expiry_date=datetime.fromisoformat(document_expiry_date) if document_expiry_date else None,
-        document_file_path=str(file_path),
+        document_file_path=file_url,
         address_country=address_country,
         address_city=address_city,
         address_street=address_street,

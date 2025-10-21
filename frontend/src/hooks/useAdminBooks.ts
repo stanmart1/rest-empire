@@ -18,7 +18,7 @@ export const useBookReviews = (bookId?: number) => {
     queryKey: ['bookReviews', bookId],
     queryFn: async () => {
       if (!bookId) return [];
-      const response = await api.get(`/books/${bookId}/reviews`);
+      const response = await api.get(`/admin/books/${bookId}/reviews`);
       return response.data;
     },
     enabled: !!bookId,

@@ -4,8 +4,8 @@ from typing import List, Optional
 from app.core.database import get_db
 from app.api.deps import require_permission
 from app.models.user import User
-from app.models.book import Book
-from app.schemas.book import BookResponse
+from app.models.book import Book, BookReview
+from app.schemas.book import BookResponse, BookReviewResponse
 from app.core.storage import save_file, get_file_url
 import os
 from datetime import datetime
@@ -96,3 +96,13 @@ def delete_book(
     db.delete(book)
     db.commit()
     return {"message": "Book deleted successfully"}
+
+@router.get("/books/{book_id}/reviews", response_model=List[BookReviewResponse])
+def get_book_reviews(
+    book_id: int,
+    admin: User = Depends(require_permission("books:list")),
+    db: Session = Depends(get_db)
+):
+    """Get reviews for a book (admin only)"""
+    reviews = db.query(BookReview).filter(BookReview.book_id == book_id).all()
+    return reviews
