@@ -152,7 +152,7 @@ const Payouts = () => {
               <p className="text-muted-foreground mb-6 max-w-md">
                 You need to complete and get your KYC verification approved before you can request payouts. This helps us ensure secure transactions and comply with regulations.
               </p>
-              <Link to="/settings">
+              <Link to="/account-settings">
                 <Button>
                   Submit KYC Verification
                 </Button>

@@ -17,7 +17,7 @@ const Profile = () => {
   const [fullName, setFullName] = useState(user?.full_name || '');
   const [phoneNumber, setPhoneNumber] = useState(user?.phone_number || '');
   const [gender, setGender] = useState(user?.gender || '');
-  const [dateOfBirth, setDateOfBirth] = useState(user?.date_of_birth ? new Date(user.date_of_birth).toISOString().split('T')[0] : '');
+  const [dateOfBirth, setDateOfBirth] = useState(user?.date_of_birth ? user.date_of_birth.split('T')[0] : '');
   const [occupation, setOccupation] = useState(user?.occupation || '');
   
   useEffect(() => {
@@ -25,7 +25,7 @@ const Profile = () => {
       setFullName(user.full_name || '');
       setPhoneNumber(user.phone_number || '');
       setGender(user.gender || '');
-      setDateOfBirth(user.date_of_birth ? new Date(user.date_of_birth).toISOString().split('T')[0] : '');
+      setDateOfBirth(user.date_of_birth ? user.date_of_birth.split('T')[0] : '');
       setOccupation(user.occupation || '');
     }
   }, [user]);
