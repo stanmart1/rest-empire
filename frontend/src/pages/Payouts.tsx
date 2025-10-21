@@ -17,6 +17,9 @@ import apiService from '@/services/api';
 import api from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { Payout } from '@/lib/types';
+import { useAuth } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
+import { AlertCircle } from 'lucide-react';
 
 const payoutSchema = z.object({
   amount: z.coerce.number(),
@@ -34,6 +37,7 @@ const payoutSchema = z.object({
 type PayoutFormData = z.infer<typeof payoutSchema>;
 
 const Payouts = () => {
+  const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -139,6 +143,22 @@ const Payouts = () => {
           <CardTitle>Request Payout</CardTitle>
         </CardHeader>
         <CardContent>
+          {!user?.kyc_verified ? (
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+                <AlertCircle className="w-8 h-8 text-yellow-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">KYC Verification Required</h3>
+              <p className="text-muted-foreground mb-6 max-w-md">
+                You need to complete and get your KYC verification approved before you can request payouts. This helps us ensure secure transactions and comply with regulations.
+              </p>
+              <Link to="/settings">
+                <Button>
+                  Submit KYC Verification
+                </Button>
+              </Link>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -265,6 +285,7 @@ const Payouts = () => {
               Submit Payout Request
             </Button>
           </form>
+          )}
         </CardContent>
       </Card>
 
