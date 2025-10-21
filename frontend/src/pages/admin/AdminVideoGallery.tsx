@@ -297,7 +297,7 @@ const AdminVideoGallery = () => {
                   {video.thumbnail_url ? (
                     <>
                       <img
-                        src={video.thumbnail_url}
+                        src={video.thumbnail_url.startsWith('http') ? video.thumbnail_url : `${import.meta.env.VITE_API_BASE_URL}${video.thumbnail_url}`}
                         alt={video.title}
                         className="w-full h-full object-cover"
                       />
