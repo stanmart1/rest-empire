@@ -27,15 +27,31 @@ const PromoMaterials = () => {
   }
 
   const downloadMutation = useMutation({
-    mutationFn: (materialId: number) => apiService.promoMaterials.downloadMaterial(materialId),
-    onSuccess: (data) => {
+    mutationFn: async ({ materialId, fileUrl, title }: { materialId: number; fileUrl: string; title: string }) => {
+      // Track download
+      await apiService.promoMaterials.downloadMaterial(materialId);
+      
+      // Fetch file as blob
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+      const response = await fetch(`${baseUrl}${fileUrl}`);
+      const blob = await response.blob();
+      const filename = fileUrl.split('/').pop() || title;
+      
+      return { blob, filename };
+    },
+    onSuccess: ({ blob, filename }) => {
       queryClient.invalidateQueries({ queryKey: ['promo-materials'] });
       queryClient.invalidateQueries({ queryKey: ['promo-stats'] });
       
-      // Open download URL
-      if (data.download_url) {
-        window.open(data.download_url, '_blank');
-      }
+      // Create blob URL and download
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
       
       toast({
         title: "Download Started",
@@ -107,14 +123,13 @@ const PromoMaterials = () => {
           
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>{material.download_count} downloads</span>
-            <span>{material.language.toUpperCase()}</span>
           </div>
         </div>
         
         <Button 
           variant="outline" 
           className="w-full"
-          onClick={() => downloadMutation.mutate(material.id)}
+          onClick={() => downloadMutation.mutate({ materialId: material.id, fileUrl: material.file_url, title: material.title })}
           disabled={downloadMutation.isPending}
         >
           {downloadMutation.isPending ? (
@@ -153,19 +168,6 @@ const PromoMaterials = () => {
             <SelectItem value="video">Video</SelectItem>
             <SelectItem value="image">Image</SelectItem>
             <SelectItem value="document">Document</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select value={languageFilter} onValueChange={setLanguageFilter}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Language" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Languages</SelectItem>
-            <SelectItem value="en">English</SelectItem>
-            <SelectItem value="es">Spanish</SelectItem>
-            <SelectItem value="fr">French</SelectItem>
-            <SelectItem value="de">German</SelectItem>
           </SelectContent>
         </Select>
       </div>

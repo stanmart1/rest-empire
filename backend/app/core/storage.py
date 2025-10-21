@@ -32,4 +32,6 @@ def delete_file(file_path: str) -> bool:
 
 def get_file_url(file_path: str) -> str:
     """Convert file path to URL"""
-    return f"/{file_path.replace(os.sep, '/')}"
+    # Remove the storage base path and return relative to /uploads mount point
+    relative_path = str(Path(file_path).relative_to(UPLOAD_DIR))
+    return f"/uploads/{relative_path.replace(os.sep, '/')}"

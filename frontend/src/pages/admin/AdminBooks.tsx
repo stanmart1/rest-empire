@@ -199,9 +199,9 @@ const AdminBooks = () => {
                 <Card key={book.id} className="flex flex-col hover:shadow-lg transition-shadow cursor-pointer" onClick={() => handleViewReviews(book)}>
                   <div className="aspect-[3/4] overflow-hidden rounded-t-lg bg-gray-200 relative">
                     <img
-                      src={book.cover_image || '/placeholder-book.png'}
+                      src={book.cover_image ? `${import.meta.env.VITE_API_BASE_URL}${book.cover_image}` : '/placeholder-book.png'}
                       alt={book.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       onError={(e) => {
                         e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450"%3E%3Crect fill="%23e5e7eb" width="300" height="450"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="24" fill="%239ca3af"%3ENo Image%3C/text%3E%3C/svg%3E';
                       }}
@@ -243,9 +243,9 @@ const AdminBooks = () => {
                   {books.map((book) => (
                     <div key={book.id} className="flex items-center gap-4 p-4 hover:bg-muted/30 cursor-pointer transition-colors" onClick={() => handleViewReviews(book)}>
                       <img
-                        src={book.cover_image || '/placeholder-book.png'}
+                        src={book.cover_image ? `${import.meta.env.VITE_API_BASE_URL}${book.cover_image}` : '/placeholder-book.png'}
                         alt={book.title}
-                        className="w-16 h-24 object-cover rounded"
+                        className="w-16 h-24 object-contain rounded"
                         onError={(e) => {
                           e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="96" viewBox="0 0 64 96"%3E%3Crect fill="%23e5e7eb" width="64" height="96"/%3E%3C/svg%3E';
                         }}

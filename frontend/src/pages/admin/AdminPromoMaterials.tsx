@@ -226,7 +226,6 @@ const AdminPromoMaterials = () => {
                 <TableRow>
                   <TableHead>Title</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead>Language</TableHead>
                   <TableHead>Size</TableHead>
                   <TableHead>Downloads</TableHead>
                   <TableHead>Actions</TableHead>
@@ -235,13 +234,13 @@ const AdminPromoMaterials = () => {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
+                    <TableCell colSpan={5} className="text-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                     </TableCell>
                   </TableRow>
                 ) : !materials || materials.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">
                       No materials found
                     </TableCell>
                   </TableRow>
@@ -250,7 +249,6 @@ const AdminPromoMaterials = () => {
                     <TableRow key={material.id}>
                       <TableCell className="font-medium">{material.title}</TableCell>
                       <TableCell className="capitalize">{material.material_type}</TableCell>
-                      <TableCell className="uppercase">{material.language}</TableCell>
                       <TableCell>{formatFileSize(material.file_size)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
@@ -299,8 +297,6 @@ const AdminPromoMaterials = () => {
                     <h3 className="font-medium">{material.title}</h3>
                     <div className="flex gap-2 mt-2 text-sm text-muted-foreground">
                       <span className="capitalize">{material.material_type}</span>
-                      <span>•</span>
-                      <span className="uppercase">{material.language}</span>
                       <span>•</span>
                       <span>{formatFileSize(material.file_size)}</span>
                     </div>
