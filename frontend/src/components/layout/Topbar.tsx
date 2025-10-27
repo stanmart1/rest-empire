@@ -1,6 +1,6 @@
-import { ChevronDown, LayoutDashboard, Shield } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, Shield, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,6 +15,10 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 const Topbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Check if on admin route
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   // Check if user has admin permissions
   const hasAdminAccess = user?.permissions?.some(
@@ -27,6 +31,14 @@ const Topbar = () => {
       .map(n => n[0])
       .join('')
       .toUpperCase();
+  };
+
+  // Function to open help page
+  const openHelp = () => {
+    const chatbaseId = import.meta.env.VITE_CHATBASE_ID;
+    if (chatbaseId) {
+      window.open(`https://www.chatbase.co/${chatbaseId}/help`, '_blank');
+    }
   };
 
   return (
@@ -42,6 +54,19 @@ const Topbar = () => {
 
       {/* Right: User menu */}
       <div className="flex items-center gap-2 sm:gap-4">
+        {/* Help Button - Only show for non-admin users */}
+        {!isAdminRoute && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={openHelp}
+            className="relative"
+            title="Get Help"
+          >
+            <HelpCircle className="w-5 h-5" />
+          </Button>
+        )}
+        
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
