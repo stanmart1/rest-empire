@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Copy, QrCode, Wallet, CircleDot, Info, Loader2 } from 'lucide-react';
+import { Copy, Wallet, CircleDot, Info, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import RankBadge from '@/components/common/RankBadge';
 import { useDashboardStats } from '@/hooks/useApi';
@@ -77,18 +77,6 @@ const Dashboard = () => {
             <div className="flex gap-2">
               <Button size="icon" variant="ghost" onClick={copyReferralLink}>
                 <Copy className="w-4 h-4" />
-              </Button>
-              <Button 
-                size="icon" 
-                variant="ghost"
-                onClick={() => {
-                  toast({
-                    title: "QR Code",
-                    description: "QR code feature coming soon",
-                  });
-                }}
-              >
-                <QrCode className="w-4 h-4" />
               </Button>
             </div>
           </div>
