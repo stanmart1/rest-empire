@@ -17,11 +17,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { data: dashboardStats, isLoading: statsLoading, error: statsError } = useDashboardStats();
   
-  // Redirect users with admin dashboard permission
-  if (user?.permissions?.includes('admin_dashboard:view')) {
-    return <Navigate to="/admin/dashboard" replace />;
-  }
-  
   const { data: bonusConfig } = useQuery({
     queryKey: ['bonusConfig'],
     queryFn: async () => {

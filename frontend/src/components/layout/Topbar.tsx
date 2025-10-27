@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -14,6 +15,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 const Topbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  // Check if user has admin permissions
+  const hasAdminAccess = user?.permissions?.some(
+    (permission) => permission.includes('admin') || permission.includes('super_admin')
+  ) || false;
 
   const getInitials = (name: string) => {
     return name
@@ -50,26 +56,49 @@ const Topbar = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem 
+            {/* Dashboard Links */}
+            {hasAdminAccess && (
+              <>
+                <DropdownMenuLabel className="text-xs text-muted-foreground">Dashboards</DropdownMenuLabel>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => navigate('/admin/dashboard')}
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Admin Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  User Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
+
+            {/* Regular menu items */}
+            <DropdownMenuItem
               className="cursor-pointer"
               onClick={() => navigate('/profile')}
             >
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="cursor-pointer"
               onClick={() => navigate('/account-settings')}
             >
               Account Settings
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="cursor-pointer"
               onClick={() => navigate('/team')}
             >
               Referral Link
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={logout}
               className="cursor-pointer text-destructive focus:text-destructive"
             >

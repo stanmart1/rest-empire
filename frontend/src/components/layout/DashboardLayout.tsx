@@ -1,16 +1,17 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import AdminSidebar from './AdminSidebar';
 import Topbar from './Topbar';
-import { useAuth } from '@/contexts/AuthContext';
 
 const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
-  const { user } = useAuth();
-  const isAdmin = user?.permissions?.includes('admin_dashboard:view');
+  const location = useLocation();
+
+  // Show AdminSidebar only when on admin routes
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
     <div className="flex min-h-screen w-full bg-background">
-      {isAdmin ? <AdminSidebar /> : <Sidebar />}
+      {isAdminRoute ? <AdminSidebar /> : <Sidebar />}
       <div className="flex-1 flex flex-col md:ml-64">
         <Topbar />
         <main className="flex-1 p-4 md:p-6 overflow-auto pt-16 md:pt-4">
