@@ -7,12 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import StatusBadge from '@/components/common/StatusBadge';
 import { formatCurrency, formatDateTime } from '@/utils/formatters';
 import { usePayouts } from '@/hooks/useApi';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 import apiService from '@/services/api';
 import api from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
@@ -42,7 +42,7 @@ const Payouts = () => {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const { data: payouts, isLoading } = usePayouts(statusFilter === 'all' ? {} : { status: statusFilter });
-  
+
   const { data: payoutConfig } = useQuery({
     queryKey: ['payoutConfig'],
     queryFn: async () => {
@@ -80,7 +80,7 @@ const Payouts = () => {
 
   const watchAmount = watch('amount');
   const watchCurrency = watch('currency');
-  
+
   const MINIMUM_PAYOUT = {
     NGN: payoutConfig?.min_payout_ngn || 5000,
     USDT: payoutConfig?.min_payout_usdt || 10
@@ -89,7 +89,7 @@ const Payouts = () => {
     NGN: payoutConfig?.payout_fee_ngn || 1.5,
     USDT: payoutConfig?.payout_fee_usdt || 2.0
   };
-  
+
   const fee = watchAmount && FEE_PERCENTAGE[watchCurrency] ? watchAmount * (FEE_PERCENTAGE[watchCurrency] / 100) : 0;
   const netAmount = watchAmount && fee ? watchAmount - fee : watchAmount || 0;
 
@@ -105,14 +105,14 @@ const Payouts = () => {
     }
     const account_details = data.method === 'bank_transfer'
       ? {
-          account_number: data.account_number,
-          account_name: data.account_name,
-          bank_name: data.bank_name,
-        }
+        account_number: data.account_number,
+        account_name: data.account_name,
+        bank_name: data.bank_name,
+      }
       : {
-          wallet_address: data.wallet_address,
-          network: data.network || 'TRC20',
-        };
+        wallet_address: data.wallet_address,
+        network: data.network || 'TRC20',
+      };
 
     const payoutData = {
       amount: data.amount,
@@ -159,132 +159,132 @@ const Payouts = () => {
               </Link>
             </div>
           ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  placeholder={`Min: ${watchCurrency === 'NGN' ? '₦' : '$'}${MINIMUM_PAYOUT[watchCurrency]?.toLocaleString() || ''}`}
-                  {...register('amount')}
-                />
-                {errors.amount && (
-                  <p className="text-sm text-destructive">{errors.amount.message}</p>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Amount</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    placeholder={`Min: ${watchCurrency === 'NGN' ? '₦' : '$'}${MINIMUM_PAYOUT[watchCurrency]?.toLocaleString() || ''}`}
+                    {...register('amount')}
+                  />
+                  {errors.amount && (
+                    <p className="text-sm text-destructive">{errors.amount.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="currency">Currency</Label>
+                  <Select onValueChange={(value) => setValue('currency', value as any)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select currency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="NGN">NGN (Naira)</SelectItem>
+                      <SelectItem value="USDT">USDT</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.currency && (
+                    <p className="text-sm text-destructive">{errors.currency.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="method">Payment Method</Label>
+                  <Select onValueChange={(value) => setValue('method', value as any)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                      <SelectItem value="crypto">Cryptocurrency</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.method && (
+                    <p className="text-sm text-destructive">{errors.method.message}</p>
+                  )}
+                </div>
+
+                {watch('method') === 'bank_transfer' ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="account_number">Account Number</Label>
+                      <Input
+                        id="account_number"
+                        placeholder="1234567890"
+                        {...register('account_number')}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="account_name">Account Name</Label>
+                      <Input
+                        id="account_name"
+                        placeholder="John Doe"
+                        {...register('account_name')}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="bank_name">Bank Name</Label>
+                      <Input
+                        id="bank_name"
+                        placeholder="GTBank"
+                        {...register('bank_name')}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="wallet_address">Wallet Address</Label>
+                      <Input
+                        id="wallet_address"
+                        placeholder="TXxx..."
+                        {...register('wallet_address')}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="network">Network</Label>
+                      <Input
+                        id="network"
+                        placeholder="TRC20"
+                        defaultValue="TRC20"
+                        {...register('network')}
+                      />
+                    </div>
+                  </>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="currency">Currency</Label>
-                <Select onValueChange={(value) => setValue('currency', value as any)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select currency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NGN">NGN (Naira)</SelectItem>
-                    <SelectItem value="USDT">USDT</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.currency && (
-                  <p className="text-sm text-destructive">{errors.currency.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="method">Payment Method</Label>
-                <Select onValueChange={(value) => setValue('method', value as any)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select method" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                    <SelectItem value="crypto">Cryptocurrency</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.method && (
-                  <p className="text-sm text-destructive">{errors.method.message}</p>
-                )}
-              </div>
-
-              {watch('method') === 'bank_transfer' ? (
-                <>
-                  <div className="space-y-2">
-                    <Label htmlFor="account_number">Account Number</Label>
-                    <Input
-                      id="account_number"
-                      placeholder="1234567890"
-                      {...register('account_number')}
-                    />
+              {watchAmount && FEE_PERCENTAGE[watchCurrency] && (
+                <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                  <div className="flex justify-between">
+                    <span>Requested Amount:</span>
+                    <span>{formatCurrency(Number(watchAmount), watchCurrency)}</span>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="account_name">Account Name</Label>
-                    <Input
-                      id="account_name"
-                      placeholder="John Doe"
-                      {...register('account_name')}
-                    />
+                  <div className="flex justify-between">
+                    <span>Payout Fee ({FEE_PERCENTAGE[watchCurrency]}%):</span>
+                    <span>{formatCurrency(fee, watchCurrency)}</span>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bank_name">Bank Name</Label>
-                    <Input
-                      id="bank_name"
-                      placeholder="GTBank"
-                      {...register('bank_name')}
-                    />
+                  <div className="flex justify-between font-semibold border-t pt-2">
+                    <span>Net Amount:</span>
+                    <span>{formatCurrency(netAmount, watchCurrency)}</span>
                   </div>
-                </>
-              ) : (
-                <>
-                  <div className="space-y-2">
-                    <Label htmlFor="wallet_address">Wallet Address</Label>
-                    <Input
-                      id="wallet_address"
-                      placeholder="TXxx..."
-                      {...register('wallet_address')}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="network">Network</Label>
-                    <Input
-                      id="network"
-                      placeholder="TRC20"
-                      defaultValue="TRC20"
-                      {...register('network')}
-                    />
-                  </div>
-                </>
+                </div>
               )}
-            </div>
 
-            {watchAmount && FEE_PERCENTAGE[watchCurrency] && (
-              <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                <div className="flex justify-between">
-                  <span>Requested Amount:</span>
-                  <span>{formatCurrency(Number(watchAmount), watchCurrency)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Payout Fee ({FEE_PERCENTAGE[watchCurrency]}%):</span>
-                  <span>{formatCurrency(fee, watchCurrency)}</span>
-                </div>
-                <div className="flex justify-between font-semibold border-t pt-2">
-                  <span>Net Amount:</span>
-                  <span>{formatCurrency(netAmount, watchCurrency)}</span>
-                </div>
-              </div>
-            )}
-
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={payoutMutation.isPending}
-            >
-              {payoutMutation.isPending ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : null}
-              Submit Payout Request
-            </Button>
-          </form>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={payoutMutation.isPending}
+              >
+                {payoutMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : null}
+                Submit Payout Request
+              </Button>
+            </form>
           )}
         </CardContent>
       </Card>

@@ -539,11 +539,11 @@ const AdminContentManagement = () => {
               </div>
               <div>
                 <Label>Business Hours</Label>
-                <Textarea
+                <RichTextEditor
                   value={contactContent.business_hours}
-                  onChange={(e) => setContactContent({ ...contactContent, business_hours: e.target.value })}
+                  onChange={(value) => setContactContent({ ...contactContent, business_hours: value })}
                   placeholder="Monday - Friday: 9:00 AM - 6:00 PM EST&#10;Saturday: 10:00 AM - 4:00 PM EST&#10;Sunday: Closed"
-                  className="min-h-[100px]"
+                  minHeight="120px"
                 />
               </div>
               <Button onClick={handleContactSave} disabled={updateContactMutation.isPending}>

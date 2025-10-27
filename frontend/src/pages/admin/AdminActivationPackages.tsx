@@ -197,12 +197,12 @@ const AdminActivationPackages = () => {
               </div>
               <div>
                 <Label htmlFor="features">Package Benefits (one per line)</Label>
-                <Textarea
+                <RichTextEditor
                   id="features"
                   value={formData.features}
-                  onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+                  onChange={(value) => setFormData({ ...formData, features: value })}
                   placeholder="Access to premium training materials&#10;Priority customer support&#10;Exclusive bonus opportunities&#10;Advanced team management tools"
-                  rows={4}
+                  minHeight="150px"
                 />
               </div>
               <div>
@@ -460,11 +460,11 @@ const AdminActivationPackages = () => {
             </div>
             <div>
               <Label htmlFor="edit-features">Package Benefits (one per line)</Label>
-              <Textarea
+              <RichTextEditor
                 id="edit-features"
                 value={formData.features}
-                onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                rows={4}
+                onChange={(value) => setFormData({ ...formData, features: value })}
+                minHeight="150px"
               />
             </div>
             <div>

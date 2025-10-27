@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { cn } from '@/lib/utils';
@@ -22,20 +22,35 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   id,
   minHeight = '200px',
 }) => {
+  // Suppress findDOMNode warning from React Quill
+  useEffect(() => {
+    const originalError = console.error;
+    console.error = (...args) => {
+      if (
+        typeof args[0] === 'string' &&
+        args[0].includes('findDOMNode')
+      ) {
+        return;
+      }
+      originalError.call(console, ...args);
+    };
+
+    return () => {
+      console.error = originalError;
+    };
+  }, []);
   const modules = useMemo(
     () => ({
       toolbar: [
-        [{ header: [1, 2, 3, 4, 5, 6, false] }],
-        [{ font: [] }],
-        [{ size: ['small', false, 'large', 'huge'] }],
+        [{ header: [1, 2, 3, false] }],
+        [{ size: ['small', false, 'large'] }],
         ['bold', 'italic', 'underline', 'strike'],
         [{ color: [] }, { background: [] }],
-        [{ script: 'sub' }, { script: 'super' }],
         [{ list: 'ordered' }, { list: 'bullet' }],
         [{ indent: '-1' }, { indent: '+1' }],
         [{ align: [] }],
         ['blockquote', 'code-block'],
-        ['link', 'image', 'video'],
+        ['link', 'image'],
         ['clean'],
       ],
       clipboard: {
@@ -47,7 +62,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const formats = [
     'header',
-    'font',
     'size',
     'bold',
     'italic',
@@ -55,7 +69,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     'strike',
     'color',
     'background',
-    'script',
     'list',
     'bullet',
     'indent',
@@ -64,7 +77,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     'code-block',
     'link',
     'image',
-    'video',
   ];
 
   return (
