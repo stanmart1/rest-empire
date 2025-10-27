@@ -119,8 +119,8 @@ const Footer = () => {
               © {new Date().getFullYear()} Opened Seal and Rest Empire. All rights reserved.
             </p>
             <div className="flex space-x-6">
-              <a href="#" className="text-gray-400 hover:text-primary text-sm">Privacy Policy</a>
-              <a href="#" className="text-gray-400 hover:text-primary text-sm">Terms of Service</a>
+              <Link to="/privacy" className="text-gray-400 hover:text-primary text-sm">Privacy Policy</Link>
+              <Link to="/terms" className="text-gray-400 hover:text-primary text-sm">Terms of Service</Link>
             </div>
           </div>
         </div>
