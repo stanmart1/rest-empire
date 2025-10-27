@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Edit, Trash2, Loader2, Package, Eye, CheckCircle, XCircle, UserPlus } from 'lucide-react';
 import { ActivationPackage, ActivationPayment, PackageFormData } from '@/types/admin-activation';
 import { formatCurrency } from '@/utils/formatters';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 import {
   useActivationPackages,
   useActivationPayments,
@@ -159,12 +159,12 @@ const AdminActivationPackages = () => {
               </div>
               <div>
                 <Label htmlFor="description">Description</Label>
-                <Textarea
+                <RichTextEditor
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(value) => setFormData({ ...formData, description: value })}
                   placeholder="Package description..."
-                  rows={3}
+                  minHeight="150px"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -423,11 +423,11 @@ const AdminActivationPackages = () => {
             </div>
             <div>
               <Label htmlFor="edit-description">Description</Label>
-              <Textarea
+              <RichTextEditor
                 id="edit-description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
+                onChange={(value) => setFormData({ ...formData, description: value })}
+                minHeight="150px"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">

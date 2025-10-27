@@ -3,7 +3,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Star, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useBooks } from '@/hooks/useApi';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
@@ -11,6 +10,7 @@ import apiService from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 import { Book, BookReview } from '@/types/books';
 import FeatureRestricted from '@/components/common/FeatureRestricted';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 
 const BOOKS_PER_PAGE = 12;
 
@@ -211,15 +211,15 @@ const Books = () => {
                       <p className="text-sm text-muted-foreground">
                         Share your detailed thoughts about this book. What did you like or dislike? How did it impact you?
                       </p>
-                      <Textarea
+                      <RichTextEditor
                         id="review"
                         placeholder="Write your review here..."
                         value={currentReview.comment}
-                        onChange={(e) => setCurrentReview({
+                        onChange={(value) => setCurrentReview({
                           ...currentReview,
-                          comment: e.target.value
+                          comment: value
                         })}
-                        className="min-h-[150px] text-base p-4"
+                        minHeight="200px"
                       />
                     </div>
                   </div>

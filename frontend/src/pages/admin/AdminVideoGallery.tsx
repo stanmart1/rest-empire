@@ -3,12 +3,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Plus, Loader2, Pencil, Trash2, Video, Play } from 'lucide-react';
 import VideoPlayerModal from '@/components/VideoPlayerModal';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { toast } from 'sonner';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 import {
   Dialog,
   DialogContent,
@@ -184,11 +184,11 @@ const AdminVideoGallery = () => {
               </div>
               <div>
                 <Label>Description</Label>
-                <Textarea
+                <RichTextEditor
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={(value) => setDescription(value)}
                   placeholder="Video description"
-                  rows={3}
+                  minHeight="150px"
                 />
               </div>
               <div>

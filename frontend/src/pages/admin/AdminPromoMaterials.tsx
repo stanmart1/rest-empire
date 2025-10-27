@@ -7,12 +7,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Trash2, Download, Pencil, Loader2 } from 'lucide-react';
 import { PromoMaterial } from '@/types/admin-promo';
 import { usePromoMaterials, useCreatePromoMaterial, useUpdatePromoMaterial, useDeletePromoMaterial } from '@/hooks/useAdminPromo';
 import api from '@/lib/api';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 
 const AdminPromoMaterials = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -168,11 +168,11 @@ const AdminPromoMaterials = () => {
               </div>
               <div>
                 <Label htmlFor="description">Description</Label>
-                <Textarea
+                <RichTextEditor
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
+                  onChange={(value) => setFormData({ ...formData, description: value })}
+                  minHeight="150px"
                 />
               </div>
               <div>
@@ -350,11 +350,11 @@ const AdminPromoMaterials = () => {
             </div>
             <div>
               <Label htmlFor="edit-description">Description</Label>
-              <Textarea
+              <RichTextEditor
                 id="edit-description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
+                onChange={(value) => setFormData({ ...formData, description: value })}
+                minHeight="150px"
               />
             </div>
             <div>

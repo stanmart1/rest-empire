@@ -5,9 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Eye } from 'lucide-react';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 import { SupportTicket } from '@/types/admin-support';
 import { useSupportTickets, useRespondToTicket, useUpdateTicketStatus } from '@/hooks/useAdminSupport';
 
@@ -223,12 +223,12 @@ const AdminSupport = () => {
 
                 <div>
                   <Label htmlFor="response">Send Response</Label>
-                  <Textarea
+                  <RichTextEditor
                     id="response"
                     placeholder="Type your response to the user..."
                     value={responseMessage}
-                    onChange={(e) => setResponseMessage(e.target.value)}
-                    rows={4}
+                    onChange={(value) => setResponseMessage(value)}
+                    minHeight="150px"
                     className="mt-2"
                   />
                   <Button

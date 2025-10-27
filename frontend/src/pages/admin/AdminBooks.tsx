@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Plus, Trash2, Star, Grid3x3, List, Pencil } from 'lucide-react';
 import { Book } from '@/types/admin-books';
 import { useBooks, useBookReviews, useUploadBook, useDeleteBook } from '@/hooks/useAdminBooks';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 
 const AdminBooks = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -136,11 +136,11 @@ const AdminBooks = () => {
               </div>
               <div>
                 <Label htmlFor="description">Description</Label>
-                <Textarea
+                <RichTextEditor
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  required
+                  onChange={(value) => setFormData({ ...formData, description: value })}
+                  minHeight="150px"
                 />
               </div>
               <div>

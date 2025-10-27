@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Phone, Mail, MapPin, Clock, ArrowRight, Users, Gift, TrendingUp, Loader2 } from "lucide-react";
@@ -10,6 +9,7 @@ import Footer from "@/components/layout/Footer";
 import { useState, useEffect } from "react";
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -230,14 +230,12 @@ const Contact = () => {
 
                     <div className="space-y-2">
                       <Label htmlFor="message">Message</Label>
-                      <Textarea 
-                        id="message" 
-                        name="message"
-                        placeholder="How can we help you?" 
-                        rows={5} 
-                        required 
+                      <RichTextEditor
+                        id="message"
+                        placeholder="How can we help you?"
                         value={formData.message}
-                        onChange={handleChange}
+                        onChange={(value) => setFormData(prev => ({ ...prev, message: value }))}
+                        minHeight="200px"
                       />
                     </div>
 

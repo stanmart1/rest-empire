@@ -3,13 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { Loader2, Plus, Pencil, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 
 interface FAQ {
   id: number;
@@ -355,11 +355,11 @@ const AdminContentManagement = () => {
                       </div>
                       <div>
                         <Label>Content</Label>
-                        <Textarea
+                        <RichTextEditor
                           value={blogFormData.content}
-                          onChange={(e) => setBlogFormData({ ...blogFormData, content: e.target.value })}
+                          onChange={(value) => setBlogFormData({ ...blogFormData, content: value })}
                           placeholder="Enter blog content"
-                          className="min-h-[200px]"
+                          minHeight="300px"
                         />
                       </div>
                       <Button onClick={handleBlogSubmit} disabled={createBlogMutation.isPending || updateBlogMutation.isPending}>
@@ -426,11 +426,11 @@ const AdminContentManagement = () => {
                       </div>
                       <div>
                         <Label>Answer</Label>
-                        <Textarea
+                        <RichTextEditor
                           value={formData.answer}
-                          onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
+                          onChange={(value) => setFormData({ ...formData, answer: value })}
                           placeholder="Enter answer"
-                          className="min-h-[150px]"
+                          minHeight="200px"
                         />
                       </div>
                       <div>
@@ -474,11 +474,11 @@ const AdminContentManagement = () => {
             </TabsContent>
 
             <TabsContent value="about" className="space-y-4">
-              <Textarea
+              <RichTextEditor
                 value={aboutContent}
-                onChange={(e) => setAboutContent(e.target.value)}
+                onChange={(value) => setAboutContent(value)}
                 placeholder="Enter about page content..."
-                className="min-h-[400px]"
+                minHeight="400px"
               />
               <Button onClick={handleAboutSave} disabled={updateAboutMutation.isPending}>
                 {updateAboutMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

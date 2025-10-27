@@ -8,11 +8,11 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 import { Loader2, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -202,13 +202,12 @@ const Support = () => {
             </div>
             <div>
               <Label htmlFor="message">Message</Label>
-              <Textarea
+              <RichTextEditor
                 id="message"
                 placeholder="Please provide details about your inquiry..."
-                rows={6}
                 value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                required
+                onChange={(value) => setFormData({ ...formData, message: value })}
+                minHeight="200px"
               />
             </div>
             <Button type="submit" disabled={submitMutation.isPending}>

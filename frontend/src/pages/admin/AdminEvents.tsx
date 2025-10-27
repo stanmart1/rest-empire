@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Plus, Trash2, Users, Edit, Loader2, UserCheck } from 'lucide-react';
 import { Event } from '@/types/admin-events';
 import { useEvents, useEventAttendees, useCreateEvent, useUpdateEvent, useDeleteEvent } from '@/hooks/useAdminEvents';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 
 const AdminEvents = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -146,11 +146,11 @@ const AdminEvents = () => {
               </div>
               <div>
                 <Label htmlFor="description">Description</Label>
-                <Textarea
+                <RichTextEditor
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
+                  onChange={(value) => setFormData({ ...formData, description: value })}
+                  minHeight="150px"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -443,11 +443,11 @@ const AdminEvents = () => {
             </div>
             <div>
               <Label htmlFor="edit-description">Description</Label>
-              <Textarea
+              <RichTextEditor
                 id="edit-description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
+                onChange={(value) => setFormData({ ...formData, description: value })}
+                minHeight="150px"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">

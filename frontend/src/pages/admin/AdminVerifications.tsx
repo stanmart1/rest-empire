@@ -6,11 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { AdminVerification } from '@/lib/admin-types';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 
 const AdminVerifications = () => {
   const [selectedVerification, setSelectedVerification] = useState<AdminVerification | null>(null);
@@ -240,11 +240,12 @@ const AdminVerifications = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="rejection">Rejection Reason</Label>
-                    <Textarea
+                    <RichTextEditor
                       id="rejection"
                       placeholder="Enter reason for rejection..."
                       value={rejectionReason}
-                      onChange={(e) => setRejectionReason(e.target.value)}
+                      onChange={(value) => setRejectionReason(value)}
+                      minHeight="120px"
                     />
                     <Button
                       variant="destructive"
