@@ -40,6 +40,13 @@ async def register(user_data: UserCreate, request: Request, db: Session = Depend
             raise HTTPException(status_code=400, detail="Invalid referral code")
         if not sponsor.is_active:
             raise HTTPException(status_code=400, detail="Sponsor account is not active")
+    else:
+        # Use default sponsor if no referral code provided
+        default_sponsor_id = get_config(db, "default_sponsor_id")
+        if default_sponsor_id:
+            sponsor = db.query(User).filter(User.id == int(default_sponsor_id)).first()
+            if sponsor and not sponsor.is_active:
+                sponsor = None  # Don't use inactive default sponsor
     
     # Check if activation packages are required
     activation_packages_enabled = (get_config(db, "activation_packages_enabled") or "true") == "true"

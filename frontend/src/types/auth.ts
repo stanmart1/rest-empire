@@ -85,6 +85,7 @@ export interface RegisterFormData {
   fullName: string;
   phone: string;
   residence: string;
+  manualReferralCode?: string;
   terms1: boolean;
   terms2: boolean;
   terms3: boolean;

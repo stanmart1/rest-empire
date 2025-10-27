@@ -21,6 +21,7 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
   const [monthlyWithdrawalLimit, setMonthlyWithdrawalLimit] = useState('0');
   const [accessTokenExpireMinutes, setAccessTokenExpireMinutes] = useState('30');
   const [refreshTokenExpireDays, setRefreshTokenExpireDays] = useState('7');
+  const [defaultSponsorId, setDefaultSponsorId] = useState('');
   
   const updateMutation = useUpdateSystemSettings();
 
@@ -34,6 +35,7 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
       setMonthlyWithdrawalLimit(settings.monthly_withdrawal_limit?.toString() || '0');
       setAccessTokenExpireMinutes(settings.access_token_expire_minutes?.toString() || '30');
       setRefreshTokenExpireDays(settings.refresh_token_expire_days?.toString() || '7');
+      setDefaultSponsorId(settings.default_sponsor_id?.toString() || '');
     }
   }, [settings]);
 
@@ -47,6 +49,7 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
       monthly_withdrawal_limit: monthlyWithdrawalLimit,
       access_token_expire_minutes: accessTokenExpireMinutes,
       refresh_token_expire_days: refreshTokenExpireDays,
+      default_sponsor_id: defaultSponsorId,
     });
   };
 
@@ -142,6 +145,29 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
                 className="mt-2"
               />
             </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        <div className="space-y-4">
+          <h3 className="font-semibold">Default Sponsor Configuration</h3>
+          <p className="text-sm text-muted-foreground">
+            Set a default sponsor for users who register without a referral code
+          </p>
+          <div>
+            <Label>Default Sponsor User ID</Label>
+            <Input
+              type="number"
+              min="1"
+              value={defaultSponsorId}
+              onChange={(e) => setDefaultSponsorId(e.target.value)}
+              placeholder="Enter user ID (e.g., 1)"
+              className="mt-2"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Users registering without a referral code will be assigned to this sponsor. Leave empty to allow orphaned registrations.
+            </p>
           </div>
         </div>
 
