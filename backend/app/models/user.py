@@ -14,6 +14,7 @@ class User(Base):
     gender = Column(String)
     date_of_birth = Column(DateTime)
     occupation = Column(String)
+    profile_picture = Column(String, nullable=True)  # URL to profile picture
     
     is_verified = Column(Boolean, default=False)
     verification_token = Column(String, nullable=True)

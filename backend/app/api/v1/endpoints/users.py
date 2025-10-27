@@ -74,6 +74,9 @@ def update_profile(
     if profile_data.occupation is not None:
         current_user.occupation = profile_data.occupation
     
+    if profile_data.profile_picture is not None:
+        current_user.profile_picture = profile_data.profile_picture
+    
     current_user.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(current_user)

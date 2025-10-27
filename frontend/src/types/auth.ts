@@ -66,6 +66,10 @@ export interface AuthUser {
   total_earnings: number;
   role: string;
   permissions?: string[];
+  profile_picture?: string;
+  gender?: string;
+  date_of_birth?: string;
+  occupation?: string;
 }
 
 // Form Data Types

@@ -43,6 +43,7 @@ class UserResponse(UserBase):
     gender: Optional[str] = None
     date_of_birth: Optional[datetime] = None
     occupation: Optional[str] = None
+    profile_picture: Optional[str] = None
     registration_date: Optional[datetime] = None
     created_at: Optional[datetime] = None
     role: Optional[str] = "user"

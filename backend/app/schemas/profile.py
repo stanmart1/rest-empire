@@ -8,6 +8,7 @@ class ProfileUpdate(BaseModel):
     gender: Optional[str] = None
     date_of_birth: Optional[str] = None
     occupation: Optional[str] = None
+    profile_picture: Optional[str] = None
 
 class EmailChange(BaseModel):
     new_email: EmailStr
