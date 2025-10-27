@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
+import {
+  LayoutDashboard,
   Users,
   Receipt,
   CheckCircle,
@@ -25,7 +25,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePermission } from '@/hooks/usePermission';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 
 const AdminSidebar = () => {
   const { user } = useAuth();
@@ -115,6 +115,10 @@ const AdminSidebar = () => {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0 bg-sidebar">
+            <SheetTitle className="sr-only">Admin Navigation Menu</SheetTitle>
+            <SheetDescription className="sr-only">
+              Navigate through admin dashboard sections
+            </SheetDescription>
             <SidebarContent />
           </SheetContent>
         </Sheet>

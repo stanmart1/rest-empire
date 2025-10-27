@@ -123,6 +123,8 @@ const Sidebar = () => {
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border overflow-y-auto z-50 md:hidden"
+            role="navigation"
+            aria-label="User Navigation Menu"
           >
         {/* User Profile Card */}
         <div className="p-4 border-b border-sidebar-border">
