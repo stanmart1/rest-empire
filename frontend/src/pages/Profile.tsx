@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
-import { Check, Phone, Calendar, Globe, MessageCircle, Camera, Video, Users, Loader2 } from 'lucide-react';
+import { Check, Phone, Calendar, Globe, MessageCircle, Camera, Video, Users, Loader2, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation } from '@tanstack/react-query';
 import apiService from '@/services/api';
@@ -59,8 +59,49 @@ const Profile = () => {
     });
   };
 
+  const referralLink = user?.referral_code 
+    ? `${window.location.origin}/register?ref=${user.referral_code}`
+    : `${window.location.origin}/register`;
+
+  const copyReferralLink = () => {
+    navigator.clipboard.writeText(referralLink);
+    toast({
+      title: "Copied!",
+      description: "Referral link copied to clipboard",
+    });
+  };
+
   return (
     <div className="space-y-4">
+      {/* Referral Link Section */}
+      <div>
+        <h2 className="text-2xl font-bold mb-6">Referral Link</h2>
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-3">
+              <Label className="text-muted-foreground">Your Referral Link</Label>
+              <div className="flex gap-2">
+                <Input 
+                  value={referralLink}
+                  readOnly
+                  className="flex-1 bg-muted/50"
+                />
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={copyReferralLink}
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Share this link with others to invite them to join your team
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Profile Photo Section */}
       <div>
         <h2 className="text-2xl font-bold mb-6">Profile</h2>
