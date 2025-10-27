@@ -196,7 +196,7 @@ const SignalForm = ({
           value={signal?.description || ''}
           onChange={() => {}}
           disabled={isLoading}
-          minHeight="150px"
+          minHeight="100px"
         />
       </div>
       <div>

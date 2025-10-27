@@ -142,7 +142,7 @@ const AdminActivationPackages = () => {
               <DialogTrigger asChild>
                 <Button><Plus className="w-4 h-4 mr-2" />Create Package</Button>
               </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create Activation Package</DialogTitle>
             </DialogHeader>
@@ -164,7 +164,7 @@ const AdminActivationPackages = () => {
                   value={formData.description}
                   onChange={(value) => setFormData({ ...formData, description: value })}
                   placeholder="Package description..."
-                  minHeight="150px"
+                  minHeight="80px"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -202,7 +202,7 @@ const AdminActivationPackages = () => {
                   value={formData.features}
                   onChange={(value) => setFormData({ ...formData, features: value })}
                   placeholder="Access to premium training materials&#10;Priority customer support&#10;Exclusive bonus opportunities&#10;Advanced team management tools"
-                  minHeight="150px"
+                  minHeight="80px"
                 />
               </div>
               <div>
@@ -407,7 +407,7 @@ const AdminActivationPackages = () => {
     </Tabs>
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Activation Package</DialogTitle>
           </DialogHeader>
@@ -427,7 +427,7 @@ const AdminActivationPackages = () => {
                 id="edit-description"
                 value={formData.description}
                 onChange={(value) => setFormData({ ...formData, description: value })}
-                minHeight="150px"
+                minHeight="80px"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -464,7 +464,7 @@ const AdminActivationPackages = () => {
                 id="edit-features"
                 value={formData.features}
                 onChange={(value) => setFormData({ ...formData, features: value })}
-                minHeight="150px"
+                minHeight="80px"
               />
             </div>
             <div>
