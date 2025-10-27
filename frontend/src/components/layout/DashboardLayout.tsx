@@ -14,8 +14,12 @@ const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
   useEffect(() => {
     const chatbaseId = import.meta.env.VITE_CHATBASE_ID;
 
+    // Debug: Check if chatbase ID is loaded
+    console.log('Chatbase ID:', chatbaseId ? 'Loaded' : 'Not found');
+
     // Skip if no chatbase ID is configured
     if (!chatbaseId) {
+      console.warn('Chatbase widget not loaded: VITE_CHATBASE_ID environment variable is not set');
       return;
     }
 
