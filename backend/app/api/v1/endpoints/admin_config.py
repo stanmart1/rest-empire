@@ -150,6 +150,14 @@ def get_public_system_settings(db: Session = Depends(get_db)):
         "activation_packages_enabled": (get_config(db, "activation_packages_enabled") or "true") == "true"
     }
 
+@router.get("/config/public/site-logo")
+def get_public_site_logo(db: Session = Depends(get_db)):
+    """Public: Get site logo URL (no auth required)"""
+    logo_url = get_config(db, "site_logo")
+    return {
+        "logo_url": logo_url if logo_url else "/favicon.png"
+    }
+
 @router.get("/config/settings/platform")
 def admin_get_platform_settings(
     admin: User = Depends(require_permission("config:view")),

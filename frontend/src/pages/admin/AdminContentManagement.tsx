@@ -48,6 +48,65 @@ const AdminContentManagement = () => {
     business_hours: ''
   });
   const [contactInitialized, setContactInitialized] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string>('');
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  // Fetch current logo
+  const { data: logoData } = useQuery({
+    queryKey: ['site-logo'],
+    queryFn: async () => {
+      const response = await api.get('/admin/config/config/public/site-logo');
+      return response.data;
+    },
+  });
+
+  // Set logo preview from fetched data
+  if (logoData?.logo_url && !logoPreview && logoPreview !== logoData.logo_url) {
+    setLogoPreview(logoData.logo_url);
+  }
+
+  const handleLogoUpload = async () => {
+    if (!logoFile) return;
+
+    setUploadingLogo(true);
+    try {
+      // Upload file
+      const formData = new FormData();
+      formData.append('file', logoFile);
+      formData.append('subfolder', 'logos');
+
+      const uploadResponse = await api.post('/upload/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      const fileUrl = uploadResponse.data.file_url;
+
+      // Save logo URL to config
+      await api.post('/admin/config/config', {
+        key: 'site_logo',
+        value: fileUrl,
+        description: 'Site logo URL',
+        is_public: true
+      });
+
+      toast({
+        title: 'Success',
+        description: 'Logo uploaded successfully'
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['site-logo'] });
+      setLogoFile(null);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.detail || 'Failed to upload logo',
+        variant: 'destructive'
+      });
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
   const [socialLinks, setSocialLinks] = useState({
     facebook: '',
     instagram: '',
@@ -307,9 +366,10 @@ const AdminContentManagement = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="blog">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="blog">Blog</TabsTrigger>
               <TabsTrigger value="faq">FAQ</TabsTrigger>
+              <TabsTrigger value="logo">Logo</TabsTrigger>
               <TabsTrigger value="about">About</TabsTrigger>
               <TabsTrigger value="contact">Contact</TabsTrigger>
               <TabsTrigger value="social">Social Links</TabsTrigger>
@@ -550,6 +610,97 @@ const AdminContentManagement = () => {
                 {updateContactMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Save Changes
               </Button>
+            </TabsContent>
+
+            <TabsContent value="logo" className="space-y-4">
+              <div className="max-w-2xl">
+                <div className="space-y-4">
+                  <div>
+                    <Label>Current Logo</Label>
+                    <div className="mt-2 p-4 border rounded-lg bg-muted/50">
+                      <img 
+                        src={logoPreview || "/favicon.png"} 
+                        alt="Logo" 
+                        className="h-16 w-auto object-contain"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="logo-upload">Upload New Logo</Label>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Recommended: Square image (e.g., 512x512px) in PNG format with transparent background. Max size: 2MB
+                    </p>
+                    <Input
+                      id="logo-upload"
+                      type="file"
+                      accept="image/png,image/jpeg,image/svg+xml"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          // Validate file size (2MB max)
+                          if (file.size > 2 * 1024 * 1024) {
+                            toast({
+                              title: 'Error',
+                              description: 'File size must be less than 2MB',
+                              variant: 'destructive'
+                            });
+                            return;
+                          }
+                          
+                          // Validate dimensions
+                          const img = new Image();
+                          img.onload = () => {
+                            if (img.width > 1024 || img.height > 1024) {
+                              toast({
+                                title: 'Warning',
+                                description: 'Image dimensions are large. Recommended: 512x512px or smaller',
+                              });
+                            }
+                            setLogoFile(file);
+                            setLogoPreview(URL.createObjectURL(file));
+                          };
+                          img.src = URL.createObjectURL(file);
+                        }
+                      }}
+                    />
+                  </div>
+
+                  {logoPreview && logoPreview !== "/favicon.png" && (
+                    <div>
+                      <Label>Preview</Label>
+                      <div className="mt-2 p-4 border rounded-lg bg-background">
+                        <img 
+                          src={logoPreview} 
+                          alt="Logo Preview" 
+                          className="h-16 w-auto object-contain"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={handleLogoUpload} 
+                      disabled={!logoFile || uploadingLogo}
+                    >
+                      {uploadingLogo && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                      Upload Logo
+                    </Button>
+                    {logoPreview && logoPreview !== "/favicon.png" && (
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          setLogoFile(null);
+                          setLogoPreview('');
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="social" className="space-y-4">
