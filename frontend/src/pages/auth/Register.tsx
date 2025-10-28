@@ -24,7 +24,6 @@ const registerSchema = z.object({
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/\d/, 'Password must contain at least one number'),
-  confirmPassword: z.string(),
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   residence: z.string().min(1, 'Place of residence is required'),
@@ -32,9 +31,6 @@ const registerSchema = z.object({
   terms1: z.boolean().refine(val => val === true, 'You must accept the General Terms and Conditions'),
   terms2: z.boolean().refine(val => val === true, 'You must accept the Data and Privacy Policy'),
   terms3: z.boolean().refine(val => val === true, 'You must confirm the information is correct'),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
 });
 
 const Register = () => {
@@ -43,7 +39,6 @@ const Register = () => {
   const { register: registerUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [step, setStep] = useState(1);
 
   const referralCode = searchParams.get('ref');
@@ -90,7 +85,7 @@ const Register = () => {
       // Use manual input (which may have been auto-filled from URL), or undefined (will use default sponsor)
       const finalReferralCode = data.manualReferralCode || undefined;
 
-      const response = await registerUser({
+      await registerUser({
         email: data.email,
         password: data.password,
         full_name: data.fullName,
@@ -220,28 +215,27 @@ const Register = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">Confirm Password <span className="text-destructive">*</span></Label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="confirmPassword"
-                            type={showConfirmPassword ? 'text' : 'password'}
-                            placeholder="Confirm your password"
-                            className="pl-10 pr-10 placeholder:text-foreground/70"
-                            {...register('confirmPassword')}
-                            disabled={isLoading}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-3 text-foreground hover:text-foreground"
-                          >
-                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </button>
-                        </div>
-                        {errors.confirmPassword && (
-                          <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-                        )}
+                        <Label htmlFor="manualReferralCode">
+                          Referral ID (Optional)
+                          {referralCode && (
+                            <span className="ml-2 text-xs text-primary font-normal">
+                              • Auto-filled from referral link
+                            </span>
+                          )}
+                        </Label>
+                        <Input
+                          id="manualReferralCode"
+                          placeholder="Enter referral ID if you have one"
+                          {...register('manualReferralCode')}
+                          disabled={isLoading}
+                          className="placeholder:text-foreground/70"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          {referralCode
+                            ? 'This field was auto-filled from your referral link. You can edit it if needed.'
+                            : 'If you were referred by someone, enter their referral ID here'
+                          }
+                        </p>
                       </div>
                     </motion.div>
                   )}
@@ -273,30 +267,6 @@ const Register = () => {
                         {errors.residence && (
                           <p className="text-sm text-destructive">{errors.residence.message}</p>
                         )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="manualReferralCode">
-                          Referral ID (Optional)
-                          {referralCode && (
-                            <span className="ml-2 text-xs text-primary font-normal">
-                              • Auto-filled from referral link
-                            </span>
-                          )}
-                        </Label>
-                        <Input
-                          id="manualReferralCode"
-                          placeholder="Enter referral ID if you have one"
-                          {...register('manualReferralCode')}
-                          disabled={isLoading}
-                          className="placeholder:text-foreground/70"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          {referralCode 
-                            ? 'This field was auto-filled from your referral link. You can edit it if needed.'
-                            : 'If you were referred by someone, enter their referral ID here'
-                          }
-                        </p>
                       </div>
 
                       <div className="pt-4 space-y-3">
