@@ -193,6 +193,13 @@ def admin_list_users(
     
     users = query.order_by(User.created_at.desc()).offset(skip).limit(limit).all()
     
+    # Add sponsor referral code to each user
+    for user in users:
+        if user.sponsor_id:
+            sponsor = db.query(User).filter(User.id == user.sponsor_id).first()
+            if sponsor:
+                user.sponsor_referral_code = sponsor.referral_code
+    
     return users
 
 @router.get("/users/{user_id}", response_model=UserResponse)

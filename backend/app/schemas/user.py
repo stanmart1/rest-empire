@@ -39,6 +39,7 @@ class UserResponse(UserBase):
     total_earnings: Optional[float] = 0.0
     referral_code: str
     sponsor_id: Optional[int] = None
+    sponsor_referral_code: Optional[str] = None
     phone_number: Optional[str] = None
     gender: Optional[str] = None
     date_of_birth: Optional[datetime] = None

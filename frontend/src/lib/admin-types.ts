@@ -21,6 +21,7 @@ export interface AdminUser {
   balance_usdt: number;
   registration_date: string;
   sponsor_id?: number;
+  sponsor_referral_code?: string;
 }
 
 export interface AdminVerification {

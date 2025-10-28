@@ -61,8 +61,8 @@ const UserDetailsModal = ({ user, open, onClose }: UserDetailsModalProps) => {
               <p className="font-medium">{new Date(user.registration_date).toLocaleDateString()}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Sponsor ID</p>
-              <p className="font-medium">{user.sponsor_id || 'N/A'}</p>
+              <p className="text-sm text-muted-foreground">Sponsor Referral Code</p>
+              <p className="font-medium">{user.sponsor_referral_code || 'N/A'}</p>
             </div>
           </div>
       </DialogContent>
