@@ -25,35 +25,35 @@ const AdminSettings = () => {
   const [payoutFeeNGN, setPayoutFeeNGN] = useState('1.5');
   const [payoutFeeUSDT, setPayoutFeeUSDT] = useState('2.0');
   const [maxReferralDepth, setMaxReferralDepth] = useState('15');
-  
+
   // Payment Gateway States
   const [gtpayEnabled, setGtpayEnabled] = useState(false);
   const [gtpayMerchantId, setGtpayMerchantId] = useState('');
   const [gtpayApiKey, setGtpayApiKey] = useState('');
   const [gtpayCallbackUrl, setGtpayCallbackUrl] = useState('');
-  
+
   const [providusEnabled, setProvidusEnabled] = useState(false);
   const [providusAccountNumber, setProvidusAccountNumber] = useState('');
   const [providusBankCode, setProvidusBankCode] = useState('');
   const [providusApiKey, setProvidusApiKey] = useState('');
-  
+
   const [paystackEnabled, setPaystackEnabled] = useState(false);
   const [paystackPublicKey, setPaystackPublicKey] = useState('');
   const [paystackSecretKey, setPaystackSecretKey] = useState('');
   const [paystackCallbackUrl, setPaystackCallbackUrl] = useState('');
-  
+
   const [cryptoEnabled, setCryptoEnabled] = useState(false);
   const [cryptoWalletAddress, setCryptoWalletAddress] = useState('');
-  
+
   const [bankTransferEnabled, setBankTransferEnabled] = useState(false);
   const [bankTransferBankName, setBankTransferBankName] = useState('');
   const [bankTransferAccountNumber, setBankTransferAccountNumber] = useState('');
   const [bankTransferAccountName, setBankTransferAccountName] = useState('');
-  
+
   const [editingGateway, setEditingGateway] = useState<any>(null);
   const [gatewaySettings, setGatewaySettings] = useState<Record<string, any>>({});
   const [togglingGatewayId, setTogglingGatewayId] = useState<string | null>(null);
-  
+
   const queryClient = useQueryClient();
 
   const { data: settings, isLoading } = useQuery({
@@ -81,7 +81,7 @@ const AdminSettings = () => {
       setMaxReferralDepth(settings.max_referral_depth?.toString() || '15');
     }
   }, [settings]);
-  
+
 
 
   const updateMutation = useMutation({
@@ -111,7 +111,7 @@ const AdminSettings = () => {
       max_referral_depth: maxReferralDepth,
     });
   };
-  
+
   const paymentGatewayMutation = useMutation({
     mutationFn: async ({ gateway_id, data }: { gateway_id: string; data: any }) => {
       await api.put(`/admin/config/payment-gateways/${gateway_id}`, data);
@@ -119,14 +119,14 @@ const AdminSettings = () => {
     onMutate: async ({ gateway_id, data }) => {
       await queryClient.cancelQueries({ queryKey: ['paymentGateways'] });
       const previousGateways = queryClient.getQueryData(['paymentGateways']);
-      
+
       queryClient.setQueryData(['paymentGateways'], (old: any) => {
         if (!old) return old;
-        return old.map((g: any) => 
+        return old.map((g: any) =>
           g.gateway_id === gateway_id ? { ...g, ...data } : g
         );
       });
-      
+
       return { previousGateways };
     },
     onSuccess: () => {
@@ -142,7 +142,7 @@ const AdminSettings = () => {
       queryClient.invalidateQueries({ queryKey: ['paymentGateways'] });
     },
   });
-  
+
   const handleSavePaymentGateways = () => {
     if (!editingGateway) return;
     paymentGatewayMutation.mutate(
@@ -157,11 +157,11 @@ const AdminSettings = () => {
       }
     );
   };
-  
+
   const handleFieldChange = (key: string, value: string) => {
     setGatewaySettings(prev => ({ ...prev, [key]: value }));
   };
-  
+
   const handleToggleGateway = (gateway: any) => {
     setTogglingGatewayId(gateway.gateway_id);
     paymentGatewayMutation.mutate({
@@ -169,7 +169,7 @@ const AdminSettings = () => {
       data: { is_enabled: !gateway.is_enabled }
     });
   };
-  
+
   const handleEditGateway = (gateway: any) => {
     setGatewaySettings(gateway.config_values || {});
     setEditingGateway(gateway);
@@ -183,13 +183,13 @@ const AdminSettings = () => {
       </div>
 
       <Tabs defaultValue="payout">
-        <TabsList>
-          {hasPermission('config:view') && <TabsTrigger value="payout">Payout Settings</TabsTrigger>}
-          {hasPermission('config:payment_gateways') && <TabsTrigger value="payment">Payment Gateways</TabsTrigger>}
-          {hasPermission('config:bonus_settings') && <TabsTrigger value="bonus">Bonus Settings</TabsTrigger>}
-          {hasPermission('config:email_settings') && <TabsTrigger value="email">Email Settings</TabsTrigger>}
-          {hasPermission('config:view') && <TabsTrigger value="system">System Settings</TabsTrigger>}
-          {hasPermission('config:view') && <TabsTrigger value="referral">Referral Settings</TabsTrigger>}
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 h-auto">
+          {hasPermission('config:view') && <TabsTrigger value="payout" className="text-xs md:text-sm">Payout</TabsTrigger>}
+          {hasPermission('config:payment_gateways') && <TabsTrigger value="payment" className="text-xs md:text-sm">Payment</TabsTrigger>}
+          {hasPermission('config:bonus_settings') && <TabsTrigger value="bonus" className="text-xs md:text-sm">Bonus</TabsTrigger>}
+          {hasPermission('config:email_settings') && <TabsTrigger value="email" className="text-xs md:text-sm">Email</TabsTrigger>}
+          {hasPermission('config:view') && <TabsTrigger value="system" className="text-xs md:text-sm">System</TabsTrigger>}
+          {hasPermission('config:view') && <TabsTrigger value="referral" className="text-xs md:text-sm">Referral</TabsTrigger>}
         </TabsList>
 
         {hasPermission('config:view') && <TabsContent value="payout" className="space-y-4">
@@ -201,7 +201,7 @@ const AdminSettings = () => {
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <h3 className="font-semibold">NGN Payouts</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="minPayoutNGN">Minimum Payout Amount (₦)</Label>
                     <Input
@@ -230,7 +230,7 @@ const AdminSettings = () => {
 
               <div className="space-y-4">
                 <h3 className="font-semibold">USDT Payouts</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="minPayoutUSDT">Minimum Payout Amount ($)</Label>
                     <Input
@@ -274,7 +274,7 @@ const AdminSettings = () => {
               </div>
             </Card>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
               {availableGateways.map((gateway: any) => {
                 const descriptions: Record<string, string> = {
                   gtpay: 'Online payment gateway',
@@ -288,8 +288,8 @@ const AdminSettings = () => {
                   <Card key={gateway.id} className="flex flex-col p-4 h-40">
                     <div className="flex items-center justify-between w-full mb-2">
                       <h3 className="font-semibold text-sm">{gateway.name}</h3>
-                      <Switch 
-                        checked={gateway.is_enabled} 
+                      <Switch
+                        checked={gateway.is_enabled}
                         onCheckedChange={() => handleToggleGateway(gateway)}
                         disabled={isToggling}
                       />

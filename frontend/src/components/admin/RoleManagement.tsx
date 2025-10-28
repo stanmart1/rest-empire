@@ -63,9 +63,10 @@ const RoleManagement = forwardRef<RoleManagementRef, RoleManagementProps>(({ del
   };
 
   const toggleRoleSelection = (roleId: number) => {
-    setSelectedRoles(prev =>
-      prev.includes(roleId) ? prev.filter(id => id !== roleId) : [...prev, roleId]
-    );
+    const newSelection = selectedRoles.includes(roleId) 
+      ? selectedRoles.filter(id => id !== roleId) 
+      : [...selectedRoles, roleId];
+    setSelectedRoles(newSelection);
   };
 
   const handleBulkDelete = () => {
@@ -255,34 +256,34 @@ const RoleManagement = forwardRef<RoleManagementRef, RoleManagementProps>(({ del
       <Dialog open={permissionsModalOpen} onOpenChange={setPermissionsModalOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <div className="flex items-center justify-between">
-              <DialogTitle>Manage Permissions - {selectedRole?.display_name}</DialogTitle>
-              <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <DialogTitle className="text-base sm:text-lg">Manage Permissions - {selectedRole?.display_name}</DialogTitle>
+              <div className="flex flex-wrap gap-2">
                 {isEditingPermissions && (
                   <>
-                    <Button variant="outline" size="sm" onClick={selectAllPermissions}>
+                    <Button variant="outline" size="sm" onClick={selectAllPermissions} className="text-xs">
                       Select All
                     </Button>
-                    <Button variant="outline" size="sm" onClick={deselectAllPermissions}>
+                    <Button variant="outline" size="sm" onClick={deselectAllPermissions} className="text-xs">
                       Deselect All
                     </Button>
                   </>
                 )}
                 {!isEditingPermissions ? (
-                  <Button variant="outline" size="sm" onClick={() => setIsEditingPermissions(true)}>
-                    <Edit className="h-4 w-4 mr-2" />
+                  <Button variant="outline" size="sm" onClick={() => setIsEditingPermissions(true)} className="text-xs">
+                    <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     Edit
                   </Button>
                 ) : (
-                  <Button variant="outline" size="sm" onClick={() => setIsEditingPermissions(false)}>
-                    <X className="h-4 w-4 mr-2" />
-                    Cancel Edit
+                  <Button variant="outline" size="sm" onClick={() => setIsEditingPermissions(false)} className="text-xs">
+                    <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    Cancel
                   </Button>
                 )}
               </div>
             </div>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {groupedPermissions && Object.entries(groupedPermissions).map(([resource, perms]) => (
               <div key={resource}>
                 <div className="flex items-center justify-between mb-3">
@@ -323,9 +324,9 @@ const RoleManagement = forwardRef<RoleManagementRef, RoleManagementProps>(({ del
           <DialogFooter>
             <Button variant="outline" onClick={() => setPermissionsModalOpen(false)}>Close</Button>
             {isEditingPermissions && (
-              <Button onClick={handleSavePermissions}>
+              <Button onClick={handleSavePermissions} disabled={updatePermissionsMutation.isPending}>
                 <Save className="h-4 w-4 mr-2" />
-                Save Changes
+                {updatePermissionsMutation.isPending ? 'Saving...' : 'Save Changes'}
               </Button>
             )}
           </DialogFooter>
