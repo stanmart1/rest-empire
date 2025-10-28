@@ -265,3 +265,87 @@ def admin_get_verifications(
     from app.models.verification import UserVerification
     verifications = db.query(UserVerification).order_by(UserVerification.created_at.desc()).all()
     return verifications
+
+
+@router.delete("/users/{user_id}")
+def admin_delete_user(
+    user_id: int,
+    admin: User = Depends(require_permission("users:delete")),
+    db: Session = Depends(get_db)
+):
+    """Admin: Delete user account"""
+    from sqlalchemy import text
+    
+    user = db.query(User).filter(User.id == user_id).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Prevent deleting yourself
+    if user.id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    
+    # Log the deletion before deleting
+    log_activity(
+        db, user.id, "admin_deleted_user",
+        details={
+            "admin_id": admin.id,
+            "admin_email": admin.email,
+            "deleted_user_email": user.email,
+            "deleted_user_name": user.full_name
+        }
+    )
+    
+    try:
+        # Use raw SQL to delete to avoid relationship loading issues
+        
+        # Delete activity logs first (foreign key constraint)
+        db.execute(text("DELETE FROM activity_logs WHERE user_id = :user_id"), {"user_id": user_id})
+        
+        # Delete team relationships
+        db.execute(
+            text("DELETE FROM team_members WHERE user_id = :user_id OR ancestor_id = :user_id"),
+            {"user_id": user_id}
+        )
+        
+        # Delete user roles and permissions (if tables exist)
+        try:
+            db.execute(text("DELETE FROM user_roles WHERE user_id = :user_id"), {"user_id": user_id})
+        except:
+            pass
+        
+        try:
+            db.execute(text("DELETE FROM user_permissions WHERE user_id = :user_id"), {"user_id": user_id})
+        except:
+            pass
+        
+        # Delete other related records that might have foreign keys
+        try:
+            db.execute(text("DELETE FROM support_tickets WHERE user_id = :user_id"), {"user_id": user_id})
+        except:
+            pass
+        
+        try:
+            db.execute(text("DELETE FROM user_activations WHERE user_id = :user_id"), {"user_id": user_id})
+        except:
+            pass
+        
+        # Note: We keep transactions, bonuses, and payouts for audit trail
+        # If you want to delete them, uncomment these:
+        # db.execute(text("DELETE FROM transactions WHERE user_id = :user_id"), {"user_id": user_id})
+        # db.execute(text("DELETE FROM bonuses WHERE user_id = :user_id"), {"user_id": user_id})
+        # db.execute(text("DELETE FROM payouts WHERE user_id = :user_id"), {"user_id": user_id})
+        
+        # Delete the user directly with SQL to avoid relationship loading
+        db.execute(text("DELETE FROM users WHERE id = :user_id"), {"user_id": user_id})
+        
+        db.commit()
+        
+        return {"message": "User deleted successfully"}
+        
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to delete user: {str(e)}"
+        )
