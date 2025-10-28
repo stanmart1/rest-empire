@@ -102,7 +102,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-200 p-4">
       <div className="w-full max-w-5xl relative py-8">
         {/* Back to Home Button */}
         <div className="relative mb-4">

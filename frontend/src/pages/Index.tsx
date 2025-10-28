@@ -166,7 +166,7 @@ const Index = () => {
       </div>
 
       {/* Features Section - Removed negative margin to prevent color overlap */}
-      <div className="container mx-auto px-4 py-16 relative z-10 bg-background">
+      <div className="container mx-auto px-4 py-16 relative z-10 bg-gray-200">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground">Powerful Features for Your Success</h2>
 
         {/* Desktop Grid (hidden on mobile) */}
