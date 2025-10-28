@@ -3,13 +3,15 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from app.core.database import get_db
 from app.api.deps import require_permission
 from app.models.user import User
+from app.models.team import TeamMember
 from app.schemas.user import UserResponse
 from app.utils.activity import log_activity
 from app.core.security import get_password_hash
+import secrets
 
 router = APIRouter()
 
@@ -28,6 +30,58 @@ class BalanceAdjustment(BaseModel):
 class RankChange(BaseModel):
     new_rank: str
     reason: str
+
+class AdminUserCreate(BaseModel):
+    email: EmailStr
+    password: str
+    full_name: str
+    phone_number: Optional[str] = None
+    is_active: bool = True
+    is_verified: bool = True
+
+@router.post("/users", response_model=UserResponse)
+def admin_create_user(
+    user_data: AdminUserCreate,
+    admin: User = Depends(require_permission("users:create")),
+    db: Session = Depends(get_db)
+):
+    """Admin: Create a new user without referral requirement"""
+    # Check if email already exists
+    if db.query(User).filter(User.email == user_data.email).first():
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Create user
+    user = User(
+        email=user_data.email,
+        hashed_password=get_password_hash(user_data.password),
+        full_name=user_data.full_name,
+        phone_number=user_data.phone_number,
+        referral_code=secrets.token_urlsafe(8),
+        is_verified=user_data.is_verified,
+        is_active=user_data.is_active,
+        sponsor_id=None  # No sponsor required for admin-created users
+    )
+    
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    
+    # Create team relationships (closure table)
+    team_self = TeamMember(user_id=user.id, ancestor_id=user.id, depth=0, path=str(user.id))
+    db.add(team_self)
+    db.commit()
+    
+    # Log activity
+    log_activity(
+        db, user.id, "admin_created_user",
+        details={
+            "admin_id": admin.id,
+            "admin_email": admin.email,
+            "created_user_email": user.email
+        }
+    )
+    
+    return user
 
 @router.get("/users", response_model=List[UserResponse])
 def admin_list_users(

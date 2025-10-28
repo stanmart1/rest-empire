@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import api from '@/lib/api';
 import { AdminUser } from '@/lib/admin-types';
 import UserDetailsModal from '@/components/admin/UserDetailsModal';
+import AddUserModal from '@/components/admin/AddUserModal';
 import RoleManagement, { RoleManagementRef } from '@/components/admin/RoleManagement';
 import { usePermission } from '@/hooks/usePermission';
 
@@ -22,8 +23,10 @@ const AdminUsers = () => {
   const roleManagementRef = useRef<RoleManagementRef>(null);
   const canManageRoles = hasPermission('roles:list');
   const canDeleteUsers = hasPermission('users:delete');
+  const canCreateUsers = hasPermission('users:create');
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [addUserModalOpen, setAddUserModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
   const queryClient = useQueryClient();
@@ -80,6 +83,12 @@ const AdminUsers = () => {
               <TabsTrigger value="users">Users</TabsTrigger>
               {canManageRoles && <TabsTrigger value="roles">Role Management</TabsTrigger>}
             </TabsList>
+            {activeTab === 'users' && canCreateUsers && (
+              <Button onClick={() => setAddUserModalOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add User
+              </Button>
+            )}
             {activeTab === 'roles' && (
               <div className="flex gap-2">
                 {!deleteMode ? (
@@ -245,6 +254,10 @@ const AdminUsers = () => {
         user={selectedUser} 
         open={modalOpen} 
         onClose={() => setModalOpen(false)} 
+      />
+      <AddUserModal 
+        open={addUserModalOpen} 
+        onClose={() => setAddUserModalOpen(false)} 
       />
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
