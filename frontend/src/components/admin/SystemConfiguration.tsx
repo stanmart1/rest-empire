@@ -194,7 +194,7 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
                   <SelectItem value="none">No Default Sponsor</SelectItem>
                   {filteredUsers.slice(0, 50).map((user) => (
                     <SelectItem key={user.id} value={user.id.toString()}>
-                      {user.full_name} ({user.email}) - ID: {user.id}
+                      {user.full_name} ({user.email})
                     </SelectItem>
                   ))}
                   {filteredUsers.length > 50 && (
