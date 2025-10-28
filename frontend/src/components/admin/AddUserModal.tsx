@@ -3,12 +3,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Eye, EyeOff } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { useRoles } from '@/hooks/useRbac';
+import { useActivationPackages } from '@/hooks/useAdminActivation';
 
 interface AddUserModalProps {
   open: boolean;
@@ -20,25 +21,24 @@ interface CreateUserData {
   password: string;
   full_name: string;
   phone_number: string;
-  is_active: boolean;
-  is_verified: boolean;
+  package_id?: number;
   role_ids?: number[];
 }
 
 const AddUserModal = ({ open, onClose }: AddUserModalProps) => {
   const queryClient = useQueryClient();
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
+  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [selectedPackage, setSelectedPackage] = useState<string>('');
   const [formData, setFormData] = useState<CreateUserData>({
     email: '',
     password: '',
     full_name: '',
     phone_number: '',
-    is_active: true,
-    is_verified: true,
   });
 
   const { data: roles } = useRoles();
+  const { data: packages } = useActivationPackages();
 
   const createMutation = useMutation({
     mutationFn: async (data: CreateUserData) => {
@@ -61,20 +61,11 @@ const AddUserModal = ({ open, onClose }: AddUserModalProps) => {
       password: '',
       full_name: '',
       phone_number: '',
-      is_active: true,
-      is_verified: true,
     });
-    setSelectedRoles([]);
+    setSelectedRole('');
+    setSelectedPackage('');
     setShowPassword(false);
     onClose();
-  };
-
-  const handleRoleToggle = (roleId: number) => {
-    setSelectedRoles(prev =>
-      prev.includes(roleId)
-        ? prev.filter(id => id !== roleId)
-        : [...prev, roleId]
-    );
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -85,10 +76,19 @@ const AddUserModal = ({ open, onClose }: AddUserModalProps) => {
       return;
     }
 
-    createMutation.mutate({
+    const submitData: CreateUserData = {
       ...formData,
-      role_ids: selectedRoles.length > 0 ? selectedRoles : undefined,
-    });
+    };
+
+    if (selectedPackage) {
+      submitData.package_id = parseInt(selectedPackage);
+    }
+
+    if (selectedRole) {
+      submitData.role_ids = [parseInt(selectedRole)];
+    }
+
+    createMutation.mutate(submitData);
   };
 
   return (
@@ -162,56 +162,39 @@ const AddUserModal = ({ open, onClose }: AddUserModalProps) => {
             </div>
           </div>
 
-          <div className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="is_verified"
-                checked={formData.is_verified}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, is_verified: checked as boolean })
-                }
-              />
-              <Label htmlFor="is_verified" className="cursor-pointer">
-                Email Verified
-              </Label>
+          {packages && packages.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="package">Activation Package (Optional)</Label>
+              <Select value={selectedPackage} onValueChange={setSelectedPackage}>
+                <SelectTrigger id="package">
+                  <SelectValue placeholder="Select activation package" />
+                </SelectTrigger>
+                <SelectContent>
+                  {packages.map((pkg) => (
+                    <SelectItem key={pkg.id} value={pkg.id.toString()}>
+                      {pkg.name} - ₦{pkg.price.toLocaleString()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="is_active"
-                checked={formData.is_active}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, is_active: checked as boolean })
-                }
-              />
-              <Label htmlFor="is_active" className="cursor-pointer">
-                Account Active
-              </Label>
-            </div>
-          </div>
+          )}
 
           {roles && roles.length > 0 && (
             <div className="space-y-2">
-              <Label>Roles (Optional)</Label>
-              <div className="border rounded-md p-3 space-y-2 max-h-40 overflow-y-auto">
-                {roles.map((role) => (
-                  <div key={role.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`role-${role.id}`}
-                      checked={selectedRoles.includes(role.id)}
-                      onCheckedChange={() => handleRoleToggle(role.id)}
-                    />
-                    <Label htmlFor={`role-${role.id}`} className="cursor-pointer font-normal">
+              <Label htmlFor="role">Role (Optional)</Label>
+              <Select value={selectedRole} onValueChange={setSelectedRole}>
+                <SelectTrigger id="role">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {roles.map((role) => (
+                    <SelectItem key={role.id} value={role.id.toString()}>
                       {role.display_name}
-                      {role.description && (
-                        <span className="text-xs text-muted-foreground ml-2">
-                          - {role.description}
-                        </span>
-                      )}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 

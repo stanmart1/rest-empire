@@ -5,11 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, EyeOff } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { AdminUser } from '@/lib/admin-types';
 import { useRoles, useUserRoles } from '@/hooks/useRbac';
+import { useActivationPackages } from '@/hooks/useAdminActivation';
 
 interface EditUserModalProps {
   user: AdminUser | null;
@@ -24,13 +26,15 @@ interface UpdateUserData {
   phone_number?: string;
   is_active?: boolean;
   is_verified?: boolean;
+  package_id?: number;
   role_ids?: number[];
 }
 
 const EditUserModal = ({ user, open, onClose }: EditUserModalProps) => {
   const queryClient = useQueryClient();
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
+  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [selectedPackage, setSelectedPackage] = useState<string>('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -42,6 +46,7 @@ const EditUserModal = ({ user, open, onClose }: EditUserModalProps) => {
 
   const { data: roles } = useRoles();
   const { data: userRoles } = useUserRoles(user?.id, open);
+  const { data: packages } = useActivationPackages();
 
   useEffect(() => {
     if (user) {
@@ -57,8 +62,8 @@ const EditUserModal = ({ user, open, onClose }: EditUserModalProps) => {
   }, [user]);
 
   useEffect(() => {
-    if (userRoles) {
-      setSelectedRoles(userRoles.map(r => r.id));
+    if (userRoles && userRoles.length > 0) {
+      setSelectedRole(userRoles[0].id.toString());
     }
   }, [userRoles]);
 
@@ -87,18 +92,13 @@ const EditUserModal = ({ user, open, onClose }: EditUserModalProps) => {
       is_active: true,
       is_verified: true,
     });
-    setSelectedRoles([]);
+    setSelectedRole('');
+    setSelectedPackage('');
     setShowPassword(false);
     onClose();
   };
 
-  const handleRoleToggle = (roleId: number) => {
-    setSelectedRoles(prev => 
-      prev.includes(roleId) 
-        ? prev.filter(id => id !== roleId)
-        : [...prev, roleId]
-    );
-  };
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,12 +114,19 @@ const EditUserModal = ({ user, open, onClose }: EditUserModalProps) => {
       phone_number: formData.phone_number,
       is_active: formData.is_active,
       is_verified: formData.is_verified,
-      role_ids: selectedRoles,
     };
 
     // Only include password if it's been changed
     if (formData.password) {
       updateData.password = formData.password;
+    }
+
+    if (selectedPackage) {
+      updateData.package_id = parseInt(selectedPackage);
+    }
+
+    if (selectedRole) {
+      updateData.role_ids = [parseInt(selectedRole)];
     }
 
     updateMutation.mutate(updateData);
@@ -197,56 +204,39 @@ const EditUserModal = ({ user, open, onClose }: EditUserModalProps) => {
             </div>
           </div>
 
-          <div className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="is_verified"
-                checked={formData.is_verified}
-                onCheckedChange={(checked) => 
-                  setFormData({ ...formData, is_verified: checked as boolean })
-                }
-              />
-              <Label htmlFor="is_verified" className="cursor-pointer">
-                Email Verified
-              </Label>
+          {packages && packages.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="package">Activation Package (Optional)</Label>
+              <Select value={selectedPackage} onValueChange={setSelectedPackage}>
+                <SelectTrigger id="package">
+                  <SelectValue placeholder="Select activation package" />
+                </SelectTrigger>
+                <SelectContent>
+                  {packages.map((pkg) => (
+                    <SelectItem key={pkg.id} value={pkg.id.toString()}>
+                      {pkg.name} - ₦{pkg.price.toLocaleString()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="is_active"
-                checked={formData.is_active}
-                onCheckedChange={(checked) => 
-                  setFormData({ ...formData, is_active: checked as boolean })
-                }
-              />
-              <Label htmlFor="is_active" className="cursor-pointer">
-                Account Active
-              </Label>
-            </div>
-          </div>
+          )}
 
           {roles && roles.length > 0 && (
             <div className="space-y-2">
-              <Label>Roles</Label>
-              <div className="border rounded-md p-3 space-y-2 max-h-40 overflow-y-auto">
-                {roles.map((role) => (
-                  <div key={role.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`role-${role.id}`}
-                      checked={selectedRoles.includes(role.id)}
-                      onCheckedChange={() => handleRoleToggle(role.id)}
-                    />
-                    <Label htmlFor={`role-${role.id}`} className="cursor-pointer font-normal">
+              <Label htmlFor="role">Role (Optional)</Label>
+              <Select value={selectedRole} onValueChange={setSelectedRole}>
+                <SelectTrigger id="role">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {roles.map((role) => (
+                    <SelectItem key={role.id} value={role.id.toString()}>
                       {role.display_name}
-                      {role.description && (
-                        <span className="text-xs text-muted-foreground ml-2">
-                          - {role.description}
-                        </span>
-                      )}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 

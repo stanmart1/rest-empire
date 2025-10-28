@@ -37,8 +37,7 @@ class AdminUserCreate(BaseModel):
     password: str
     full_name: str
     phone_number: Optional[str] = None
-    is_active: bool = True
-    is_verified: bool = True
+    package_id: Optional[int] = None
     role_ids: Optional[List[int]] = None
 
 class AdminUserUpdate(BaseModel):
@@ -48,6 +47,7 @@ class AdminUserUpdate(BaseModel):
     phone_number: Optional[str] = None
     is_active: Optional[bool] = None
     is_verified: Optional[bool] = None
+    package_id: Optional[int] = None
     role_ids: Optional[List[int]] = None
 
 @router.post("/users", response_model=UserResponse)
@@ -78,8 +78,8 @@ def admin_create_user(
         full_name=user_data.full_name,
         phone_number=user_data.phone_number,
         referral_code=secrets.token_urlsafe(8),
-        is_verified=user_data.is_verified,
-        is_active=user_data.is_active,
+        is_verified=True,  # Always verified for admin-created users
+        is_active=True,  # Always active for admin-created users
         sponsor_id=None  # No sponsor required for admin-created users
     )
     
@@ -90,6 +90,23 @@ def admin_create_user(
     # Create team relationships (closure table)
     team_self = TeamMember(user_id=user.id, ancestor_id=user.id, depth=0, path=str(user.id))
     db.add(team_self)
+    
+    # Assign activation package if provided
+    if user_data.package_id:
+        from app.models.activation_package import ActivationPackage
+        from app.models.user_activation import UserActivation
+        
+        package = db.query(ActivationPackage).filter(ActivationPackage.id == user_data.package_id).first()
+        if package:
+            activation = UserActivation(
+                user_id=user.id,
+                package_id=package.id,
+                amount_paid=package.price,
+                payment_method="admin_assigned",
+                payment_status="completed",
+                activated_at=datetime.utcnow()
+            )
+            db.add(activation)
     
     # Assign roles if provided
     if user_data.role_ids:
