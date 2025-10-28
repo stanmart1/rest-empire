@@ -5,8 +5,12 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUpdateSystemSettings } from '@/hooks/useSystemSettings';
 import { SystemSettings } from '@/types/system';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
+import { AdminUser } from '@/lib/admin-types';
 
 interface SystemConfigurationProps {
   settings: SystemSettings;
@@ -22,8 +26,25 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
   const [accessTokenExpireMinutes, setAccessTokenExpireMinutes] = useState('30');
   const [refreshTokenExpireDays, setRefreshTokenExpireDays] = useState('7');
   const [defaultSponsorId, setDefaultSponsorId] = useState('');
-  
+  const [searchQuery, setSearchQuery] = useState('');
+
   const updateMutation = useUpdateSystemSettings();
+
+  // Fetch all users for the dropdown
+  const { data: users } = useQuery<AdminUser[]>({
+    queryKey: ['adminUsers'],
+    queryFn: async () => {
+      const response = await api.get('/admin/users?limit=200');
+      return response.data;
+    },
+  });
+
+  // Filter users based on search query
+  const filteredUsers = users?.filter(user =>
+    user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.id.toString().includes(searchQuery)
+  ) || [];
 
   useEffect(() => {
     if (settings) {
@@ -155,18 +176,37 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
           <p className="text-sm text-muted-foreground">
             Set a default sponsor for users who register without a referral code
           </p>
-          <div>
-            <Label>Default Sponsor User ID</Label>
-            <Input
-              type="number"
-              min="1"
-              value={defaultSponsorId}
-              onChange={(e) => setDefaultSponsorId(e.target.value)}
-              placeholder="Enter user ID (e.g., 1)"
-              className="mt-2"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Users registering without a referral code will be assigned to this sponsor. Leave empty to allow orphaned registrations.
+          <div className="space-y-2">
+            <Label>Default Sponsor</Label>
+            <div className="space-y-2">
+              <Input
+                type="text"
+                placeholder="Search by name, email, or ID..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="mb-2"
+              />
+              <Select value={defaultSponsorId || "none"} onValueChange={(value) => setDefaultSponsorId(value === "none" ? "" : value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select default sponsor (optional)" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  <SelectItem value="none">No Default Sponsor</SelectItem>
+                  {filteredUsers.slice(0, 50).map((user) => (
+                    <SelectItem key={user.id} value={user.id.toString()}>
+                      {user.full_name} ({user.email}) - ID: {user.id}
+                    </SelectItem>
+                  ))}
+                  {filteredUsers.length > 50 && (
+                    <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                      Showing first 50 results. Refine your search for more.
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Users registering without a referral code will be automatically assigned to this sponsor. Leave empty to allow orphaned registrations.
             </p>
           </div>
         </div>

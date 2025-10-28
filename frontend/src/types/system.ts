@@ -7,6 +7,7 @@ export interface SystemSettings {
   monthly_withdrawal_limit: number;
   access_token_expire_minutes: number;
   refresh_token_expire_days: number;
+  default_sponsor_id?: number;
 }
 
 export interface SystemSettingsUpdate {
@@ -18,4 +19,5 @@ export interface SystemSettingsUpdate {
   monthly_withdrawal_limit?: string;
   access_token_expire_minutes?: string;
   refresh_token_expire_days?: string;
+  default_sponsor_id?: string;
 }
