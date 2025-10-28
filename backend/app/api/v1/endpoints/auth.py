@@ -12,7 +12,7 @@ from app.schemas.user import (
     UserCreate, UserLogin, UserResponse, Token, TokenRefresh,
     EmailVerification, PasswordResetRequest, PasswordReset
 )
-from app.services.email_service import send_verification_email, send_password_reset_email, send_welcome_email
+from app.services.email_service import send_verification_email, send_password_reset_email, send_welcome_email, send_team_member_joined_email
 from app.utils.activity import log_activity
 from app.services.config_service import get_config
 from jose import jwt, JWTError
@@ -101,7 +101,6 @@ async def register(user_data: UserCreate, request: Request, db: Session = Depend
     # Notify sponsor of new team member
     if sponsor:
         try:
-            from app.models.team import TeamMember
             team_size = db.query(TeamMember).filter(TeamMember.ancestor_id == sponsor.id).count()
             first_line = db.query(User).filter(User.sponsor_id == sponsor.id).count()
             await send_team_member_joined_email(

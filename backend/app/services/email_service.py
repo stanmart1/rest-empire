@@ -18,8 +18,8 @@ async def send_verification_email(email: str, token: str, db: Session):
     verification_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
     html_content = load_template("verify_email.html", verification_url=verification_url)
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email") or "noreply@restempire.com"
     
     if api_key:
         resend.api_key = api_key
@@ -34,8 +34,8 @@ async def send_password_reset_email(email: str, token: str, db: Session):
     reset_url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
     html_content = load_template("reset_password.html", reset_url=reset_url)
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email") or "noreply@restempire.com"
     
     if api_key:
         resend.api_key = api_key
@@ -50,8 +50,8 @@ async def send_welcome_email(email: str, name: str, db: Session):
     dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
     html_content = load_template("welcome.html", name=name, dashboard_url=dashboard_url)
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email", "noreply@restempire.com")
     
     if api_key:
         resend.api_key = api_key
@@ -74,8 +74,8 @@ async def send_rank_achievement_email(email: str, user_name: str, rank_name: str
         dashboard_url=dashboard_url
     )
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email", "noreply@restempire.com")
     
     if api_key:
         resend.api_key = api_key
@@ -96,8 +96,8 @@ async def send_bonus_earned_email(email: str, bonus_type: str, amount: float, ne
         dashboard_url=dashboard_url
     )
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email", "noreply@restempire.com")
     
     if api_key:
         resend.api_key = api_key
@@ -120,8 +120,8 @@ async def send_payout_processed_email(email: str, status: str, amount: float, me
         payouts_url=payouts_url
     )
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email", "noreply@restempire.com")
     
     if api_key:
         resend.api_key = api_key
@@ -143,8 +143,8 @@ async def send_team_member_joined_email(email: str, member_name: str, member_ema
         team_url=team_url
     )
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email", "noreply@restempire.com")
     
     if api_key:
         resend.api_key = api_key
@@ -166,8 +166,8 @@ async def send_security_alert_email(email: str, action: str, timestamp: str, loc
         security_url=security_url
     )
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email", "noreply@restempire.com")
     
     if api_key:
         resend.api_key = api_key
@@ -188,8 +188,8 @@ async def send_account_activated_email(email: str, user_name: str, package_name:
         dashboard_url=dashboard_url
     )
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email", "noreply@restempire.com")
     
     if api_key:
         resend.api_key = api_key
@@ -212,8 +212,8 @@ async def send_payment_received_email(email: str, package_name: str, amount: flo
         dashboard_url=dashboard_url
     )
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email", "noreply@restempire.com")
     
     if api_key:
         resend.api_key = api_key
@@ -232,8 +232,8 @@ async def send_payout_request_email(email: str, amount: float, db: Session):
         payouts_url=payouts_url
     )
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email", "noreply@restempire.com")
     
     if api_key:
         resend.api_key = api_key
@@ -252,8 +252,8 @@ async def send_kyc_approved_email(email: str, user_name: str, db: Session):
         dashboard_url=dashboard_url
     )
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email", "noreply@restempire.com")
     
     if api_key:
         resend.api_key = api_key
@@ -273,8 +273,8 @@ async def send_kyc_rejected_email(email: str, user_name: str, reason: str, db: S
         settings_url=settings_url
     )
     
-    api_key = get_config(db, "resend_api_key", settings.RESEND_API_KEY)
-    from_email = get_config(db, "from_email", settings.MAIL_FROM)
+    api_key = get_config(db, "resend_api_key")
+    from_email = get_config(db, "from_email", "noreply@restempire.com")
     
     if api_key:
         resend.api_key = api_key
