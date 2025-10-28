@@ -29,10 +29,33 @@ def list_events(
     upcoming_only: bool = False,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    current_user: User = Depends(check_feature_access("events")),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Get all events"""
+    from app.core.rbac import has_role
+    
+    # Allow admins and superadmins to bypass feature access check
+    is_admin = has_role(db, current_user, 'super_admin') or has_role(db, current_user, 'admin')
+    
+    if not is_admin:
+        # Check feature access for regular users
+        from app.models.activation import UserActivation
+        from datetime import datetime
+        
+        if not current_user.is_active:
+            raise HTTPException(status_code=403, detail="Please activate your account to access this feature")
+        
+        activation = db.query(UserActivation).filter(
+            UserActivation.user_id == current_user.id
+        ).first()
+        
+        if not activation or activation.status != "active":
+            raise HTTPException(status_code=403, detail="Please activate your account to access this feature")
+        
+        if activation.expires_at and datetime.utcnow() > activation.expires_at:
+            raise HTTPException(status_code=403, detail="Your subscription has expired")
+    
     events = get_events(
         db=db,
         user_id=current_user.id,
