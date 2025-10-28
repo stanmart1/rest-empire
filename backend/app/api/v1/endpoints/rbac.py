@@ -12,6 +12,7 @@ from app.schemas.rbac import (
     RoleResponse, RoleCreate, RoleUpdate, PermissionResponse,
     UserRoleAssign, UserRoleResponse
 )
+from app.core.rbac import has_role
 
 router = APIRouter()
 
@@ -33,7 +34,13 @@ def get_all_roles(
     db: Session = Depends(get_db)
 ):
     """Get all roles with their permissions"""
-    roles = db.query(Role).filter(Role.is_active == True).all()
+    query = db.query(Role).filter(Role.is_active == True)
+    
+    # Filter out super_admin role if current user is not super_admin
+    if not has_role(db, current_user, "super_admin"):
+        query = query.filter(Role.name != "super_admin")
+    
+    roles = query.all()
     
     result = []
     for role in roles:
@@ -257,6 +264,13 @@ def assign_roles_to_user(
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    
+    # Prevent non-superadmin from assigning super_admin role
+    if not has_role(db, current_user, "super_admin"):
+        for role_id in role_data.role_ids:
+            role = db.query(Role).filter(Role.id == role_id).first()
+            if role and role.name == "super_admin":
+                raise HTTPException(status_code=403, detail="Only super admins can assign super admin role")
     
     # Remove existing roles
     db.query(UserRole).filter(UserRole.user_id == user_id).delete()

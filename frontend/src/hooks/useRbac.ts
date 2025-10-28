@@ -73,3 +73,32 @@ export const useUpdateRolePermissions = () => {
     },
   });
 };
+
+export const useUserRoles = (userId: number | undefined, enabled: boolean = true) => {
+  return useQuery<Role[]>({
+    queryKey: ['userRoles', userId],
+    queryFn: async () => {
+      const response = await api.get(`/admin/rbac/users/${userId}/roles`);
+      return response.data;
+    },
+    enabled: !!userId && enabled,
+  });
+};
+
+export const useAssignUserRoles = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ userId, roleIds }: { userId: number; roleIds: number[] }) => {
+      await api.post(`/admin/rbac/users/${userId}/roles`, { role_ids: roleIds });
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['userRoles', variables.userId] });
+      queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
+      toast.success('Roles updated successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || 'Failed to update roles');
+    },
+  });
+};

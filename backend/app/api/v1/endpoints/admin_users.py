@@ -11,6 +11,7 @@ from app.models.team import TeamMember
 from app.schemas.user import UserResponse
 from app.utils.activity import log_activity
 from app.core.security import get_password_hash
+from app.core.rbac import has_role
 import secrets
 
 router = APIRouter()
@@ -38,6 +39,16 @@ class AdminUserCreate(BaseModel):
     phone_number: Optional[str] = None
     is_active: bool = True
     is_verified: bool = True
+    role_ids: Optional[List[int]] = None
+
+class AdminUserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    full_name: Optional[str] = None
+    phone_number: Optional[str] = None
+    is_active: Optional[bool] = None
+    is_verified: Optional[bool] = None
+    role_ids: Optional[List[int]] = None
 
 @router.post("/users", response_model=UserResponse)
 def admin_create_user(
@@ -46,9 +57,19 @@ def admin_create_user(
     db: Session = Depends(get_db)
 ):
     """Admin: Create a new user without referral requirement"""
+    from app.models.role import Role
+    from app.models.user_role import UserRole
+    
     # Check if email already exists
     if db.query(User).filter(User.email == user_data.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Prevent non-superadmin from creating superadmin users
+    if user_data.role_ids:
+        for role_id in user_data.role_ids:
+            role = db.query(Role).filter(Role.id == role_id).first()
+            if role and role.name == "super_admin" and not has_role(db, admin, "super_admin"):
+                raise HTTPException(status_code=403, detail="Only super admins can assign super admin role")
     
     # Create user
     user = User(
@@ -69,6 +90,19 @@ def admin_create_user(
     # Create team relationships (closure table)
     team_self = TeamMember(user_id=user.id, ancestor_id=user.id, depth=0, path=str(user.id))
     db.add(team_self)
+    
+    # Assign roles if provided
+    if user_data.role_ids:
+        for role_id in user_data.role_ids:
+            role = db.query(Role).filter(Role.id == role_id, Role.is_active == True).first()
+            if role:
+                user_role = UserRole(
+                    user_id=user.id,
+                    role_id=role_id,
+                    assigned_by=admin.id
+                )
+                db.add(user_role)
+    
     db.commit()
     
     # Log activity
@@ -77,7 +111,8 @@ def admin_create_user(
         details={
             "admin_id": admin.id,
             "admin_email": admin.email,
-            "created_user_email": user.email
+            "created_user_email": user.email,
+            "assigned_roles": user_data.role_ids
         }
     )
     
@@ -96,7 +131,27 @@ def admin_list_users(
     db: Session = Depends(get_db)
 ):
     """Admin: List all users with filters"""
+    from app.models.role import Role
+    from app.models.user_role import UserRole
+    
     query = db.query(User)
+    
+    # Filter out super_admin users if current user is not super_admin
+    if not has_role(db, admin, "super_admin"):
+        # Get all super_admin role IDs
+        super_admin_roles = db.query(Role.id).filter(Role.name == "super_admin").all()
+        super_admin_role_ids = [r[0] for r in super_admin_roles]
+        
+        if super_admin_role_ids:
+            # Get user IDs with super_admin role
+            super_admin_user_ids = db.query(UserRole.user_id).filter(
+                UserRole.role_id.in_(super_admin_role_ids)
+            ).all()
+            super_admin_user_ids = [u[0] for u in super_admin_user_ids]
+            
+            # Exclude those users
+            if super_admin_user_ids:
+                query = query.filter(~User.id.in_(super_admin_user_ids))
     
     if search:
         query = query.filter(
@@ -116,8 +171,8 @@ def admin_list_users(
     if is_active is not None:
         query = query.filter(User.is_active == is_active)
     
-    if role:
-        query = query.filter(User.role == role)
+    # Note: role filter removed as User model doesn't have a role field
+    # Role filtering should be done through RBAC system if needed
     
     users = query.order_by(User.created_at.desc()).offset(skip).limit(limit).all()
     
@@ -134,6 +189,83 @@ def admin_get_user(
     
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    
+    return user
+
+@router.put("/users/{user_id}", response_model=UserResponse)
+def admin_update_user(
+    user_id: int,
+    user_data: AdminUserUpdate,
+    admin: User = Depends(require_permission("users:update")),
+    db: Session = Depends(get_db)
+):
+    """Admin: Update user details"""
+    from app.models.role import Role
+    from app.models.user_role import UserRole
+    
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Prevent editing yourself
+    if user.id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot edit your own account through this endpoint")
+    
+    # Check if email is being changed and if it's already taken
+    if user_data.email and user_data.email != user.email:
+        existing = db.query(User).filter(User.email == user_data.email).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already in use")
+        user.email = user_data.email
+    
+    # Update basic fields
+    if user_data.full_name is not None:
+        user.full_name = user_data.full_name
+    if user_data.phone_number is not None:
+        user.phone_number = user_data.phone_number
+    if user_data.is_active is not None:
+        user.is_active = user_data.is_active
+    if user_data.is_verified is not None:
+        user.is_verified = user_data.is_verified
+    if user_data.password:
+        user.hashed_password = get_password_hash(user_data.password)
+    
+    # Update roles if provided
+    if user_data.role_ids is not None:
+        # Prevent non-superadmin from assigning super_admin role
+        if not has_role(db, admin, "super_admin"):
+            for role_id in user_data.role_ids:
+                role = db.query(Role).filter(Role.id == role_id).first()
+                if role and role.name == "super_admin":
+                    raise HTTPException(status_code=403, detail="Only super admins can assign super admin role")
+        
+        # Remove existing roles
+        db.query(UserRole).filter(UserRole.user_id == user_id).delete()
+        
+        # Assign new roles
+        for role_id in user_data.role_ids:
+            role = db.query(Role).filter(Role.id == role_id, Role.is_active == True).first()
+            if role:
+                user_role = UserRole(
+                    user_id=user_id,
+                    role_id=role_id,
+                    assigned_by=admin.id
+                )
+                db.add(user_role)
+    
+    user.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(user)
+    
+    # Log activity
+    log_activity(
+        db, user.id, "admin_updated_user",
+        details={
+            "admin_id": admin.id,
+            "admin_email": admin.email,
+            "updated_fields": user_data.dict(exclude_unset=True)
+        }
+    )
     
     return user
 

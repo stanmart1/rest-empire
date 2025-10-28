@@ -6,12 +6,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Trash2, Plus, X } from 'lucide-react';
+import { Trash2, Plus, X, Edit } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { AdminUser } from '@/lib/admin-types';
 import UserDetailsModal from '@/components/admin/UserDetailsModal';
 import AddUserModal from '@/components/admin/AddUserModal';
+import EditUserModal from '@/components/admin/EditUserModal';
 import RoleManagement, { RoleManagementRef } from '@/components/admin/RoleManagement';
 import { usePermission } from '@/hooks/usePermission';
 
@@ -24,9 +25,12 @@ const AdminUsers = () => {
   const canManageRoles = hasPermission('roles:list');
   const canDeleteUsers = hasPermission('users:delete');
   const canCreateUsers = hasPermission('users:create');
+  const canUpdateUsers = hasPermission('users:update');
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
+  const [editUserModalOpen, setEditUserModalOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState<AdminUser | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
   const queryClient = useQueryClient();
@@ -57,6 +61,12 @@ const AdminUsers = () => {
   const handleUserClick = (user: AdminUser) => {
     setSelectedUser(user);
     setModalOpen(true);
+  };
+
+  const handleEditClick = (e: React.MouseEvent, user: AdminUser) => {
+    e.stopPropagation();
+    setUserToEdit(user);
+    setEditUserModalOpen(true);
   };
 
   const handleDeleteClick = (e: React.MouseEvent, user: AdminUser) => {
@@ -134,7 +144,7 @@ const AdminUsers = () => {
               <TableHead>Status</TableHead>
               <TableHead>Balance (NGN)</TableHead>
               <TableHead>Registered</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className="w-[100px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -166,16 +176,28 @@ const AdminUsers = () => {
                   <TableCell>₦{user.balance_ngn.toLocaleString()}</TableCell>
                   <TableCell>{new Date(user.registration_date).toLocaleDateString()}</TableCell>
                   <TableCell>
-                    {canDeleteUsers && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => handleDeleteClick(e, user)}
-                        className="h-8 w-8 text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
+                    <div className="flex gap-1">
+                      {canUpdateUsers && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => handleEditClick(e, user)}
+                          className="h-8 w-8"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {canDeleteUsers && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => handleDeleteClick(e, user)}
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -202,16 +224,28 @@ const AdminUsers = () => {
                     <p className="font-medium">{user.full_name}</p>
                     <p className="text-sm text-muted-foreground">{user.email}</p>
                   </div>
-                  {canDeleteUsers && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => handleDeleteClick(e, user)}
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <div className="flex gap-1">
+                    {canUpdateUsers && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => handleEditClick(e, user)}
+                        className="h-8 w-8"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {canDeleteUsers && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => handleDeleteClick(e, user)}
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Rank:</span>
@@ -258,6 +292,14 @@ const AdminUsers = () => {
       <AddUserModal 
         open={addUserModalOpen} 
         onClose={() => setAddUserModalOpen(false)} 
+      />
+      <EditUserModal 
+        user={userToEdit}
+        open={editUserModalOpen} 
+        onClose={() => {
+          setEditUserModalOpen(false);
+          setUserToEdit(null);
+        }} 
       />
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
