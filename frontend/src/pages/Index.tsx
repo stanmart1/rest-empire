@@ -175,18 +175,18 @@ const Index = () => {
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
               <Users className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="text-2xl font-semibold mb-4 text-foreground">Team Building</h3>
+            <h3 className="text-2xl font-semibold mb-4 text-foreground">Book Review</h3>
             <p className="text-foreground mb-4">
-              Easily manage and support your growing team with our intuitive dashboard and powerful analytics tools.
+              Access our curated library of personal development and business books with reviews and insights from our community.
             </p>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm">Real-time team visualization</span>
+                <span className="text-sm">Extensive digital library</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm">Performance tracking</span>
+                <span className="text-sm">Community reviews and ratings</span>
               </li>
             </ul>
           </div>
@@ -195,18 +195,18 @@ const Index = () => {
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
               <Gift className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="text-2xl font-semibold mb-4 text-foreground">Multiple Bonuses</h3>
+            <h3 className="text-2xl font-semibold mb-4 text-foreground">Crypto Signals</h3>
             <p className="text-foreground mb-4">
-              Earn through various bonus structures including Rank, Unilevel, and Infinity bonuses for maximum income potential.
+              Get access to expert cryptocurrency trading signals and market analysis to help you make informed investment decisions.
             </p>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm">Rank bonuses up to €1.2M</span>
+                <span className="text-sm">Real-time market insights</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm">Unilevel commissions</span>
+                <span className="text-sm">Expert trading recommendations</span>
               </li>
             </ul>
           </div>
@@ -215,18 +215,18 @@ const Index = () => {
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
               <TrendingUp className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="text-2xl font-semibold mb-4 text-foreground">Real-time Analytics</h3>
+            <h3 className="text-2xl font-semibold mb-4 text-foreground">Video Gallery</h3>
             <p className="text-foreground mb-4">
-              Track your team performance and earnings in real-time with comprehensive reporting and visualization tools.
+              Watch training videos, webinars, and success stories from our community to accelerate your learning and growth.
             </p>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm">Live dashboard updates</span>
+                <span className="text-sm">Training and tutorials</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm">Custom reporting</span>
+                <span className="text-sm">Success stories and testimonials</span>
               </li>
             </ul>
           </div>
@@ -247,18 +247,18 @@ const Index = () => {
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <TrendingUp className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Real-time Analytics</h3>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Video Gallery</h3>
                   <p className="text-foreground mb-4">
-                    Track your team performance and earnings in real-time with comprehensive reporting and visualization tools.
+                    Watch training videos, webinars, and success stories from our community to accelerate your learning and growth.
                   </p>
                   <ul className="space-y-2">
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Live dashboard updates</span>
+                      <span className="text-sm">Training and tutorials</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Custom reporting</span>
+                      <span className="text-sm">Success stories and testimonials</span>
                     </li>
                   </ul>
                 </div>
@@ -270,18 +270,18 @@ const Index = () => {
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <Users className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Team Building</h3>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Book Review</h3>
                   <p className="text-foreground mb-4">
-                    Easily manage and support your growing team with our intuitive dashboard and powerful analytics tools.
+                    Access our curated library of personal development and business books with reviews and insights from our community.
                   </p>
                   <ul className="space-y-2">
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Real-time team visualization</span>
+                      <span className="text-sm">Extensive digital library</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Performance tracking</span>
+                      <span className="text-sm">Community reviews and ratings</span>
                     </li>
                   </ul>
                 </div>
@@ -293,18 +293,18 @@ const Index = () => {
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <Gift className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Multiple Bonuses</h3>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Crypto Signals</h3>
                   <p className="text-foreground mb-4">
-                    Earn through various bonus structures including Rank, Unilevel, and Infinity bonuses for maximum income potential.
+                    Get access to expert cryptocurrency trading signals and market analysis to help you make informed investment decisions.
                   </p>
                   <ul className="space-y-2">
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Rank bonuses up to €1.2M</span>
+                      <span className="text-sm">Real-time market insights</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Unilevel commissions</span>
+                      <span className="text-sm">Expert trading recommendations</span>
                     </li>
                   </ul>
                 </div>
@@ -316,18 +316,18 @@ const Index = () => {
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <TrendingUp className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Real-time Analytics</h3>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Video Gallery</h3>
                   <p className="text-foreground mb-4">
-                    Track your team performance and earnings in real-time with comprehensive reporting and visualization tools.
+                    Watch training videos, webinars, and success stories from our community to accelerate your learning and growth.
                   </p>
                   <ul className="space-y-2">
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Live dashboard updates</span>
+                      <span className="text-sm">Training and tutorials</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Custom reporting</span>
+                      <span className="text-sm">Success stories and testimonials</span>
                     </li>
                   </ul>
                 </div>
@@ -339,18 +339,18 @@ const Index = () => {
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <Users className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Team Building</h3>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Book Review</h3>
                   <p className="text-foreground mb-4">
-                    Easily manage and support your growing team with our intuitive dashboard and powerful analytics tools.
+                    Access our curated library of personal development and business books with reviews and insights from our community.
                   </p>
                   <ul className="space-y-2">
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Real-time team visualization</span>
+                      <span className="text-sm">Extensive digital library</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Performance tracking</span>
+                      <span className="text-sm">Community reviews and ratings</span>
                     </li>
                   </ul>
                 </div>
