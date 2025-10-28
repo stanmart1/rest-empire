@@ -81,7 +81,6 @@ export interface LoginFormData {
 export interface RegisterFormData {
   email: string;
   password: string;
-  confirmPassword: string;
   fullName: string;
   phone: string;
   residence: string;
@@ -133,7 +132,6 @@ export interface LoginValidation {
 export interface RegisterValidation {
   email: string;
   password: string;
-  confirmPassword: string;
   fullName: string;
   phone: string;
   residence: string;
