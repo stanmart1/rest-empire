@@ -91,6 +91,30 @@ async def register(user_data: UserCreate, request: Request, db: Session = Depend
         ip_address=request.client.host
     )
     
+    # Send welcome email
+    try:
+        await send_welcome_email(user.email, user.full_name or "User", db)
+    except Exception as e:
+        # Don't fail registration if email fails
+        print(f"Failed to send welcome email: {e}")
+    
+    # Notify sponsor of new team member
+    if sponsor:
+        try:
+            from app.models.team import TeamMember
+            team_size = db.query(TeamMember).filter(TeamMember.ancestor_id == sponsor.id).count()
+            first_line = db.query(User).filter(User.sponsor_id == sponsor.id).count()
+            await send_team_member_joined_email(
+                sponsor.email,
+                user.full_name or "New Member",
+                user.email,
+                team_size,
+                first_line,
+                db
+            )
+        except Exception as e:
+            print(f"Failed to send team member notification: {e}")
+    
     return user
 
 @router.post("/login", response_model=Token)

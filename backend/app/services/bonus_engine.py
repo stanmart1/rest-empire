@@ -117,9 +117,25 @@ def calculate_unilevel_bonus(db: Session, transaction_id: int):
         if user:
             if transaction.currency == "NGN":
                 user.balance_ngn = (user.balance_ngn or 0) + bonus_amount
+                new_balance = float(user.balance_ngn)
             elif transaction.currency == "USDT":
                 user.balance_usdt = (user.balance_usdt or 0) + bonus_amount
+                new_balance = float(user.balance_usdt)
             user.total_earnings = (user.total_earnings or 0) + bonus_amount
+            
+            # Send bonus earned email
+            try:
+                import asyncio
+                from app.services.email_service import send_bonus_earned_email
+                asyncio.create_task(send_bonus_earned_email(
+                    user.email,
+                    f"Unilevel Level {level}",
+                    float(bonus_amount),
+                    new_balance,
+                    db
+                ))
+            except Exception as e:
+                print(f"Failed to send bonus email: {e}")
         
         bonuses_created.append(bonus)
     

@@ -221,6 +221,34 @@ class OptimizedBonusEngine:
         OptimizedBonusEngine._bulk_update_balances(db, balance_updates)
         db.commit()
         
+        # Send rank achievement emails
+        for user_id, old_rank, new_rank in user_rank_changes:
+            bonus_amount = rank_bonus_map.get(new_rank, 0)
+            if bonus_amount > 0:
+                try:
+                    from app.models.user import User
+                    from app.models.team import TeamMember
+                    import asyncio
+                    from app.services.email_service import send_rank_achievement_email
+                    
+                    user = db.query(User).filter(User.id == user_id).first()
+                    if user:
+                        # Get team stats
+                        team_size = db.query(TeamMember).filter(TeamMember.ancestor_id == user_id).count()
+                        total_turnover = float(user.total_earnings or 0)
+                        
+                        asyncio.create_task(send_rank_achievement_email(
+                            user.email,
+                            user.full_name or "User",
+                            new_rank,
+                            float(bonus_amount),
+                            total_turnover,
+                            team_size,
+                            db
+                        ))
+                except Exception as e:
+                    print(f"Failed to send rank achievement email: {e}")
+        
         logger.info(f"Created {len(bonuses_to_create)} rank bonuses")
         return bonuses_to_create
     

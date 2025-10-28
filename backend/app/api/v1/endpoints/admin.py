@@ -224,10 +224,28 @@ def admin_reject_payout(
     db: Session = Depends(get_db)
 ):
     """Admin: Reject a payout request"""
+    payout = db.query(Payout).filter(Payout.id == payout_id).first()
+    if not payout:
+        raise HTTPException(status_code=404, detail="Payout not found")
+    
+    user = db.query(User).filter(User.id == payout.user_id).first()
+    
     success = reject_payout(db, payout_id, admin.id, rejection.reason)
     
     if not success:
         raise HTTPException(status_code=400, detail="Cannot reject payout")
+    
+    # Send payout rejected email
+    if user:
+        asyncio.create_task(send_payout_processed_email(
+            user.email,
+            "rejected",
+            float(payout.amount),
+            payout.payout_method,
+            payout.payout_reference,
+            "N/A",
+            db
+        ))
     
     return {"message": "Payout rejected successfully"}
 
