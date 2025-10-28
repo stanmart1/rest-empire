@@ -182,6 +182,12 @@ const Register = () => {
                             className="pl-10 placeholder:text-foreground/70"
                             {...register('phone')}
                             disabled={isLoading}
+                            onKeyPress={(e) => {
+                              // Allow only numbers, +, -, (, ), and space
+                              if (!/[\d\+\-\(\)\s]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                           />
                         </div>
                         {errors.phone && (
