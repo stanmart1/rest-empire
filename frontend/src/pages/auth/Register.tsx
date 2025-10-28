@@ -69,8 +69,16 @@ const Register = () => {
       terms1: false,
       terms2: false,
       terms3: false,
+      manualReferralCode: referralCode || '',
     },
   });
+
+  // Auto-populate referral code from URL
+  useEffect(() => {
+    if (referralCode) {
+      setValue('manualReferralCode', referralCode);
+    }
+  }, [referralCode, setValue]);
 
   const terms1Value = watch('terms1');
   const terms2Value = watch('terms2');
@@ -79,8 +87,8 @@ const Register = () => {
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     try {
-      // Use referral code from URL, or manual input, or undefined (will use default sponsor)
-      const finalReferralCode = referralCode || data.manualReferralCode || undefined;
+      // Use manual input (which may have been auto-filled from URL), or undefined (will use default sponsor)
+      const finalReferralCode = data.manualReferralCode || undefined;
 
       const response = await registerUser({
         email: data.email,
@@ -267,31 +275,29 @@ const Register = () => {
                         )}
                       </div>
 
-                      {!referralCode && (
-                        <div className="space-y-2">
-                          <Label htmlFor="manualReferralCode">Referral Code (Optional)</Label>
-                          <Input
-                            id="manualReferralCode"
-                            placeholder="Enter referral code if you have one"
-                            {...register('manualReferralCode')}
-                            disabled={isLoading}
-                            className="placeholder:text-foreground/70"
-                          />
-                          <p className="text-xs text-muted-foreground">
-                            If you were referred by someone, enter their referral code here
-                          </p>
-                        </div>
-                      )}
-
-                      {referralCode && (
-                        <div className="space-y-2">
-                          <Label>Referral Code</Label>
-                          <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg">
-                            <Check className="w-4 h-4 text-primary" />
-                            <span className="text-sm font-medium">Using referral code: {referralCode}</span>
-                          </div>
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="manualReferralCode">
+                          Referral ID (Optional)
+                          {referralCode && (
+                            <span className="ml-2 text-xs text-primary font-normal">
+                              • Auto-filled from referral link
+                            </span>
+                          )}
+                        </Label>
+                        <Input
+                          id="manualReferralCode"
+                          placeholder="Enter referral ID if you have one"
+                          {...register('manualReferralCode')}
+                          disabled={isLoading}
+                          className="placeholder:text-foreground/70"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          {referralCode 
+                            ? 'This field was auto-filled from your referral link. You can edit it if needed.'
+                            : 'If you were referred by someone, enter their referral ID here'
+                          }
+                        </p>
+                      </div>
 
                       <div className="pt-4 space-y-3">
                         <div className="flex items-start space-x-2">
