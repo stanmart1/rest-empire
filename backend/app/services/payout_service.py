@@ -34,10 +34,33 @@ def create_payout_request(
     amount: float,
     currency: str,
     payout_method: str,
-    account_details: dict
+    account_details: dict,
+    idempotency_key: str = None
 ) -> Payout:
-    """Create a payout request"""
-    user = db.query(User).filter(User.id == user_id).first()
+    """Create a payout request with idempotency and atomic transaction"""
+    import logging
+    import hashlib
+    from sqlalchemy import select
+    
+    logger = logging.getLogger(__name__)
+    
+    # Generate idempotency key if not provided
+    if not idempotency_key:
+        idempotency_key = hashlib.sha256(
+            f"{user_id}:{amount}:{currency}:{datetime.utcnow().isoformat()}".encode()
+        ).hexdigest()
+    
+    # Check for duplicate payout (idempotency)
+    existing_payout = db.query(Payout).filter(
+        Payout.idempotency_key == idempotency_key
+    ).first()
+    
+    if existing_payout:
+        logger.warning(f"Duplicate payout request detected: {idempotency_key}")
+        return existing_payout
+    
+    # Use SELECT FOR UPDATE to lock user row and prevent race conditions
+    user = db.query(User).filter(User.id == user_id).with_for_update().first()
     
     if not user:
         raise ValueError("User not found")
@@ -90,40 +113,58 @@ def create_payout_request(
     if amount < min_payout:
         raise ValueError(f"Minimum payout is {min_payout} {currency}")
     
-    # Check balance
+    # Check balance with locked row
+    current_balance = 0
     if currency == "NGN":
-        if user.balance_ngn < amount:
-            raise ValueError("Insufficient balance")
+        current_balance = float(user.balance_ngn or 0)
+        if current_balance < amount:
+            raise ValueError(f"Insufficient balance. Available: ₦{current_balance:,.2f}")
     elif currency == "USDT":
-        if user.balance_usdt < amount:
-            raise ValueError("Insufficient balance")
+        current_balance = float(user.balance_usdt or 0)
+        if current_balance < amount:
+            raise ValueError(f"Insufficient balance. Available: ${current_balance:,.2f}")
     
     # Calculate fee and net amount
     processing_fee = calculate_processing_fee(db, amount, currency)
     net_amount = amount - processing_fee
     
-    # Create payout
-    payout = Payout(
-        user_id=user_id,
-        amount=amount,
-        currency=currency,
-        status=PayoutStatus.pending,
-        payout_method=payout_method,
-        account_details=account_details,
-        processing_fee=processing_fee,
-        net_amount=net_amount
-    )
-    
-    db.add(payout)
-    
-    # Deduct from user balance (hold)
-    if currency == "NGN":
-        user.balance_ngn -= amount
-    elif currency == "USDT":
-        user.balance_usdt -= amount
-    
-    db.commit()
-    db.refresh(payout)
+    try:
+        # Atomic transaction: create payout and deduct balance together
+        payout = Payout(
+            user_id=user_id,
+            amount=amount,
+            currency=currency,
+            status=PayoutStatus.pending,
+            payout_method=payout_method,
+            account_details=account_details,
+            processing_fee=processing_fee,
+            net_amount=net_amount,
+            idempotency_key=idempotency_key
+        )
+        
+        db.add(payout)
+        
+        # Deduct from user balance (atomic with payout creation)
+        if currency == "NGN":
+            user.balance_ngn -= amount
+            new_balance = float(user.balance_ngn)
+        elif currency == "USDT":
+            user.balance_usdt -= amount
+            new_balance = float(user.balance_usdt)
+        
+        # Commit both operations atomically
+        db.commit()
+        db.refresh(payout)
+        
+        logger.info(
+            f"Payout created: ID={payout.id}, User={user_id}, "
+            f"Amount={amount} {currency}, New Balance={new_balance}"
+        )
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to create payout: {str(e)}", exc_info=True)
+        raise ValueError(f"Failed to create payout: {str(e)}")
     
     # Log activity
     log_activity(
@@ -136,17 +177,34 @@ def create_payout_request(
     return payout
 
 def approve_payout(db: Session, payout_id: int, admin_id: int) -> bool:
-    """Approve a payout request"""
-    payout = db.query(Payout).filter(Payout.id == payout_id).first()
+    """Approve a payout request with row locking"""
+    import logging
+    logger = logging.getLogger(__name__)
     
-    if not payout or payout.status != PayoutStatus.pending:
+    # Lock payout row to prevent concurrent approvals
+    payout = db.query(Payout).filter(
+        Payout.id == payout_id
+    ).with_for_update().first()
+    
+    if not payout:
+        logger.warning(f"Payout {payout_id} not found")
         return False
     
-    payout.status = PayoutStatus.approved
-    payout.approved_at = datetime.utcnow()
-    payout.approved_by = admin_id
+    if payout.status != PayoutStatus.pending:
+        logger.warning(f"Payout {payout_id} already processed: {payout.status}")
+        return False
     
-    db.commit()
+    try:
+        payout.status = PayoutStatus.approved
+        payout.approved_at = datetime.utcnow()
+        payout.approved_by = admin_id
+        
+        db.commit()
+        logger.info(f"Payout {payout_id} approved by admin {admin_id}")
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to approve payout {payout_id}: {str(e)}")
+        return False
     
     log_activity(
         db, payout.user_id, "payout_approved",
@@ -197,26 +255,55 @@ def complete_payout(
     return True
 
 def reject_payout(db: Session, payout_id: int, admin_id: int, reason: str) -> bool:
-    """Reject a payout request and refund balance"""
-    payout = db.query(Payout).filter(Payout.id == payout_id).first()
+    """Reject a payout request and refund balance atomically"""
+    import logging
+    logger = logging.getLogger(__name__)
     
-    if not payout or payout.status != PayoutStatus.pending:
+    # Lock both payout and user rows
+    payout = db.query(Payout).filter(
+        Payout.id == payout_id
+    ).with_for_update().first()
+    
+    if not payout:
+        logger.warning(f"Payout {payout_id} not found")
         return False
     
-    payout.status = PayoutStatus.rejected
-    payout.rejection_reason = reason
-    payout.approved_by = admin_id
-    payout.approved_at = datetime.utcnow()
+    if payout.status != PayoutStatus.pending:
+        logger.warning(f"Payout {payout_id} already processed: {payout.status}")
+        return False
     
-    # Refund balance
-    user = db.query(User).filter(User.id == payout.user_id).first()
-    if user:
+    user = db.query(User).filter(
+        User.id == payout.user_id
+    ).with_for_update().first()
+    
+    if not user:
+        logger.error(f"User {payout.user_id} not found for payout {payout_id}")
+        return False
+    
+    try:
+        # Atomic: reject payout and refund balance
+        payout.status = PayoutStatus.rejected
+        payout.rejection_reason = reason
+        payout.approved_by = admin_id
+        payout.approved_at = datetime.utcnow()
+        
+        # Refund balance
         if payout.currency == "NGN":
             user.balance_ngn += payout.amount
+            new_balance = float(user.balance_ngn)
         elif payout.currency == "USDT":
             user.balance_usdt += payout.amount
-    
-    db.commit()
+            new_balance = float(user.balance_usdt)
+        
+        db.commit()
+        logger.info(
+            f"Payout {payout_id} rejected by admin {admin_id}. "
+            f"Refunded {payout.amount} {payout.currency}. New balance: {new_balance}"
+        )
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to reject payout {payout_id}: {str(e)}")
+        return False
     
     log_activity(
         db, payout.user_id, "payout_rejected",

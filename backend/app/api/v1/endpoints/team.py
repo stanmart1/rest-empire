@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List, Optional
 from datetime import datetime
 from app.core.database import get_db
@@ -17,35 +18,61 @@ router = APIRouter()
 @router.get("/tree", response_model=List[TeamMemberInfo])
 def get_team_tree(
     depth: Optional[int] = Query(None, ge=1, le=15),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=500),
+    cursor: Optional[int] = Query(None, description="Last user_id from previous page"),
+    limit: int = Query(50, ge=1, le=100),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get team tree with optional depth limit"""
-    team_members = get_team_members(db, current_user.id, depth)
+    """Get team tree with cursor-based pagination - optimized for large teams"""
+    from sqlalchemy.orm import joinedload
     
-    # Get user details for each team member
+    query = db.query(TeamMember).options(
+        joinedload(TeamMember.user)
+    ).filter(
+        TeamMember.ancestor_id == current_user.id,
+        TeamMember.depth > 0
+    )
+    
+    if depth:
+        query = query.filter(TeamMember.depth <= depth)
+    
+    # Cursor-based pagination
+    if cursor:
+        query = query.filter(TeamMember.user_id > cursor)
+    
+    query = query.order_by(TeamMember.user_id).limit(limit)
+    team_members = query.all()
+    
+    if not team_members:
+        return []
+    
+    # Batch get team sizes
+    user_ids = [tm.user_id for tm in team_members]
+    team_sizes = db.query(
+        TeamMember.ancestor_id,
+        func.count(TeamMember.user_id).label('size')
+    ).filter(
+        TeamMember.ancestor_id.in_(user_ids),
+        TeamMember.depth > 0
+    ).group_by(TeamMember.ancestor_id).all()
+    
+    size_map = {ancestor_id: size for ancestor_id, size in team_sizes}
+    
     result = []
-    for tm in team_members[skip:skip+limit]:
-        user = db.query(User).filter(User.id == tm.user_id).first()
-        if user:
-            # Get team size for this member
-            member_team_size = get_team_size(db, user.id)
-            
-            result.append(TeamMemberInfo(
-                id=user.id,
-                full_name=user.full_name,
-                email=user.email,
-                current_rank=user.current_rank,
-                registration_date=user.registration_date,
-                is_verified=user.is_verified,
-                is_active=user.is_active,
-                activity_status=user.activity_status,
-                personal_turnover=float(tm.personal_turnover),
-                team_size=member_team_size,
-                depth=tm.depth
-            ))
+    for tm in team_members:
+        result.append(TeamMemberInfo(
+            id=tm.user.id,
+            full_name=tm.user.full_name,
+            email=tm.user.email,
+            current_rank=tm.user.current_rank,
+            registration_date=tm.user.registration_date,
+            is_verified=tm.user.is_verified,
+            is_active=tm.user.is_active,
+            activity_status=tm.user.activity_status,
+            personal_turnover=float(tm.personal_turnover) if tm.personal_turnover else 0,
+            team_size=size_map.get(tm.user_id, 0),
+            depth=tm.depth
+        ))
     
     return result
 
@@ -54,19 +81,42 @@ def get_first_line_members(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get direct referrals (first line)"""
-    first_line = get_first_line(db, current_user.id)
+    """Get direct referrals (first line) - optimized"""
+    from sqlalchemy.orm import joinedload
+    
+    # Get users with their team member data in one query
+    first_line = db.query(User).filter(
+        User.sponsor_id == current_user.id,
+        User.is_active == True
+    ).all()
+    
+    if not first_line:
+        return []
+    
+    user_ids = [u.id for u in first_line]
+    
+    # Batch get personal turnover
+    turnovers = db.query(
+        TeamMember.user_id,
+        TeamMember.personal_turnover
+    ).filter(
+        TeamMember.user_id.in_(user_ids),
+        TeamMember.depth == 0
+    ).all()
+    turnover_map = {uid: float(t) if t else 0 for uid, t in turnovers}
+    
+    # Batch get team sizes
+    team_sizes = db.query(
+        TeamMember.ancestor_id,
+        func.count(TeamMember.user_id).label('size')
+    ).filter(
+        TeamMember.ancestor_id.in_(user_ids),
+        TeamMember.depth > 0
+    ).group_by(TeamMember.ancestor_id).all()
+    size_map = {ancestor_id: size for ancestor_id, size in team_sizes}
     
     result = []
     for user in first_line:
-        # Get team member info
-        tm = db.query(TeamMember).filter(
-            TeamMember.user_id == user.id,
-            TeamMember.depth == 0
-        ).first()
-        
-        member_team_size = get_team_size(db, user.id)
-        
         result.append(TeamMemberInfo(
             id=user.id,
             full_name=user.full_name,
@@ -76,8 +126,8 @@ def get_first_line_members(
             is_verified=user.is_verified,
             is_active=user.is_active,
             activity_status=user.activity_status,
-            personal_turnover=float(tm.personal_turnover) if tm else 0,
-            team_size=member_team_size,
+            personal_turnover=turnover_map.get(user.id, 0),
+            team_size=size_map.get(user.id, 0),
             depth=1
         ))
     
@@ -88,32 +138,37 @@ def get_team_stats(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get team statistics"""
-    # Total team size
-    total_team_size = get_team_size(db, current_user.id)
+    """Get team statistics - optimized without loading all members"""
+    # Total team size - single count query
+    total_team_size = db.query(func.count(TeamMember.user_id)).filter(
+        TeamMember.ancestor_id == current_user.id,
+        TeamMember.depth > 0
+    ).scalar() or 0
     
-    # First line count
-    first_line_count = len(get_first_line(db, current_user.id))
+    # First line count - single count query
+    first_line_count = db.query(func.count(User.id)).filter(
+        User.sponsor_id == current_user.id
+    ).scalar() or 0
     
-    # Active/inactive members
-    team_members = get_team_members(db, current_user.id)
-    member_ids = [tm.user_id for tm in team_members]
-    
-    active_members = db.query(User).filter(
-        User.id.in_(member_ids),
+    # Active members - single query with join
+    active_members = db.query(func.count(User.id)).join(
+        TeamMember, TeamMember.user_id == User.id
+    ).filter(
+        TeamMember.ancestor_id == current_user.id,
+        TeamMember.depth > 0,
         User.is_active == True,
         User.activity_status == "active"
-    ).count() if member_ids else 0
+    ).scalar() or 0
     
     inactive_members = total_team_size - active_members
     
-    # Total team turnover
-    user_team = db.query(TeamMember).filter(
+    # Total team turnover - single query
+    user_team = db.query(TeamMember.total_turnover).filter(
         TeamMember.user_id == current_user.id,
         TeamMember.depth == 0
-    ).first()
+    ).scalar()
     
-    total_turnover = float(user_team.total_turnover) if user_team else 0
+    total_turnover = float(user_team) if user_team else 0
     
     return TeamStats(
         total_team_size=total_team_size,
@@ -162,18 +217,19 @@ def search_team(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Search and filter team members"""
-    # Get all team member IDs
-    team_members = get_team_members(db, current_user.id)
-    member_ids = [tm.user_id for tm in team_members]
+    """Search and filter team members - optimized"""
+    # Get member IDs in one query
+    member_ids_query = db.query(TeamMember.user_id).filter(
+        TeamMember.ancestor_id == current_user.id,
+        TeamMember.depth > 0
+    )
+    member_ids = [row[0] for row in member_ids_query.all()]
     
     if not member_ids:
         return []
     
-    # Build query
     user_query = db.query(User).filter(User.id.in_(member_ids))
     
-    # Apply filters
     if query:
         user_query = user_query.filter(
             (User.full_name.ilike(f"%{query}%")) | 
@@ -190,24 +246,45 @@ def search_team(
     if is_verified is not None:
         user_query = user_query.filter(User.is_verified == is_verified)
     
-    # Get results
     users = user_query.offset(skip).limit(limit).all()
     
-    # Build response
+    if not users:
+        return []
+    
+    user_ids = [u.id for u in users]
+    
+    # Batch get depths
+    depths = db.query(
+        TeamMember.user_id,
+        TeamMember.depth
+    ).filter(
+        TeamMember.user_id.in_(user_ids),
+        TeamMember.ancestor_id == current_user.id
+    ).all()
+    depth_map = {uid: d for uid, d in depths}
+    
+    # Batch get turnovers
+    turnovers = db.query(
+        TeamMember.user_id,
+        TeamMember.personal_turnover
+    ).filter(
+        TeamMember.user_id.in_(user_ids),
+        TeamMember.depth == 0
+    ).all()
+    turnover_map = {uid: float(t) if t else 0 for uid, t in turnovers}
+    
+    # Batch get team sizes
+    team_sizes = db.query(
+        TeamMember.ancestor_id,
+        func.count(TeamMember.user_id).label('size')
+    ).filter(
+        TeamMember.ancestor_id.in_(user_ids),
+        TeamMember.depth > 0
+    ).group_by(TeamMember.ancestor_id).all()
+    size_map = {ancestor_id: size for ancestor_id, size in team_sizes}
+    
     result = []
     for user in users:
-        tm = db.query(TeamMember).filter(
-            TeamMember.user_id == user.id,
-            TeamMember.ancestor_id == current_user.id
-        ).first()
-        
-        user_tm = db.query(TeamMember).filter(
-            TeamMember.user_id == user.id,
-            TeamMember.depth == 0
-        ).first()
-        
-        member_team_size = get_team_size(db, user.id)
-        
         result.append(TeamMemberInfo(
             id=user.id,
             full_name=user.full_name,
@@ -217,9 +294,9 @@ def search_team(
             is_verified=user.is_verified,
             is_active=user.is_active,
             activity_status=user.activity_status,
-            personal_turnover=float(user_tm.personal_turnover) if user_tm else 0,
-            team_size=member_team_size,
-            depth=tm.depth if tm else 0
+            personal_turnover=turnover_map.get(user.id, 0),
+            team_size=size_map.get(user.id, 0),
+            depth=depth_map.get(user.id, 0)
         ))
     
     return result
@@ -230,9 +307,9 @@ def get_member_children(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get direct children of a specific team member (for lazy loading tree)"""
-    # Verify member is in user's team
-    is_in_team = db.query(TeamMember).filter(
+    """Get direct children of a specific team member - lazy loading optimized"""
+    # Verify access
+    is_in_team = db.query(TeamMember.user_id).filter(
         TeamMember.user_id == member_id,
         TeamMember.ancestor_id == current_user.id
     ).first()
@@ -240,24 +317,46 @@ def get_member_children(
     if not is_in_team and member_id != current_user.id:
         raise HTTPException(status_code=403, detail="Member not in your team")
     
-    # Get direct children
+    # Get children
     children = db.query(User).filter(User.sponsor_id == member_id).all()
+    
+    if not children:
+        return []
+    
+    user_ids = [u.id for u in children]
+    
+    # Batch get depths
+    depths = db.query(
+        TeamMember.user_id,
+        TeamMember.depth
+    ).filter(
+        TeamMember.user_id.in_(user_ids),
+        TeamMember.ancestor_id == current_user.id
+    ).all()
+    depth_map = {uid: d for uid, d in depths}
+    
+    # Batch get turnovers
+    turnovers = db.query(
+        TeamMember.user_id,
+        TeamMember.personal_turnover
+    ).filter(
+        TeamMember.user_id.in_(user_ids),
+        TeamMember.depth == 0
+    ).all()
+    turnover_map = {uid: float(t) if t else 0 for uid, t in turnovers}
+    
+    # Batch get team sizes
+    team_sizes = db.query(
+        TeamMember.ancestor_id,
+        func.count(TeamMember.user_id).label('size')
+    ).filter(
+        TeamMember.ancestor_id.in_(user_ids),
+        TeamMember.depth > 0
+    ).group_by(TeamMember.ancestor_id).all()
+    size_map = {ancestor_id: size for ancestor_id, size in team_sizes}
     
     result = []
     for user in children:
-        tm = db.query(TeamMember).filter(
-            TeamMember.user_id == user.id,
-            TeamMember.depth == 0
-        ).first()
-        
-        member_team_size = get_team_size(db, user.id)
-        
-        # Get depth relative to current_user
-        depth_rel = db.query(TeamMember).filter(
-            TeamMember.user_id == user.id,
-            TeamMember.ancestor_id == current_user.id
-        ).first()
-        
         result.append(TeamMemberInfo(
             id=user.id,
             full_name=user.full_name,
@@ -267,9 +366,9 @@ def get_member_children(
             is_verified=user.is_verified,
             is_active=user.is_active,
             activity_status=user.activity_status,
-            personal_turnover=float(tm.personal_turnover) if tm else 0,
-            team_size=member_team_size,
-            depth=depth_rel.depth if depth_rel else 0
+            personal_turnover=turnover_map.get(user.id, 0),
+            team_size=size_map.get(user.id, 0),
+            depth=depth_map.get(user.id, 0)
         ))
     
     return result

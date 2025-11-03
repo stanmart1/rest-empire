@@ -1,8 +1,12 @@
 import resend
+import logging
 from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.services.config_service import get_config
 from pathlib import Path
+from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 def load_template(template_name: str, **kwargs) -> str:
     template_path = Path(__file__).parent.parent / "templates" / template_name
@@ -14,14 +18,18 @@ def load_template(template_name: str, **kwargs) -> str:
     
     return template
 
-async def send_verification_email(email: str, token: str, db: Session):
-    verification_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
-    html_content = load_template("verify_email.html", verification_url=verification_url)
-    
-    api_key = get_config(db, "resend_api_key")
-    from_email = get_config(db, "from_email") or "noreply@restempire.com"
-    
-    if api_key:
+async def send_verification_email(email: str, token: str, db: Session) -> bool:
+    try:
+        verification_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
+        html_content = load_template("verify_email.html", verification_url=verification_url)
+        
+        api_key = get_config(db, "resend_api_key")
+        from_email = get_config(db, "from_email") or "noreply@restempire.com"
+        
+        if not api_key:
+            logger.warning("Email API key not configured")
+            return False
+        
         resend.api_key = api_key
         resend.Emails.send({
             "from": from_email,
@@ -29,15 +37,24 @@ async def send_verification_email(email: str, token: str, db: Session):
             "subject": "Verify Your Email - Opened Seal and Rest Empire",
             "html": html_content
         })
+        logger.info(f"Verification email sent to {email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send verification email to {email}: {str(e)}", exc_info=True)
+        return False
 
-async def send_password_reset_email(email: str, token: str, db: Session):
-    reset_url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
-    html_content = load_template("reset_password.html", reset_url=reset_url)
-    
-    api_key = get_config(db, "resend_api_key")
-    from_email = get_config(db, "from_email") or "noreply@restempire.com"
-    
-    if api_key:
+async def send_password_reset_email(email: str, token: str, db: Session) -> bool:
+    try:
+        reset_url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
+        html_content = load_template("reset_password.html", reset_url=reset_url)
+        
+        api_key = get_config(db, "resend_api_key")
+        from_email = get_config(db, "from_email") or "noreply@restempire.com"
+        
+        if not api_key:
+            logger.warning("Email API key not configured")
+            return False
+        
         resend.api_key = api_key
         resend.Emails.send({
             "from": from_email,
@@ -45,15 +62,24 @@ async def send_password_reset_email(email: str, token: str, db: Session):
             "subject": "Password Reset - Opened Seal and Rest Empire",
             "html": html_content
         })
+        logger.info(f"Password reset email sent to {email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send password reset email to {email}: {str(e)}", exc_info=True)
+        return False
 
-async def send_welcome_email(email: str, name: str, db: Session):
-    dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
-    html_content = load_template("welcome.html", name=name, dashboard_url=dashboard_url)
-    
-    api_key = get_config(db, "resend_api_key")
-    from_email = get_config(db, "from_email", "noreply@restempire.com")
-    
-    if api_key:
+async def send_welcome_email(email: str, name: str, db: Session) -> bool:
+    try:
+        dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
+        html_content = load_template("welcome.html", name=name, dashboard_url=dashboard_url)
+        
+        api_key = get_config(db, "resend_api_key")
+        from_email = get_config(db, "from_email", "noreply@restempire.com")
+        
+        if not api_key:
+            logger.warning("Email API key not configured")
+            return False
+        
         resend.api_key = api_key
         resend.Emails.send({
             "from": from_email,
@@ -61,6 +87,11 @@ async def send_welcome_email(email: str, name: str, db: Session):
             "subject": "Welcome to Opened Seal and Rest Empire!",
             "html": html_content
         })
+        logger.info(f"Welcome email sent to {email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send welcome email to {email}: {str(e)}", exc_info=True)
+        return False
 
 async def send_rank_achievement_email(email: str, user_name: str, rank_name: str, bonus_amount: float, total_turnover: float, team_size: int, db: Session):
     dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
@@ -86,20 +117,24 @@ async def send_rank_achievement_email(email: str, user_name: str, rank_name: str
             "html": html_content
         })
 
-async def send_bonus_earned_email(email: str, bonus_type: str, amount: float, new_balance: float, db: Session):
-    dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
-    html_content = load_template(
-        "bonus_earned.html",
-        bonus_type=bonus_type,
-        amount=f"{amount:,.2f}",
-        new_balance=f"{new_balance:,.2f}",
-        dashboard_url=dashboard_url
-    )
-    
-    api_key = get_config(db, "resend_api_key")
-    from_email = get_config(db, "from_email", "noreply@restempire.com")
-    
-    if api_key:
+async def send_bonus_earned_email(email: str, bonus_type: str, amount: float, new_balance: float, db: Session) -> bool:
+    try:
+        dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
+        html_content = load_template(
+            "bonus_earned.html",
+            bonus_type=bonus_type,
+            amount=f"{amount:,.2f}",
+            new_balance=f"{new_balance:,.2f}",
+            dashboard_url=dashboard_url
+        )
+        
+        api_key = get_config(db, "resend_api_key")
+        from_email = get_config(db, "from_email", "noreply@restempire.com")
+        
+        if not api_key:
+            logger.warning("Email API key not configured")
+            return False
+        
         resend.api_key = api_key
         resend.Emails.send({
             "from": from_email,
@@ -107,6 +142,11 @@ async def send_bonus_earned_email(email: str, bonus_type: str, amount: float, ne
             "subject": f"💰 Bonus Earned: ₦{amount:,.2f}",
             "html": html_content
         })
+        logger.info(f"Bonus earned email sent to {email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send bonus earned email to {email}: {str(e)}", exc_info=True)
+        return False
 
 async def send_payout_processed_email(email: str, status: str, amount: float, method: str, reference: str, expected_arrival: str, db: Session):
     payouts_url = f"{settings.FRONTEND_URL}/payouts"

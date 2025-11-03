@@ -1,9 +1,13 @@
 import hashlib
 import requests
+import logging
 from typing import Dict, Optional
 from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.models.payment_gateway import PaymentGateway
+from app.utils.retry import retry_on_exception
+
+logger = logging.getLogger(__name__)
 
 class GTPayService:
     """GTPay payment gateway integration"""
@@ -17,16 +21,12 @@ class GTPayService:
     @staticmethod
     def initiate_payment(transaction_id: int, amount: float, customer_email: str, customer_name: str, db: Session = None) -> Dict:
         """Initiate GTPay payment"""
-        merchant_id = settings.GTPAY_MERCHANT_ID
-        api_key = settings.GTPAY_HASH_KEY
-        callback_url = f"{settings.FRONTEND_URL}/payment/callback"
+        from app.utils.payment_helpers import get_gtpay_config
         
-        if db:
-            gateway = db.query(PaymentGateway).filter(PaymentGateway.gateway_id == "gtpay").first()
-            if gateway and gateway.config_values:
-                merchant_id = gateway.config_values.get("merchant_id", merchant_id)
-                api_key = gateway.config_values.get("api_key", api_key)
-                callback_url = gateway.config_values.get("callback_url", callback_url)
+        config = get_gtpay_config(db)
+        merchant_id = config["merchant_id"]
+        api_key = config["api_key"]
+        callback_url = config["callback_url"]
         
         amount_kobo = int(amount * 100)  # Convert to kobo
         
@@ -65,16 +65,12 @@ class ProvidusService:
     @staticmethod
     def initiate_payment(transaction_id: int, amount: float, customer_email: str, customer_name: str, db: Session = None) -> Dict:
         """Initiate Providus payment"""
-        merchant_id = settings.PROVIDUS_MERCHANT_ID
-        api_key = settings.PROVIDUS_API_KEY
-        callback_url = f"{settings.FRONTEND_URL}/payment/callback"
+        from app.utils.payment_helpers import get_providus_config
         
-        if db:
-            gateway = db.query(PaymentGateway).filter(PaymentGateway.gateway_id == "providus").first()
-            if gateway and gateway.config_values:
-                merchant_id = gateway.config_values.get("merchant_id", merchant_id)
-                api_key = gateway.config_values.get("api_key", api_key)
-                callback_url = gateway.config_values.get("callback_url", callback_url)
+        config = get_providus_config(db)
+        merchant_id = config["merchant_id"]
+        api_key = config["api_key"]
+        callback_url = config["callback_url"]
         
         headers = {
             "Authorization": f"Bearer {api_key}",
@@ -125,16 +121,12 @@ class BankTransferService:
     @staticmethod
     def get_bank_details(transaction_id: int, db: Session = None) -> Dict:
         """Get bank transfer details"""
-        bank_name = settings.BANK_NAME
-        account_number = settings.BANK_ACCOUNT_NUMBER
-        account_name = settings.BANK_ACCOUNT_NAME
+        from app.utils.payment_helpers import get_bank_transfer_config
         
-        if db:
-            gateway = db.query(PaymentGateway).filter(PaymentGateway.gateway_id == "bank_transfer").first()
-            if gateway and gateway.config_values:
-                bank_name = gateway.config_values.get("bank_name", bank_name)
-                account_number = gateway.config_values.get("account_number", account_number)
-                account_name = gateway.config_values.get("account_name", account_name)
+        config = get_bank_transfer_config(db)
+        bank_name = config["bank_name"]
+        account_number = config["account_number"]
+        account_name = config["account_name"]
         
         return {
             "bank_name": bank_name,
@@ -155,13 +147,11 @@ class CryptoPaymentService:
     @staticmethod
     def get_payment_address(transaction_id: int, amount: float, db: Session = None) -> Dict:
         """Get crypto payment address"""
-        wallet_address = settings.CRYPTO_WALLET_ADDRESS
-        network = settings.CRYPTO_NETWORK
+        from app.utils.payment_helpers import get_crypto_config
         
-        if db:
-            gateway = db.query(PaymentGateway).filter(PaymentGateway.gateway_id == "crypto").first()
-            if gateway and gateway.config_values:
-                wallet_address = gateway.config_values.get("wallet_address", wallet_address)
+        config = get_crypto_config(db)
+        wallet_address = config["wallet_address"]
+        network = config["network"]
         
         return {
             "wallet_address": wallet_address,
@@ -192,77 +182,88 @@ class PaystackService:
     """Paystack payment gateway integration"""
     
     @staticmethod
+    @retry_on_exception(max_attempts=3, delay=1.0, exceptions=(requests.RequestException,))
     def initiate_payment(transaction_id: int, amount: float, customer_email: str, db: Session = None) -> Dict:
-        """Initiate Paystack payment"""
-        secret_key = settings.PAYSTACK_SECRET_KEY
-        callback_url = f"{settings.FRONTEND_URL}/payment/callback"
-        
-        if db:
-            gateway = db.query(PaymentGateway).filter(PaymentGateway.gateway_id == "paystack").first()
-            if gateway and gateway.config_values:
-                secret_key = gateway.config_values.get("secret_key", secret_key)
-                callback_url = gateway.config_values.get("callback_url", callback_url)
-        
-        headers = {
-            "Authorization": f"Bearer {secret_key}",
-            "Content-Type": "application/json"
-        }
-        
-        amount_kobo = int(amount * 100)  # Convert to kobo
-        
-        payload = {
-            "email": customer_email,
-            "amount": amount_kobo,
-            "reference": f"REST{transaction_id:08d}",
-            "callback_url": callback_url,
-            "metadata": {
-                "transaction_id": transaction_id
-            }
-        }
+        """Initiate Paystack payment with retry logic"""
+        from app.utils.payment_helpers import get_paystack_config
         
         try:
+            config = get_paystack_config(db)
+            secret_key = config["secret_key"]
+            callback_url = config["callback_url"]
+            
+            headers = {
+                "Authorization": f"Bearer {secret_key}",
+                "Content-Type": "application/json"
+            }
+            
+            amount_kobo = int(amount * 100)  # Convert to kobo
+            
+            payload = {
+                "email": customer_email,
+                "amount": amount_kobo,
+                "reference": f"REST{transaction_id:08d}",
+                "callback_url": callback_url,
+                "metadata": {
+                    "transaction_id": transaction_id
+                }
+            }
+            
             response = requests.post(
                 "https://api.paystack.co/transaction/initialize",
                 json=payload,
-                headers=headers
+                headers=headers,
+                timeout=10
             )
             response.raise_for_status()
             data = response.json()
             
+            logger.info(f"Paystack payment initiated for transaction {transaction_id}")
             return {
                 "authorization_url": data["data"]["authorization_url"],
                 "access_code": data["data"]["access_code"],
                 "reference": data["data"]["reference"]
             }
+        except requests.RequestException as e:
+            logger.error(f"Paystack API error for transaction {transaction_id}: {str(e)}", exc_info=True)
+            raise
         except Exception as e:
+            logger.error(f"Unexpected error initiating Paystack payment: {str(e)}", exc_info=True)
             return {
                 "error": str(e),
                 "authorization_url": None
             }
     
     @staticmethod
+    @retry_on_exception(max_attempts=3, delay=1.0, exceptions=(requests.RequestException,))
     def verify_payment(reference: str) -> Dict:
-        """Verify Paystack payment"""
-        headers = {
-            "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
-            "Content-Type": "application/json"
-        }
-        
+        """Verify Paystack payment with retry logic"""
         try:
+            headers = {
+                "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
+                "Content-Type": "application/json"
+            }
+            
             response = requests.get(
                 f"https://api.paystack.co/transaction/verify/{reference}",
-                headers=headers
+                headers=headers,
+                timeout=10
             )
             response.raise_for_status()
             data = response.json()
             
+            logger.info(f"Paystack payment verified: {reference}")
             return {
                 "status": data["data"]["status"],
                 "amount": data["data"]["amount"] / 100,  # Convert from kobo
                 "reference": data["data"]["reference"],
                 "paid_at": data["data"]["paid_at"]
             }
+        except requests.RequestException as e:
+            logger.error(f"Paystack verification error for {reference}: {str(e)}", exc_info=True)
+            raise
         except Exception as e:
+            logger.error(f"Unexpected error verifying Paystack payment: {str(e)}", exc_info=True)
             return {
                 "status": "failed",
                 "error": str(e)

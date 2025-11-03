@@ -57,7 +57,10 @@ def check_rank_qualification(db: Session, user_id: int, rank: Rank) -> dict:
     }
 
 def calculate_rank_advancement(db: Session, user_id: int) -> str:
-    """Calculate and apply rank advancement for user"""
+    """Calculate and apply rank advancement for user - awards highest qualified rank"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         return None
@@ -71,27 +74,37 @@ def calculate_rank_advancement(db: Session, user_id: int) -> str:
         Rank.level > current_rank.level
     ).order_by(Rank.level).all()
     
-    # Check qualification for each higher rank
-    new_rank = user.current_rank
+    # Check ALL ranks and find highest qualified
+    highest_qualified_rank = None
     for rank in higher_ranks:
         qualification = check_rank_qualification(db, user_id, rank)
         if qualification["qualified"]:
-            new_rank = rank.name
-            
-            # Update user rank
-            user.current_rank = rank.name
-            user.rank_achieved_date = datetime.utcnow()
-            if not user.highest_rank_achieved or rank.level > get_rank_by_name(db, user.highest_rank_achieved).level:
-                user.highest_rank_achieved = rank.name
-            
-            db.commit()
-            
-            # Log activity
-            log_activity(db, user_id, "rank_advancement", f"Advanced to {rank.name}")
-        else:
-            break  # Stop at first non-qualifying rank
+            highest_qualified_rank = rank
+            # Continue checking higher ranks
+        # Don't break - check all ranks
     
-    return new_rank
+    # Award highest qualified rank
+    if highest_qualified_rank:
+        user.current_rank = highest_qualified_rank.name
+        user.rank_achieved_date = datetime.utcnow()
+        
+        # Update highest rank achieved
+        if not user.highest_rank_achieved:
+            user.highest_rank_achieved = highest_qualified_rank.name
+        else:
+            highest_ever = get_rank_by_name(db, user.highest_rank_achieved)
+            if highest_ever and highest_qualified_rank.level > highest_ever.level:
+                user.highest_rank_achieved = highest_qualified_rank.name
+        
+        db.commit()
+        
+        # Log activity
+        log_activity(db, user_id, "rank_advancement", f"Advanced to {highest_qualified_rank.name}")
+        logger.info(f"User {user_id} advanced to {highest_qualified_rank.name}")
+        
+        return highest_qualified_rank.name
+    
+    return user.current_rank
 
 def calculate_user_rank(db: Session, user_id: int) -> str:
     """Calculate user rank (alias for calculate_rank_advancement)"""

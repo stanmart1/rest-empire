@@ -20,6 +20,7 @@ class Payout(Base):
     currency = Column(String, default="EUR")
     status = Column(Enum(PayoutStatus), default=PayoutStatus.pending, index=True)
     payout_method = Column(String)
+    idempotency_key = Column(String, unique=True, index=True, nullable=True)
     
     account_details = Column(JSON)
     processing_fee = Column(Numeric(10, 2), default=0)

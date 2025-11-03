@@ -18,10 +18,11 @@ router = APIRouter()
 @router.post("/request", response_model=PayoutResponse)
 def request_payout(
     payout: PayoutRequest,
+    idempotency_key: str = None,
     current_user: User = Depends(check_feature_access("payouts")),
     db: Session = Depends(get_db)
 ):
-    """Request a payout"""
+    """Request a payout with idempotency support"""
     # Validate currency
     if payout.currency not in ["NGN", "USDT"]:
         raise HTTPException(status_code=400, detail="Currency must be NGN or USDT")
@@ -44,7 +45,8 @@ def request_payout(
             payout.amount,
             payout.currency,
             payout.payout_method,
-            payout.account_details
+            payout.account_details,
+            idempotency_key=idempotency_key
         )
         
         # Send payout request email
