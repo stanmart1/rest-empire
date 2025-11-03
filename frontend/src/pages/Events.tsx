@@ -215,7 +215,7 @@ const Events = () => {
           )}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button 
             variant="outline" 
             size="sm"
@@ -241,6 +241,14 @@ const Events = () => {
                   ) : (
                     'Unregister'
                   )}
+                </Button>
+              ) : event.registration_deadline && new Date(event.registration_deadline) < new Date() ? (
+                <Button
+                  size="sm"
+                  disabled
+                  className="whitespace-nowrap"
+                >
+                  Closed
                 </Button>
               ) : (
                 <Button

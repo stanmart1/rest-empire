@@ -105,6 +105,19 @@ def check_feature_access(feature_name: str):
     ) -> User:
         from app.models.activation import UserActivation, ActivationPackage
         from datetime import datetime
+        from app.services.config_service import get_config
+        
+        # Check if activation packages are enabled
+        activation_packages_enabled = (get_config(db, "activation_packages_enabled") or "true") == "true"
+        
+        if not activation_packages_enabled:
+            # If activation packages are disabled, just check if user is active
+            if not current_user.is_active:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Please activate your account to access this feature"
+                )
+            return current_user
         
         # Check if user is active
         if not current_user.is_active:

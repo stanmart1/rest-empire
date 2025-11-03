@@ -100,6 +100,8 @@ def delete_event(db: Session, event_id: int) -> bool:
 
 def register_for_event(db: Session, event_id: int, user_id: int) -> Optional[EventRegistration]:
     """Register user for event"""
+    from fastapi import HTTPException
+    
     # Check if event exists and registration is allowed
     event = db.query(Event).filter(Event.id == event_id).first()
     if not event or not event.registration_required:
@@ -107,7 +109,7 @@ def register_for_event(db: Session, event_id: int, user_id: int) -> Optional[Eve
     
     # Check if registration deadline passed
     if event.registration_deadline and datetime.utcnow() > event.registration_deadline:
-        return None
+        raise HTTPException(status_code=400, detail="Registration deadline has been reached")
     
     # Check if already registered
     existing = db.query(EventRegistration).filter(
