@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
 from app.core.database import get_db
-from app.api.deps import get_admin_user, check_feature_access
+from app.api.deps import require_permission, check_feature_access
 from app.models.crypto_signal import CryptoSignal, SignalStatus
 from app.schemas.crypto_signal import CryptoSignalCreate, CryptoSignalUpdate, CryptoSignalResponse
 
@@ -15,7 +15,7 @@ def get_signals(
     limit: int = 50,
     status: str = None,
     db: Session = Depends(get_db),
-    current_user = Depends(get_admin_user)
+    current_user = Depends(require_permission("crypto_signals:list"))
 ):
     query = db.query(CryptoSignal)
     if status:
@@ -26,7 +26,7 @@ def get_signals(
 def create_signal(
     signal: CryptoSignalCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_admin_user)
+    current_user = Depends(require_permission("crypto_signals:create"))
 ):
     db_signal = CryptoSignal(**signal.dict())
     db.add(db_signal)
@@ -39,7 +39,7 @@ def update_signal(
     signal_id: int,
     signal: CryptoSignalUpdate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_admin_user)
+    current_user = Depends(require_permission("crypto_signals:update"))
 ):
     db_signal = db.query(CryptoSignal).filter(CryptoSignal.id == signal_id).first()
     if not db_signal:
@@ -59,7 +59,7 @@ def update_signal(
 def delete_signal(
     signal_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_admin_user)
+    current_user = Depends(require_permission("crypto_signals:delete"))
 ):
     db_signal = db.query(CryptoSignal).filter(CryptoSignal.id == signal_id).first()
     if not db_signal:

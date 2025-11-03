@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Book, BookReview } from '@/types/books';
 import FeatureRestricted from '@/components/common/FeatureRestricted';
 import RichTextEditor from '@/components/ui/rich-text-editor';
+import RichTextDisplay from '@/components/ui/rich-text-display';
 
 const BOOKS_PER_PAGE = 12;
 
@@ -162,7 +163,9 @@ const Books = () => {
                     ({bookReviews[book.id]?.length || 0})
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{book.description}</p>
+                <div className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                  <RichTextDisplay content={book.description} />
+                </div>
               </div>
               <Dialog open={isDialogOpen && currentReview.bookId === book.id} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>

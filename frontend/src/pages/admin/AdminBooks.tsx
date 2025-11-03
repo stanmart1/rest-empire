@@ -10,6 +10,7 @@ import { Plus, Trash2, Star, Grid3x3, List, Pencil } from 'lucide-react';
 import { Book } from '@/types/admin-books';
 import { useBooks, useBookReviews, useUploadBook, useDeleteBook } from '@/hooks/useAdminBooks';
 import RichTextEditor from '@/components/ui/rich-text-editor';
+import RichTextDisplay from '@/components/ui/rich-text-display';
 
 const AdminBooks = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -228,7 +229,7 @@ const AdminBooks = () => {
                   <CardContent className="flex-1 p-4">
                     <h3 className="font-bold text-lg mb-1 line-clamp-2">{book.title}</h3>
                     <p className="text-sm text-muted-foreground mb-2">by {book.author}</p>
-                    <p className="text-sm text-muted-foreground line-clamp-3">{book.description}</p>
+                    <RichTextDisplay content={book.description || ''} className="text-sm line-clamp-3" />
                     <p className="text-xs text-muted-foreground mt-2">
                       Added {new Date(book.created_at).toLocaleDateString()}
                     </p>
