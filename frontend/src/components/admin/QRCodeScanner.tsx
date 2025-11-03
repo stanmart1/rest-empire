@@ -176,7 +176,7 @@ export const QRCodeScanner = ({ eventId, isOpen, onClose, onSuccess }: QRCodeSca
             )}
           </div>
 
-          {manualMode && (
+          {manualMode && !scanning && (
             <div className="space-y-2">
               <Input
                 placeholder="EVT-123-USR-456"

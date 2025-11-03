@@ -21,6 +21,7 @@ const AdminEvents = () => {
   const [attendeesDialogOpen, setAttendeesDialogOpen] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [eventSelectorOpen, setEventSelectorOpen] = useState(false);
+  const [eventSearchQuery, setEventSearchQuery] = useState('');
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [scanningEventId, setScanningEventId] = useState<number | null>(null);
@@ -636,32 +637,49 @@ const AdminEvents = () => {
       </Dialog>
 
       {/* Event Selector Dialog */}
-      <Dialog open={eventSelectorOpen} onOpenChange={setEventSelectorOpen}>
-        <DialogContent>
+      <Dialog open={eventSelectorOpen} onOpenChange={(open) => {
+        setEventSelectorOpen(open);
+        if (!open) setEventSearchQuery('');
+      }}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Select Event to Scan</DialogTitle>
             <DialogDescription>Choose which event you want to scan QR codes for</DialogDescription>
           </DialogHeader>
-          <div className="space-y-2 max-h-[400px] overflow-y-auto">
-            {events?.filter(e => e.status === 'upcoming' || e.status === 'ongoing').map((event) => (
-              <Button
-                key={event.id}
-                variant="outline"
-                className="w-full justify-start h-auto py-3"
-                onClick={() => {
-                  setScanningEventId(event.id);
-                  setEventSelectorOpen(false);
-                  setScannerOpen(true);
-                }}
-              >
-                <div className="text-left">
-                  <div className="font-semibold">{event.title}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {new Date(event.start_date).toLocaleDateString()} • {event.current_attendees} attendees
+          <div className="space-y-3">
+            <Input
+              placeholder="Search events..."
+              value={eventSearchQuery}
+              onChange={(e) => setEventSearchQuery(e.target.value)}
+            />
+            <div className="space-y-2 max-h-[400px] overflow-y-auto">
+              {events
+                ?.filter(e => e.status === 'upcoming' || e.status === 'ongoing')
+                ?.filter(e => e.title.toLowerCase().includes(eventSearchQuery.toLowerCase()))
+                .map((event) => (
+                <Button
+                  key={event.id}
+                  variant="outline"
+                  className="w-full justify-start h-auto py-3 text-left"
+                  onClick={() => {
+                    setScanningEventId(event.id);
+                    setEventSelectorOpen(false);
+                    setEventSearchQuery('');
+                    setScannerOpen(true);
+                  }}
+                >
+                  <div className="w-full min-w-0">
+                    <div className="font-semibold truncate">{event.title}</div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {new Date(event.start_date).toLocaleDateString()} • {event.current_attendees} attendees
+                    </div>
                   </div>
-                </div>
-              </Button>
-            ))}
+                </Button>
+              ))}
+              {events?.filter(e => e.status === 'upcoming' || e.status === 'ongoing')?.filter(e => e.title.toLowerCase().includes(eventSearchQuery.toLowerCase())).length === 0 && (
+                <p className="text-center text-muted-foreground py-8">No events found</p>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
