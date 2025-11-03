@@ -4,6 +4,7 @@ import { TrendingUp, TrendingDown, Target, AlertTriangle, TrendingUpIcon } from 
 import { CryptoSignal } from '@/types/crypto-signals';
 import { usePublishedSignals } from '@/hooks/useCryptoSignals';
 import FeatureRestricted from '@/components/common/FeatureRestricted';
+import RichTextDisplay from '@/components/ui/rich-text-display';
 
 const CryptoSignals = () => {
   const { data: signals = [], isLoading, error } = usePublishedSignals();
@@ -97,7 +98,7 @@ const CryptoSignals = () => {
 
                 {signal.description && (
                   <div className="pt-3 border-t">
-                    <p className="text-sm text-muted-foreground">{signal.description}</p>
+                    <RichTextDisplay content={signal.description} className="text-sm" />
                   </div>
                 )}
 

@@ -15,6 +15,7 @@ import EventDetailModal from '@/components/events/EventDetailModal';
 import EventRegistrationModal from '@/components/events/EventRegistrationModal';
 import EventQRCodeModal from '@/components/events/EventQRCodeModal';
 import { useAuth } from '@/contexts/AuthContext';
+import RichTextDisplay from '@/components/ui/rich-text-display';
 
 const Events = () => {
   const { toast } = useToast();
@@ -166,7 +167,7 @@ const Events = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         {event.description && (
-          <p className="text-sm text-muted-foreground">{event.description}</p>
+          <RichTextDisplay content={event.description} className="text-sm line-clamp-2" />
         )}
         
         <div className="space-y-2 text-sm">

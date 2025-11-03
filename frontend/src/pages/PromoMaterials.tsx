@@ -10,6 +10,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiService from '@/services/api';
 import { PromoMaterial } from '@/types/promo';
 import FeatureRestricted from '@/components/common/FeatureRestricted';
+import RichTextDisplay from '@/components/ui/rich-text-display';
 
 const PromoMaterials = () => {
   const { toast } = useToast();
@@ -118,7 +119,7 @@ const PromoMaterials = () => {
           <h3 className="font-semibold">{material.title}</h3>
           
           {material.description && (
-            <p className="text-sm text-muted-foreground">{material.description}</p>
+            <RichTextDisplay content={material.description} className="text-sm line-clamp-2" />
           )}
           
           <div className="flex items-center justify-between text-xs text-muted-foreground">

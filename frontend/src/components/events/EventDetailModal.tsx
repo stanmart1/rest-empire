@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, MapPin, Users, Video, ExternalLink, Loader2, Download } from 'lucide-react';
 import { Event } from '@/types/events';
 import { useEventQRCode } from '@/hooks/useEventQRCode';
+import RichTextDisplay from '@/components/ui/rich-text-display';
 
 interface EventDetailModalProps {
   event: Event | null;
@@ -99,7 +100,7 @@ const EventDetailModal = ({
           {event.description && (
             <div>
               <h3 className="font-semibold mb-2">Description</h3>
-              <p className="text-muted-foreground">{event.description}</p>
+              <RichTextDisplay content={event.description} className="text-sm" />
             </div>
           )}
 
@@ -252,6 +253,13 @@ const EventDetailModal = ({
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
                   ) : null}
                   Unregister
+                </Button>
+              ) : event.registration_deadline && new Date(event.registration_deadline) < new Date() ? (
+                <Button
+                  disabled
+                  className="flex-1"
+                >
+                  Registration Deadline Reached
                 </Button>
               ) : (
                 <Button
