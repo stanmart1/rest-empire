@@ -184,7 +184,6 @@ const AdminPromoMaterials = () => {
                   <SelectContent>
                     <SelectItem value="presentation">Presentation</SelectItem>
                     <SelectItem value="brochure">Brochure</SelectItem>
-                    <SelectItem value="video">Video</SelectItem>
                     <SelectItem value="image">Image</SelectItem>
                     <SelectItem value="document">Document</SelectItem>
                   </SelectContent>
