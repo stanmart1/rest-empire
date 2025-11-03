@@ -316,6 +316,29 @@ def admin_verify_user(
     
     return {"message": "User verified successfully"}
 
+@router.post("/users/{user_id}/verify-kyc")
+def admin_verify_user_kyc(
+    user_id: int,
+    admin: User = Depends(require_permission("users:list")),
+    db: Session = Depends(get_db)
+):
+    """Admin: Manually verify user KYC"""
+    user = db.query(User).filter(User.id == user_id).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user.kyc_verified = True
+    user.kyc_verified_at = datetime.utcnow()
+    db.commit()
+    
+    log_activity(
+        db, user.id, "admin_kyc_verified",
+        details={"admin_id": admin.id, "admin_email": admin.email}
+    )
+    
+    return {"message": "User KYC verified successfully"}
+
 @router.post("/users/{user_id}/suspend")
 def admin_suspend_user(
     user_id: int,

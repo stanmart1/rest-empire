@@ -1,20 +1,19 @@
 import { useState, useRef } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Trash2, Plus, X, Edit } from 'lucide-react';
-import { toast } from 'sonner';
-import api from '@/lib/api';
+import { Trash2, Plus, X, Edit, CheckCircle, Loader2 } from 'lucide-react';
 import { AdminUser } from '@/lib/admin-types';
 import UserDetailsModal from '@/components/admin/UserDetailsModal';
 import AddUserModal from '@/components/admin/AddUserModal';
 import EditUserModal from '@/components/admin/EditUserModal';
 import RoleManagement, { RoleManagementRef } from '@/components/admin/RoleManagement';
 import { usePermission } from '@/hooks/usePermission';
+import { useAdminUsers, useDeleteUser, useVerifyUser } from '@/hooks/useAdminUsers';
+import React from 'react';
 
 const AdminUsers = () => {
   const { hasPermission } = usePermission();
@@ -33,30 +32,20 @@ const AdminUsers = () => {
   const [userToEdit, setUserToEdit] = useState<AdminUser | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null);
-  const queryClient = useQueryClient();
+  const { data: users, isLoading } = useAdminUsers();
+  const deleteMutation = useDeleteUser();
+  const verifyMutation = useVerifyUser();
 
-  const { data: users, isLoading } = useQuery<AdminUser[]>({
-    queryKey: ['adminUsers'],
-    queryFn: async () => {
-      const response = await api.get('/admin/users');
-      return response.data;
-    },
-  });
+  const handleDeleteSuccess = () => {
+    setDeleteDialogOpen(false);
+    setUserToDelete(null);
+  };
 
-  const deleteMutation = useMutation({
-    mutationFn: async (userId: number) => {
-      await api.delete(`/admin/users/${userId}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
-      toast.success('User deleted successfully');
-      setDeleteDialogOpen(false);
-      setUserToDelete(null);
-    },
-    onError: () => {
-      toast.error('Failed to delete user');
-    },
-  });
+  React.useEffect(() => {
+    if (deleteMutation.isSuccess) {
+      handleDeleteSuccess();
+    }
+  }, [deleteMutation.isSuccess]);
 
   const handleUserClick = (user: AdminUser) => {
     setSelectedUser(user);
@@ -177,6 +166,16 @@ const AdminUsers = () => {
                   <TableCell>{new Date(user.registration_date).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => { e.stopPropagation(); verifyMutation.mutate(user.id); }}
+                        disabled={verifyMutation.isPending || (user as any).kyc_verified}
+                        className="h-8 w-8"
+                        title={(user as any).kyc_verified ? 'Already verified' : 'Verify KYC'}
+                      >
+                        {verifyMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                      </Button>
                       {canUpdateUsers && (
                         <Button
                           variant="ghost"
@@ -225,6 +224,16 @@ const AdminUsers = () => {
                     <p className="text-sm text-muted-foreground">{user.email}</p>
                   </div>
                   <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => { e.stopPropagation(); verifyMutation.mutate(user.id); }}
+                      disabled={verifyMutation.isPending || (user as any).kyc_verified}
+                      className="h-8 w-8"
+                      title={(user as any).kyc_verified ? 'Already verified' : 'Verify KYC'}
+                    >
+                      {verifyMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                    </Button>
                     {canUpdateUsers && (
                       <Button
                         variant="ghost"
@@ -310,9 +319,10 @@ const AdminUsers = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+            <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} disabled={deleteMutation.isPending} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleteMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
