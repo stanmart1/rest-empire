@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
+from app.core.config import settings
 
-ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+ENVIRONMENT = settings.ENVIRONMENT
 STORAGE_PATH = "/app/storage" if ENVIRONMENT == "production" else "uploads"
 UPLOAD_DIR = Path(STORAGE_PATH)
 UPLOAD_DIR.mkdir(exist_ok=True, parents=True)
