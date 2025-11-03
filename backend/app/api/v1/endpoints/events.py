@@ -262,3 +262,41 @@ def get_event_qrcode(
             media_type="image/png",
             headers={"Content-Disposition": f'attachment; filename="{filename}"'}
         )
+
+@router.post("/{event_id}/scan-attendance")
+def scan_attendance(
+    event_id: int,
+    qr_data: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Scan QR code and mark attendance (admin only)"""
+    # Verify QR data
+    if qr_data.get("event_id") != event_id:
+        raise HTTPException(status_code=400, detail="Invalid QR code for this event")
+    
+    user_id = qr_data.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=400, detail="Invalid QR code data")
+    
+    # Check expiry
+    expires_at = qr_data.get("expires_at")
+    if expires_at:
+        try:
+            expiry_date = datetime.fromisoformat(expires_at.replace('Z', '+00:00'))
+            if expiry_date < datetime.utcnow():
+                raise HTTPException(status_code=400, detail="QR code has expired")
+        except ValueError:
+            pass
+    
+    # Update attendance
+    registration = update_attendance_status(db, event_id, user_id, "attended")
+    if not registration:
+        raise HTTPException(status_code=404, detail="Registration not found")
+    
+    return {
+        "success": True,
+        "user_name": registration.user.full_name,
+        "user_email": registration.user.email,
+        "attendance_status": "attended"
+    }

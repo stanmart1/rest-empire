@@ -8,17 +8,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Trash2, Users, Edit, Loader2, UserCheck } from 'lucide-react';
+import { Plus, Trash2, Users, Edit, Loader2, UserCheck, QrCode } from 'lucide-react';
 import { Event } from '@/types/admin-events';
 import { useEvents, useEventAttendees, useCreateEvent, useUpdateEvent, useDeleteEvent } from '@/hooks/useAdminEvents';
 import RichTextEditor from '@/components/ui/rich-text-editor';
+import { QRCodeScanner } from '@/components/admin/QRCodeScanner';
+import { useQueryClient } from '@tanstack/react-query';
 
 const AdminEvents = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [attendeesDialogOpen, setAttendeesDialogOpen] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [eventSelectorOpen, setEventSelectorOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [scanningEventId, setScanningEventId] = useState<number | null>(null);
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -122,14 +128,23 @@ const AdminEvents = () => {
           <h2 className="text-2xl font-bold">Events Management</h2>
           <p className="text-muted-foreground">Manage platform events and webinars</p>
         </div>
-        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Event
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setEventSelectorOpen(true)}
+            disabled={!events || events.length === 0}
+          >
+            <QrCode className="h-4 w-4 mr-2" />
+            Scan QR Code
+          </Button>
+          <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Event
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Event</DialogTitle>
               <DialogDescription>Add a new event or webinar for users</DialogDescription>
@@ -258,8 +273,9 @@ const AdminEvents = () => {
                 {createMutation.isPending ? 'Creating...' : 'Create Event'}
               </Button>
             </form>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Card>
@@ -322,6 +338,17 @@ const AdminEvents = () => {
                           <Button
                             variant="ghost"
                             size="icon"
+                            onClick={() => {
+                              setScanningEventId(event.id);
+                              setScannerOpen(true);
+                            }}
+                            title="Scan QR Codes"
+                          >
+                            <QrCode className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => handleViewAttendees(event)}
                             title="View Registrations"
                           >
@@ -369,13 +396,13 @@ const AdminEvents = () => {
                   <div className="space-y-1 text-sm">
                     <p className="text-muted-foreground capitalize">{event.event_type}</p>
                     <p>{new Date(event.start_date).toLocaleString()}</p>
-                    <p>
+                    <div>
                       {event.is_virtual ? (
                         <Badge variant="outline">Virtual</Badge>
                       ) : (
-                        event.location || 'N/A'
+                        <span>{event.location || 'N/A'}</span>
                       )}
-                    </p>
+                    </div>
                     <div className="flex items-center gap-1">
                       <Users className="h-4 w-4" />
                       {event.current_attendees}
@@ -386,16 +413,25 @@ const AdminEvents = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1"
-                      onClick={() => handleViewAttendees(event)}
+                      onClick={() => {
+                        setScanningEventId(event.id);
+                        setScannerOpen(true);
+                      }}
                     >
-                      <UserCheck className="h-4 w-4 mr-2" />
-                      Registrations
+                      <QrCode className="h-4 w-4 mr-2" />
+                      Scan
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1"
+                      onClick={() => handleViewAttendees(event)}
+                    >
+                      <UserCheck className="h-4 w-4 mr-2" />
+                      Attendees
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleEdit(event)}
                     >
                       <Edit className="h-4 w-4 mr-2" />
@@ -598,6 +634,53 @@ const AdminEvents = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Event Selector Dialog */}
+      <Dialog open={eventSelectorOpen} onOpenChange={setEventSelectorOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Select Event to Scan</DialogTitle>
+            <DialogDescription>Choose which event you want to scan QR codes for</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 max-h-[400px] overflow-y-auto">
+            {events?.filter(e => e.status === 'upcoming' || e.status === 'ongoing').map((event) => (
+              <Button
+                key={event.id}
+                variant="outline"
+                className="w-full justify-start h-auto py-3"
+                onClick={() => {
+                  setScanningEventId(event.id);
+                  setEventSelectorOpen(false);
+                  setScannerOpen(true);
+                }}
+              >
+                <div className="text-left">
+                  <div className="font-semibold">{event.title}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(event.start_date).toLocaleDateString()} • {event.current_attendees} attendees
+                  </div>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* QR Code Scanner */}
+      {scanningEventId && (
+        <QRCodeScanner
+          eventId={scanningEventId}
+          isOpen={scannerOpen}
+          onClose={() => {
+            setScannerOpen(false);
+            setScanningEventId(null);
+          }}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ['event-attendees', scanningEventId] });
+            queryClient.invalidateQueries({ queryKey: ['admin-events'] });
+          }}
+        />
+      )}
     </div>
   );
 };
