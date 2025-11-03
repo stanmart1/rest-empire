@@ -34,7 +34,7 @@ Welcome to the Administrator Guide for the Opened Seal and Rest Empire platform.
 ### Admin Permissions
 
 Different admin accounts may have different permissions:
-- **Super Admin**: Full access to all features
+- **Admin**: Full access to all features
 - **Finance Admin**: Access to financial operations
 - **Support Admin**: Access to user support features
 - **Content Admin**: Access to content management
@@ -604,64 +604,145 @@ To stop offering a package:
 
 ### Managing Events
 
+Events help you engage with your community through webinars, training sessions, conferences, and announcements.
+
 **Creating Events:**
-1. Go to "Events"
+1. Go to "Events" in admin menu
 2. Click "Create Event"
 3. Fill in event details:
-   - Event name
-   - Description
-   - Date and time
-   - Location (physical/online)
-   - Registration link
-   - Event image
+   - **Event Title**: Clear, descriptive name
+   - **Description**: What the event is about
+   - **Event Type**: Choose from:
+     - Webinar (online presentation)
+     - Training (educational session)
+     - Conference (large gathering)
+     - Meeting (team discussion)
+     - Announcement (important update)
+   - **Date & Time**: When event starts and ends
+   - **Location**: Physical address or "Virtual"
+   - **Virtual Event**: Toggle if online
+   - **Meeting Link**: Zoom, Google Meet, etc.
+   - **Max Attendees**: Limit capacity (optional)
+   - **Registration Required**: Yes/No
+   - **Registration Deadline**: Last date to register
 
-4. Publish the event
+4. Click "Create Event"
+
+**Editing Events:**
+1. Find the event in the list
+2. Click "Edit"
+3. Update any details
+4. Save changes
+
+**Event Status:**
+- **Upcoming**: Event hasn't started yet
+- **Ongoing**: Event is currently happening
+- **Completed**: Event has finished
+- **Cancelled**: Event was cancelled
 
 **Managing Registrations:**
-- View who registered
-- Send event reminders
-- Share event materials
-- Mark attendance
+
+1. **View Attendees:**
+   - Click on event
+   - Go to "Attendees" tab
+   - See list of registered users
+   - View registration date
+   - Check attendance status
+
+2. **Mark Attendance:**
+   - Open event attendees list
+   - Find user
+   - Update status:
+     - Registered (signed up)
+     - Attended (showed up)
+     - No Show (didn't attend)
+
+3. **QR Code Check-In:**
+   - Users generate QR codes from their account
+   - Scan QR code at event entrance
+   - System automatically marks attendance
+   - View attendee details instantly
+
+**Using QR Code Scanner:**
+1. Open event details
+2. Click "Scan QR Code"
+3. Allow camera access
+4. Point camera at attendee's QR code
+5. System confirms attendance
+6. See attendee name and status
+
 
 ### Managing Video Gallery
 
 **Uploading Videos:**
-1. Go to "Video Gallery"
+1. Go to "Video Gallery" in admin menu
 2. Click "Upload Video"
 3. Enter video details:
-   - Title
-   - Description
-   - Category
-   - Video file or YouTube link
-   - Thumbnail image
+   - **Title**: Clear video name
+   - **Description**: What viewers will learn
+   - **Category**: Training, Tutorial, Webinar, etc.
+   - **Video Source**: Choose one:
+     - Upload video file (MP4, MOV)
+     - YouTube link
+     - Vimeo link
+   - **Thumbnail**: Eye-catching image
+   - **Duration**: Video length
+   - **Access Level**: Free or Premium
 
-4. Publish the video
+4. Click "Publish Video"
 
 **Organizing Videos:**
-- Create categories
-- Feature important videos
-- Archive old content
-- Monitor view counts
+- **Create Categories**: Group similar videos
+- **Feature Videos**: Highlight important content
+- **Archive Old Content**: Hide outdated videos
+- **Monitor Views**: Track engagement
+- **Update Thumbnails**: Keep content fresh
+
+**Video Best Practices:**
+- Keep videos under 15 minutes
+- Use clear audio and video quality
+- Add captions for accessibility
+- Update regularly with new content
+- Remove outdated information
 
 ### Managing Promotional Materials
 
 **Adding Materials:**
-1. Go to "Promo Materials"
+1. Go to "Promo Materials" in admin menu
 2. Click "Add Material"
 3. Upload files:
-   - Banners
-   - Flyers
-   - Presentation slides
-   - Social media graphics
-   - Email templates
+   - **Banners**: Website headers (1920x600px)
+   - **Flyers**: Printable PDFs
+   - **Presentation Slides**: PowerPoint/PDF
+   - **Social Media Graphics**: 
+     - Facebook (1200x630px)
+     - Instagram (1080x1080px)
+     - Twitter (1200x675px)
+   - **Email Templates**: HTML or images
+   - **Logos**: PNG with transparent background
 
-4. Categorize and publish
+4. Add details:
+   - Material name
+   - Description
+   - Category
+   - File size
+   - Usage instructions
+
+5. Click "Publish"
 
 **Organizing Materials:**
-- Group by type
-- Update regularly
-- Remove outdated materials
-- Track download counts
+- **Group by Type**: Banners, Flyers, Social Media
+- **Update Regularly**: Add new campaigns
+- **Remove Outdated**: Delete old promotions
+- **Track Downloads**: See what's popular
+- **Version Control**: Keep latest versions
+
+**Material Guidelines:**
+- Use high-resolution images (300 DPI for print)
+- Include brand colors and logos
+- Keep file sizes under 5MB
+- Provide multiple formats (JPG, PNG, PDF)
+- Add usage instructions
 
 ### Content Management Best Practices
 
@@ -782,7 +863,6 @@ Configure social media links:
 - Instagram profile
 - Twitter handle
 - LinkedIn company page
-- YouTube channel
 
 These appear in the footer and contact pages.
 
@@ -924,17 +1004,14 @@ Help reduce tickets by creating:
 
 **Protect Admin Access:**
 - Use strong, unique passwords
-- Enable two-factor authentication
 - Don't share admin credentials
 - Log out when finished
 - Use secure internet connections
-- Keep software updated
 
 **Protect User Data:**
 - Never share user information
 - Secure financial records
 - Encrypt sensitive data
-- Regular backups
 - Comply with privacy laws
 - Monitor for suspicious activity
 
