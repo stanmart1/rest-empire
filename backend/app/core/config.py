@@ -28,6 +28,20 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     CORS_ORIGINS: Union[List[str], str] = ["http://localhost:8080"]
     API_V1_PREFIX: str = "/api/v1"
+    
+    # Payment Gateways
+    PROVIDUS_MERCHANT_ID: str = ""
+    PROVIDUS_API_KEY: str = ""
+    PROVIDUS_API_URL: str = ""
+    GTPAY_MERCHANT_ID: str = ""
+    GTPAY_HASH_KEY: str = ""
+    GTPAY_GATEWAY_URL: str = ""
+    PAYSTACK_SECRET_KEY: str = ""
+    CRYPTO_WALLET_ADDRESS: str = ""
+    CRYPTO_NETWORK: str = "TRC20"
+    BANK_NAME: str = ""
+    BANK_ACCOUNT_NUMBER: str = ""
+    BANK_ACCOUNT_NAME: str = ""
 
     # ✅ Pydantic v2 config style
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

@@ -33,9 +33,9 @@ const AdminSettings = () => {
   const [gtpayCallbackUrl, setGtpayCallbackUrl] = useState('');
 
   const [providusEnabled, setProvidusEnabled] = useState(false);
-  const [providusAccountNumber, setProvidusAccountNumber] = useState('');
-  const [providusBankCode, setProvidusBankCode] = useState('');
+  const [providusMerchantId, setProvidusMerchantId] = useState('');
   const [providusApiKey, setProvidusApiKey] = useState('');
+  const [providusCallbackUrl, setProvidusCallbackUrl] = useState('');
 
   const [paystackEnabled, setPaystackEnabled] = useState(false);
   const [paystackPublicKey, setPaystackPublicKey] = useState('');
@@ -278,7 +278,7 @@ const AdminSettings = () => {
               {availableGateways.map((gateway: any) => {
                 const descriptions: Record<string, string> = {
                   gtpay: 'Online payment gateway',
-                  providus: 'Dynamic account generation',
+                  providus: 'Payment processing gateway',
                   paystack: 'Card & bank payments',
                   crypto: 'USDT cryptocurrency payments',
                   bank_transfer: 'Manual bank transfer'

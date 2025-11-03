@@ -30,7 +30,7 @@ def upgrade():
         conn.execute(text("""
             INSERT INTO payment_gateways (name, gateway_id, config_fields) VALUES
             ('GTPay', 'gtpay', '[{"key": "merchant_id", "label": "Merchant ID", "type": "text"}, {"key": "api_key", "label": "API Key", "type": "password"}, {"key": "callback_url", "label": "Callback URL", "type": "text"}]'),
-            ('Providus', 'providus', '[{"key": "account_number", "label": "Account Number", "type": "text"}, {"key": "bank_code", "label": "Bank Code", "type": "text"}, {"key": "api_key", "label": "API Key", "type": "password"}]'),
+            ('Providus', 'providus', '[{"key": "merchant_id", "label": "Merchant ID", "type": "text"}, {"key": "api_key", "label": "API Key", "type": "password"}, {"key": "callback_url", "label": "Callback URL", "type": "text"}]'),
             ('Paystack', 'paystack', '[{"key": "public_key", "label": "Public Key", "type": "text"}, {"key": "secret_key", "label": "Secret Key", "type": "password"}, {"key": "callback_url", "label": "Callback URL", "type": "text"}]'),
             ('Crypto', 'crypto', '[{"key": "wallet_address", "label": "USDT TRC20 Wallet Address", "type": "text"}]'),
             ('Bank Transfer', 'bank_transfer', '[{"key": "bank_name", "label": "Bank Name", "type": "text"}, {"key": "account_number", "label": "Account Number", "type": "text"}, {"key": "account_name", "label": "Account Name", "type": "text"}]')

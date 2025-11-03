@@ -100,9 +100,10 @@ const Activation = () => {
           description: "Complete payment to activate your account.",
         });
       } else if (method === 'providus') {
+        window.open(data.payment_data.payment_url, '_blank');
         toast({
-          title: "Account Generated",
-          description: `Transfer ${formatCurrency(selectedPackage?.price, 'NGN')} to account ${data.payment_data.account_number}. Your account will be activated after payment confirmation.`,
+          title: "Redirecting to Providus",
+          description: "Complete payment to activate your account.",
         });
       } else if (method === 'crypto') {
         toast({

@@ -72,8 +72,10 @@ def initiate_payment(
         }
     
     elif payment.payment_method == "providus":
-        payment_data = ProvidusService.generate_dynamic_account(
+        payment_data = ProvidusService.initiate_payment(
             transaction.id,
+            payment.amount,
+            current_user.email,
             current_user.full_name or current_user.email,
             db
         )
@@ -192,7 +194,7 @@ def get_payment_methods(db: Session = Depends(get_db)):
     
     gateway_info = {
         "gtpay": {"description": "Pay with GTBank or other Nigerian banks", "currency": "NGN", "instant": True},
-        "providus": {"description": "Dynamic account number for instant payment", "currency": "NGN", "instant": True},
+        "providus": {"description": "Pay with Providus Bank payment gateway", "currency": "NGN", "instant": True},
         "bank_transfer": {"description": "Manual bank transfer (24hr confirmation)", "currency": "NGN", "instant": False},
         "paystack": {"description": "Pay with card, bank transfer, or USSD", "currency": "NGN", "instant": True},
         "crypto": {"description": "Pay with USDT on TRC20 network", "currency": "USDT", "instant": True}

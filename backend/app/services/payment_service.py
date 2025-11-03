@@ -60,21 +60,21 @@ class GTPayService:
         return hash_received == expected_hash
 
 class ProvidusService:
-    """Providus Bank payment integration"""
+    """Providus Bank payment processing integration"""
     
     @staticmethod
-    def generate_dynamic_account(transaction_id: int, customer_name: str, db: Session = None) -> Dict:
-        """Generate dynamic account number for customer"""
-        account_number = settings.PROVIDUS_MERCHANT_ID
-        bank_code = ""
+    def initiate_payment(transaction_id: int, amount: float, customer_email: str, customer_name: str, db: Session = None) -> Dict:
+        """Initiate Providus payment"""
+        merchant_id = settings.PROVIDUS_MERCHANT_ID
         api_key = settings.PROVIDUS_API_KEY
+        callback_url = f"{settings.FRONTEND_URL}/payment/callback"
         
         if db:
             gateway = db.query(PaymentGateway).filter(PaymentGateway.gateway_id == "providus").first()
             if gateway and gateway.config_values:
-                account_number = gateway.config_values.get("account_number", account_number)
-                bank_code = gateway.config_values.get("bank_code", bank_code)
+                merchant_id = gateway.config_values.get("merchant_id", merchant_id)
                 api_key = gateway.config_values.get("api_key", api_key)
+                callback_url = gateway.config_values.get("callback_url", callback_url)
         
         headers = {
             "Authorization": f"Bearer {api_key}",
@@ -82,20 +82,23 @@ class ProvidusService:
         }
         
         payload = {
-            "merchant_id": account_number,
-            "transaction_reference": str(transaction_id),
-            "customer_name": customer_name
+            "merchant_id": merchant_id,
+            "transaction_reference": f"REST{transaction_id:08d}",
+            "amount": amount,
+            "customer_email": customer_email,
+            "customer_name": customer_name,
+            "callback_url": callback_url
         }
         
-        # Note: Replace with actual Providus API endpoint
-        # response = requests.post(f"{settings.PROVIDUS_API_URL}/api/v1/account/generate", json=payload, headers=headers)
+        # Note: Replace with actual Providus payment API endpoint
+        # response = requests.post(f"{settings.PROVIDUS_API_URL}/api/v1/payment/initiate", json=payload, headers=headers)
+        # return response.json()
         
-        # Mock response for now
+        # Mock response - replace with actual API response
         return {
-            "account_number": f"9{transaction_id:09d}",  # Dynamic account
-            "account_name": customer_name,
-            "bank_name": settings.BANK_NAME,
-            "transaction_reference": str(transaction_id)
+            "payment_url": f"https://providusbank.com/pay?ref=REST{transaction_id:08d}",
+            "reference": f"REST{transaction_id:08d}",
+            "merchant_id": merchant_id
         }
     
     @staticmethod
@@ -107,7 +110,8 @@ class ProvidusService:
         }
         
         # Note: Replace with actual Providus API endpoint
-        # response = requests.get(f"{settings.PROVIDUS_API_URL}/api/v1/transaction/{transaction_reference}", headers=headers)
+        # response = requests.get(f"{settings.PROVIDUS_API_URL}/api/v1/payment/verify/{transaction_reference}", headers=headers)
+        # return response.json()
         
         return {
             "status": "success",
