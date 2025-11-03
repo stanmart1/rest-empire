@@ -48,20 +48,17 @@ const Events = () => {
 
   const registerMutation = useMutation({
     mutationFn: (eventId: number) => apiService.events.registerForEvent(eventId),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       queryClient.invalidateQueries({ queryKey: ['my-events'] });
       queryClient.invalidateQueries({ queryKey: ['event-stats'] });
-      setIsRegisterModalOpen(false);
-      setRegistrationData({ full_name: '', email: '', phone: '' });
-      
-      // Show QR code modal
-      setIsQRCodeModalOpen(true);
       
       toast({
         title: "Success",
         description: "Successfully registered for event",
       });
+      
+      return data;
     },
     onError: (error: any) => {
       toast({
@@ -69,6 +66,7 @@ const Events = () => {
         description: error.response?.data?.detail || "Failed to register for event",
         variant: "destructive",
       });
+      throw error;
     },
   });
 
@@ -295,7 +293,9 @@ const Events = () => {
           setIsRegisterModalOpen(false);
           setRegisteringEvent(null);
         }}
-        onSubmit={(eventId) => registerMutation.mutate(eventId)}
+        onSubmit={async (eventId) => {
+          return await registerMutation.mutateAsync(eventId);
+        }}
         isSubmitting={registerMutation.isPending}
         defaultData={registrationData}
       />

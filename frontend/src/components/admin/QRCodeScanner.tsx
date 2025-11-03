@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle, XCircle, Camera, CameraOff } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -15,6 +16,9 @@ interface QRCodeScannerProps {
 
 export const QRCodeScanner = ({ eventId, isOpen, onClose, onSuccess }: QRCodeScannerProps) => {
   const [scanning, setScanning] = useState(false);
+  const [manualMode, setManualMode] = useState(false);
+  const [manualCode, setManualCode] = useState('');
+  const [verifying, setVerifying] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string; userName?: string } | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const { toast } = useToast();
@@ -89,27 +93,57 @@ export const QRCodeScanner = ({ eventId, isOpen, onClose, onSuccess }: QRCodeSca
         onSuccess();
         setTimeout(() => {
           setResult(null);
-          startScanning();
+          if (scanning) startScanning();
         }, 2000);
       } else {
         setResult({ success: false, message: result.detail || 'Invalid QR code' });
         setTimeout(() => {
           setResult(null);
-          startScanning();
+          if (scanning) startScanning();
         }, 2000);
       }
     } catch (error) {
       setResult({ success: false, message: 'Failed to scan QR code' });
       setTimeout(() => {
         setResult(null);
-        startScanning();
+        if (scanning) startScanning();
       }, 2000);
+    }
+  };
+
+  const handleManualEntry = async () => {
+    if (!manualCode.trim()) return;
+    
+    setVerifying(true);
+    try {
+      const parts = manualCode.split('-');
+      if (parts.length !== 4 || parts[0] !== 'EVT' || parts[2] !== 'USR') {
+        setResult({ success: false, message: 'Invalid code format. Use: EVT-123-USR-456' });
+        setTimeout(() => setResult(null), 3000);
+        return;
+      }
+
+      const qrData = {
+        event_id: parseInt(parts[1]),
+        user_id: parseInt(parts[3]),
+        registration_code: manualCode
+      };
+
+      await handleScan(JSON.stringify(qrData));
+      setManualCode('');
+    } catch (error) {
+      setResult({ success: false, message: 'Invalid code' });
+      setTimeout(() => setResult(null), 3000);
+    } finally {
+      setVerifying(false);
     }
   };
 
   const handleClose = async () => {
     await stopScanning();
     setResult(null);
+    setManualMode(false);
+    setManualCode('');
     onClose();
   };
 
@@ -123,16 +157,39 @@ export const QRCodeScanner = ({ eventId, isOpen, onClose, onSuccess }: QRCodeSca
         <div className="space-y-4">
           {isOpen && <div id="qr-reader" className="w-full rounded-lg overflow-hidden" />}
 
-          {!scanning ? (
-            <Button onClick={startScanning} className="w-full">
-              <Camera className="w-4 h-4 mr-2" />
-              Start Camera
-            </Button>
-          ) : (
-            <Button onClick={stopScanning} variant="outline" className="w-full">
-              <CameraOff className="w-4 h-4 mr-2" />
-              Stop Camera
-            </Button>
+          <div className="flex gap-2">
+            {!scanning ? (
+              <>
+                <Button onClick={startScanning} className="flex-1">
+                  <Camera className="w-4 h-4 mr-2" />
+                  Scan QR
+                </Button>
+                <Button onClick={() => setManualMode(!manualMode)} variant="outline" className="flex-1">
+                  Manual Entry
+                </Button>
+              </>
+            ) : (
+              <Button onClick={stopScanning} variant="outline" className="w-full">
+                <CameraOff className="w-4 h-4 mr-2" />
+                Stop Camera
+              </Button>
+            )}
+          </div>
+
+          {manualMode && (
+            <div className="space-y-2">
+              <Input
+                placeholder="EVT-123-USR-456"
+                value={manualCode}
+                onChange={(e) => setManualCode(e.target.value.toUpperCase())}
+                onKeyDown={(e) => e.key === 'Enter' && !verifying && handleManualEntry()}
+                disabled={verifying}
+              />
+              <Button onClick={handleManualEntry} className="w-full" disabled={!manualCode.trim() || verifying}>
+                {verifying && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {verifying ? 'Verifying...' : 'Verify Code'}
+              </Button>
+            </div>
           )}
 
           {result && (

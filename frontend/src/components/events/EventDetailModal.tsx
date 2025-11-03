@@ -1,10 +1,14 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, MapPin, Users, Video, ExternalLink, Loader2, Download } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Calendar, Clock, MapPin, Users, Video, ExternalLink, Loader2, Download, Copy } from 'lucide-react';
 import { Event } from '@/types/events';
 import { useEventQRCode } from '@/hooks/useEventQRCode';
+import { useToast } from '@/hooks/use-toast';
 import RichTextDisplay from '@/components/ui/rich-text-display';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface EventDetailModalProps {
   event: Event | null;
@@ -25,9 +29,20 @@ const EventDetailModal = ({
   isRegistering,
   isUnregistering,
 }: EventDetailModalProps) => {
+  const { toast } = useToast();
+  const { user } = useAuth();
   const { qrCodeDataUrl, isLoading: qrLoading, downloadQRCode } = useEventQRCode(event, isOpen && event?.is_registered);
   
   if (!event) return null;
+
+  const registrationCode = event.is_registered && user ? `EVT-${event.id}-USR-${user.id}` : null;
+
+  const copyCode = () => {
+    if (registrationCode) {
+      navigator.clipboard.writeText(registrationCode);
+      toast({ title: 'Copied!', description: 'Registration code copied to clipboard' });
+    }
+  };
 
   const isExpired = event.end_date 
     ? new Date(event.end_date) < new Date() 
@@ -181,9 +196,23 @@ const EventDetailModal = ({
           </div>
 
           {event.is_registered && (
-            <div className="pt-4 border-t">
-              <h3 className="font-semibold mb-3">Your QR Code</h3>
-              <div className="flex flex-col items-center gap-3">
+            <div className="pt-4 border-t space-y-4">
+              <div>
+                <Label>Registration Code</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input value={registrationCode || ''} readOnly className="font-mono" />
+                  <Button type="button" variant="outline" size="icon" onClick={copyCode}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Show this code at the event entrance for manual check-in
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-3">Your QR Code</h3>
+                <div className="flex flex-col items-center gap-3">
                 <div className="relative">
                   <div className="flex justify-center p-4 bg-white rounded-lg border">
                     {qrCodeDataUrl ? (
@@ -236,6 +265,7 @@ const EventDetailModal = ({
                     : `Valid until: ${event.end_date ? new Date(event.end_date).toLocaleDateString() : new Date(event.start_date).toLocaleDateString()}`
                   }
                 </p>
+                </div>
               </div>
             </div>
           )}

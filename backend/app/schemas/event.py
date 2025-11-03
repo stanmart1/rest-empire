@@ -51,6 +51,8 @@ class EventRegistrationResponse(BaseModel):
     user_id: int
     registered_at: datetime
     attendance_status: AttendanceStatus
+    registration_code: Optional[str] = None
+    user: Optional[dict] = None
     
     class Config:
         from_attributes = True

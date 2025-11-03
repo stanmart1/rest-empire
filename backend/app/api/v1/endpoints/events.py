@@ -164,6 +164,8 @@ def register_for_existing_event(
             detail="Cannot register for this event. Check capacity, deadline, or existing registration."
         )
     
+    # Add registration code
+    registration.registration_code = f"EVT-{event_id}-USR-{current_user.id}"
     return registration
 
 @router.delete("/{event_id}/register")
