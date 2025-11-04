@@ -71,7 +71,7 @@ const Index = () => {
                 Build Your Network Marketing <span className="block">Empire Today</span>
               </h1>
               <p className="text-xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto lg:mx-0">
-                Join over 10,000 entrepreneurs who are building sustainable income streams with our powerful MLM platform.
+                Join over 10,000 entrepreneurs who are building sustainable income streams with Opened Seal and Rest Empire.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button asChild size="lg" className="text-lg px-8 py-6 bg-white text-primary hover:bg-white/90">
@@ -393,7 +393,7 @@ const Index = () => {
         <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-8 md:p-12 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-6">Ready to Start Your Journey?</h2>
           <p className="text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of distributors who are already building their empires with Opensed Seal and Rest Empire.
+            Join thousands of distributors who are already building their empires with Opened Seal and Rest Empire.
           </p>
           <Button asChild size="lg" className="text-lg px-8 py-6 bg-white text-primary hover:bg-white/90">
             <Link to="/register">
