@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,66 +10,74 @@ import { AdminRoute } from "./components/AdminRoute";
 import { RootRedirect } from "./components/RootRedirect";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import { motion, AnimatePresence } from "motion/react";
+import { Loader2 } from "lucide-react";
 
-// Auth Pages
-import Login from "./pages/auth/Login";
-import Register from "./pages/auth/Register";
-import ForgotPassword from "./pages/auth/ForgotPassword";
+const Login = lazy(() => import("./pages/auth/Login"));
+const Register = lazy(() => import("./pages/auth/Register"));
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Team = lazy(() => import("./pages/Team"));
+const Bonuses = lazy(() => import("./pages/Bonuses"));
+const Transactions = lazy(() => import("./pages/Transactions"));
+const Payouts = lazy(() => import("./pages/Payouts"));
+const Ranks = lazy(() => import("./pages/Ranks"));
+const Profile = lazy(() => import("./pages/Profile"));
+const AccountSettings = lazy(() => import("./pages/AccountSettings"));
+const Status = lazy(() => import("./pages/Status"));
+const Support = lazy(() => import("./pages/Support"));
+const Events = lazy(() => import("./pages/Events"));
+const PromoMaterials = lazy(() => import("./pages/PromoMaterials"));
+const Activation = lazy(() => import("./pages/Activation"));
+const RankBonus = lazy(() => import("./pages/bonuses/RankBonus"));
+const UnilevelBonus = lazy(() => import("./pages/bonuses/UnilevelBonus"));
+const InfinityBonus = lazy(() => import("./pages/bonuses/InfinityBonus"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Books = lazy(() => import("./pages/Books"));
+const CryptoSignals = lazy(() => import("./pages/CryptoSignals"));
+const VideoGallery = lazy(() => import("./pages/VideoGallery"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
+const AdminTransactions = lazy(() => import("./pages/admin/AdminTransactions"));
+const AdminVerifications = lazy(() => import("./pages/admin/AdminVerifications"));
+const AdminPayouts = lazy(() => import("./pages/admin/AdminPayouts"));
+const AdminFinance = lazy(() => import("./pages/admin/AdminFinance"));
+const AdminBonuses = lazy(() => import("./pages/admin/AdminBonuses"));
+const AdminCryptoSignals = lazy(() => import("./pages/admin/AdminCryptoSignals"));
+const AdminBooks = lazy(() => import("./pages/admin/AdminBooks"));
+const AdminEvents = lazy(() => import("./pages/admin/AdminEvents"));
+const AdminPromoMaterials = lazy(() => import("./pages/admin/AdminPromoMaterials"));
+const AdminSupport = lazy(() => import("./pages/admin/AdminSupport"));
+const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminActivationPackages = lazy(() => import("./pages/admin/AdminActivationPackages"));
+const AdminVideoGallery = lazy(() => import("./pages/admin/AdminVideoGallery"));
+const AdminContentManagement = lazy(() => import("./pages/admin/AdminContentManagement"));
+const Index = lazy(() => import("./pages/Index"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
 
-// User Pages
-import Dashboard from "./pages/Dashboard";
-import Team from "./pages/Team";
-import Bonuses from "./pages/Bonuses";
-import Transactions from "./pages/Transactions";
-import Payouts from "./pages/Payouts";
-import Ranks from "./pages/Ranks";
-import Profile from "./pages/Profile";
-import AccountSettings from "./pages/AccountSettings";
-import Status from "./pages/Status";
-import Support from "./pages/Support";
-import Events from "./pages/Events";
-import PromoMaterials from "./pages/PromoMaterials";
-import Activation from "./pages/Activation";
-import RankBonus from "./pages/bonuses/RankBonus";
-import UnilevelBonus from "./pages/bonuses/UnilevelBonus";
-import InfinityBonus from "./pages/bonuses/InfinityBonus";
-import NotFound from "./pages/NotFound";
-import Books from "./pages/Books";
-import CryptoSignals from "./pages/CryptoSignals";
-import VideoGallery from "./pages/VideoGallery";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminUsers from "./pages/admin/AdminUsers";
-import AdminTransactions from "./pages/admin/AdminTransactions";
-import AdminVerifications from "./pages/admin/AdminVerifications";
-import AdminPayouts from "./pages/admin/AdminPayouts";
-import AdminFinance from "./pages/admin/AdminFinance";
-import AdminBonuses from "./pages/admin/AdminBonuses";
-import AdminCryptoSignals from "./pages/admin/AdminCryptoSignals";
-import AdminBooks from "./pages/admin/AdminBooks";
-import AdminEvents from "./pages/admin/AdminEvents";
-import AdminPromoMaterials from "./pages/admin/AdminPromoMaterials";
-import AdminSupport from "./pages/admin/AdminSupport";
-import AdminSettings from "./pages/admin/AdminSettings";
-import AdminActivationPackages from "./pages/admin/AdminActivationPackages";
-import AdminVideoGallery from "./pages/admin/AdminVideoGallery";
-import AdminContentManagement from "./pages/admin/AdminContentManagement";
-import Index from "./pages/Index";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import FAQ from "./pages/FAQ";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const AnimatedRoutes = () => {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+    <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
         {/* Root redirect */}
         <Route path="/" element={<RootRedirect />} />
 
@@ -124,18 +133,14 @@ const AnimatedRoutes = () => {
 
         {/* Catch-all */}
         <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
-      </Routes>
-    </AnimatePresence>
+        </Routes>
+      </AnimatePresence>
+    </Suspense>
   );
 };
 
 const PageWrapper = ({ children }: { children: React.ReactNode }) => (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    transition={{ duration: 0.3 }}
-  >
+  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.9 }}>
     {children}
   </motion.div>
 );
