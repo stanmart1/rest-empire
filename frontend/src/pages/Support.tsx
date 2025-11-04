@@ -112,7 +112,7 @@ const Support = () => {
       <Card>
         <CardContent className="p-6">
           <p className="text-muted-foreground mb-6">
-            If you have any issues with the Rest Empire platform, we recommend seeking advice from your sponsor or team leader. Our community members learn fast and can help each other.
+            If you have any issues with the Opened Seal and Rest Empire platform, we recommend seeking advice from your sponsor or team leader. Our community members learn fast and can help each other.
           </p>
 
           <Accordion type="single" collapsible className="w-full">

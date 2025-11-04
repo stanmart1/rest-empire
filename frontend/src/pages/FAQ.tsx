@@ -66,7 +66,7 @@ const FAQ = () => {
               Frequently Asked Questions
             </h1>
             <p className="text-xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto">
-              Find answers to common questions about Rest Empire and our network marketing platform.
+              Find answers to common questions about Opened Seal and Rest Empire and our network marketing platform.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
