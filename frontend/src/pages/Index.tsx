@@ -3,10 +3,26 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ArrowLeft, Users, Gift, TrendingUp, Shield, Award, Globe, CheckCircle, BarChart3, Zap, Lock } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { motion, useInView, useMotionValue, useTransform, animate as motionAnimate } from "motion/react";
+
+const Counter = ({ to }: { to: number }) => {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => Math.round(latest).toLocaleString());
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
+  useEffect(() => {
+    if (isInView) {
+      const controls = motionAnimate(count, to, { duration: 2 });
+      return controls.stop;
+    }
+  }, [isInView, to, count]);
+
+  return <motion.span ref={ref}>{rounded}</motion.span>;
+};
 
 const Index = () => {
-  // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -65,79 +81,181 @@ const Index = () => {
         </div>
 
         <div className="container mx-auto px-4 py-28 md:py-36 lg:py-44 relative z-10">
+          {[...Array(5)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-16 h-16 md:w-24 md:h-24 rounded-full bg-white/5 blur-xl"
+              style={{ top: `${10 + i * 15}%`, left: `${5 + i * 18}%` }}
+              animate={{
+                y: [0, -80, 0],
+                x: [0, 40, 0],
+                scale: [1, 1.3, 1],
+              }}
+              transition={{ duration: 8 + i * 2, repeat: Infinity, delay: i * 0.5 }}
+            />
+          ))}
+
           <div className="flex flex-col lg:flex-row items-center">
-            <div className="lg:w-1/2 mb-20 lg:mb-0 lg:pr-12 text-center lg:text-left">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-primary-foreground leading-tight">
+            <motion.div 
+              className="lg:w-1/2 mb-20 lg:mb-0 lg:pr-12 text-center lg:text-left"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: { transition: { staggerChildren: 0.2 } }
+              }}
+            >
+              <motion.h1 
+                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-primary-foreground leading-tight"
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  visible: { opacity: 1, y: 0 }
+                }}
+              >
                 Build Your Network Marketing <span className="block">Empire Today</span>
-              </h1>
-              <p className="text-xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto lg:mx-0">
-                Join over 10,000 entrepreneurs who are building sustainable income streams with Opened Seal and Rest Empire.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button asChild size="lg" className="text-lg px-8 py-6 bg-white text-primary hover:bg-white/90">
-                  <Link to="/register">
-                    Create Account <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
-                <Button asChild size="lg" className="text-lg px-8 py-6 bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                  <Link to="/login">
-                    Login to Account
-                  </Link>
-                </Button>
-              </div>
-            </div>
+              </motion.h1>
+              <motion.p 
+                className="text-xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto lg:mx-0"
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  visible: { opacity: 1, y: 0 }
+                }}
+              >
+                Join over <Counter to={10000} />+ entrepreneurs who are building sustainable income streams with Opened Seal and Rest Empire.
+              </motion.p>
+              <motion.div 
+                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  visible: { opacity: 1, y: 0 }
+                }}
+              >
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button asChild size="lg" className="text-lg px-8 py-6 bg-white text-primary hover:bg-white/90">
+                    <Link to="/register">
+                      Create Account <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button asChild size="lg" className="text-lg px-8 py-6 bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+                    <Link to="/login">
+                      Login to Account
+                    </Link>
+                  </Button>
+                </motion.div>
+              </motion.div>
+            </motion.div>
 
             <div className="lg:w-1/2 flex justify-center">
-              <div className="relative w-full max-w-xl hidden sm:block">
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 border border-white/20 shadow-2xl">
+              <motion.div 
+                className="relative w-full max-w-xl hidden sm:block"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+              >
+                <motion.div 
+                  className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 border border-white/20 shadow-2xl"
+                  animate={{ 
+                    y: [0, -20, 0],
+                    rotate: [0, 1, 0, -1, 0]
+                  }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                >
                   <img
                     src="/dashbaord-preview.png"
                     alt="Rest Empire Dashboard Preview"
                     className="w-full h-auto"
                   />
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
           </div>
 
           {/* Additional Hero Content */}
-          <div className="mt-20 max-w-4xl mx-auto">
+          <motion.div 
+            className="mt-20 max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+          >
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-primary-foreground">
               Why Thousands Choose Opened Seal and Rest Empire
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 text-center">
-                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-3 gap-8"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={{
+                visible: { transition: { staggerChildren: 0.15 } }
+              }}
+            >
+              <motion.div 
+                className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 text-center"
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  visible: { opacity: 1, y: 0 }
+                }}
+                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}
+              >
+                <motion.div 
+                  className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   <BarChart3 className="w-8 h-8 text-primary-foreground" />
-                </div>
+                </motion.div>
                 <h3 className="text-xl font-semibold text-primary-foreground mb-2">Wealth Education</h3>
                 <p className="text-primary-foreground/80">
                   Our Wealth Education programs utilize cutting-edge Blockchain technology and cryptography, providing individuals with the tools to create unstoppable wealth and secure their financial futures.
                 </p>
-              </div>
+              </motion.div>
 
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 text-center">
-                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
+              <motion.div 
+                className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 text-center"
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  visible: { opacity: 1, y: 0 }
+                }}
+                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}
+              >
+                <motion.div 
+                  className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   <Zap className="w-8 h-8 text-primary-foreground" />
-                </div>
+                </motion.div>
                 <h3 className="text-xl font-semibold text-primary-foreground mb-2">Health Education</h3>
                 <p className="text-primary-foreground/80">
                   In the realm of Health Education, we draw upon our extensive expertise in Naturopathic medicine to promote plant and nature-based health practices.
                 </p>
-              </div>
+              </motion.div>
 
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 text-center">
-                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
+              <motion.div 
+                className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 text-center"
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  visible: { opacity: 1, y: 0 }
+                }}
+                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}
+              >
+                <motion.div 
+                  className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   <Lock className="w-8 h-8 text-primary-foreground" />
-                </div>
+                </motion.div>
                 <h3 className="text-xl font-semibold text-primary-foreground mb-2">Capacity Development</h3>
                 <p className="text-primary-foreground/80">
                   Through our Capacity Development initiatives, we are dedicated to fostering personal and professional growth by providing educational products and practices that cultivate a range of skills and knowledge.
                 </p>
-              </div>
-            </div>
-          </div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
         </div>
 
         {/* Wave divider */}
@@ -165,16 +283,44 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Features Section - Removed negative margin to prevent color overlap */}
+      {/* Features Section */}
       <div className="container mx-auto px-4 py-16 relative z-10 bg-gray-200">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground">Powerful Features for Your Success</h2>
+        <motion.h2 
+          className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
+          Powerful Features for Your Success
+        </motion.h2>
 
-        {/* Desktop Grid (hidden on mobile) */}
-        <div className="hidden sm:grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-card p-8 rounded-xl border shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+        {/* Desktop Grid */}
+        <motion.div 
+          className="hidden sm:grid grid-cols-1 md:grid-cols-3 gap-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={{
+            visible: { transition: { staggerChildren: 0.15 } }
+          }}
+        >
+          <motion.div 
+            className="bg-card p-8 rounded-xl border shadow-sm"
+            variants={{
+              hidden: { opacity: 0, y: 50 },
+              visible: { opacity: 1, y: 0 }
+            }}
+            whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div 
+              className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6"
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
               <Users className="w-8 h-8 text-primary" />
-            </div>
+            </motion.div>
             <h3 className="text-2xl font-semibold mb-4 text-foreground">Book Review</h3>
             <p className="text-foreground mb-4">
               Access our curated library of personal development and business books with reviews and insights from our community.
@@ -189,12 +335,24 @@ const Index = () => {
                 <span className="text-sm">Community reviews and ratings</span>
               </li>
             </ul>
-          </div>
+          </motion.div>
 
-          <div className="bg-card p-8 rounded-xl border shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+          <motion.div 
+            className="bg-card p-8 rounded-xl border shadow-sm"
+            variants={{
+              hidden: { opacity: 0, y: 50 },
+              visible: { opacity: 1, y: 0 }
+            }}
+            whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div 
+              className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6"
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
               <Gift className="w-8 h-8 text-primary" />
-            </div>
+            </motion.div>
             <h3 className="text-2xl font-semibold mb-4 text-foreground">Crypto Signals</h3>
             <p className="text-foreground mb-4">
               Get access to expert cryptocurrency trading signals and market analysis to help you make informed investment decisions.
@@ -209,12 +367,24 @@ const Index = () => {
                 <span className="text-sm">Expert trading recommendations</span>
               </li>
             </ul>
-          </div>
+          </motion.div>
 
-          <div className="bg-card p-8 rounded-xl border shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+          <motion.div 
+            className="bg-card p-8 rounded-xl border shadow-sm"
+            variants={{
+              hidden: { opacity: 0, y: 50 },
+              visible: { opacity: 1, y: 0 }
+            }}
+            whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div 
+              className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6"
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
               <TrendingUp className="w-8 h-8 text-primary" />
-            </div>
+            </motion.div>
             <h3 className="text-2xl font-semibold mb-4 text-foreground">Video Gallery</h3>
             <p className="text-foreground mb-4">
               Watch training videos, webinars, and success stories from our community to accelerate your learning and growth.
@@ -229,8 +399,8 @@ const Index = () => {
                 <span className="text-sm">Success stories and testimonials</span>
               </li>
             </ul>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Mobile Carousel (visible only on mobile) */}
         <div className="sm:hidden">
@@ -390,17 +560,46 @@ const Index = () => {
 
       {/* CTA Section */}
       <div className="container mx-auto px-4 py-16">
-        <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-8 md:p-12 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-6">Ready to Start Your Journey?</h2>
-          <p className="text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
+        <motion.div 
+          className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-8 md:p-12 text-center"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.h2 
+            className="text-3xl md:text-4xl font-bold text-primary-foreground mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Ready to Start Your Journey?
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
             Join thousands of distributors who are already building their empires with Opened Seal and Rest Empire.
-          </p>
-          <Button asChild size="lg" className="text-lg px-8 py-6 bg-white text-primary hover:bg-white/90">
-            <Link to="/register">
-              Create Your Account <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-        </div>
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button asChild size="lg" className="text-lg px-8 py-6 bg-white text-primary hover:bg-white/90">
+              <Link to="/register">
+                Create Your Account <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </motion.div>
+        </motion.div>
       </div>
 
       <Footer />
