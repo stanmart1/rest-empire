@@ -115,16 +115,15 @@ const Index = () => {
 
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <AnimatePresence mode="wait">
+        {heroSlides.map((slide, index) => (
           <motion.div
-            key={heroSlide}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-            className={`absolute inset-0 bg-gradient-to-r ${heroSlides[heroSlide].gradient}`}
+            key={index}
+            initial={false}
+            animate={{ opacity: heroSlide === index ? 1 : 0 }}
+            transition={{ duration: 1 }}
+            className={`absolute inset-0 bg-gradient-to-r ${slide.gradient}`}
           />
-        </AnimatePresence>
+        ))}
         {/* Decorative elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHBhdHRlcm5Vbml0cz0idXNlckNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxjaXJjbGUgY3g9IjEwIiBjeT0iMTAiIHI9IjEuNSIgZmlsbD0id2hpdGUiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=')]"></div>
