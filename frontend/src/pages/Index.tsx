@@ -114,7 +114,7 @@ const Index = () => {
       <Header />
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden min-h-[600px] md:min-h-[700px]">
         {heroSlides.map((slide, index) => (
           <motion.div
             key={index}
@@ -129,7 +129,7 @@ const Index = () => {
           <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHBhdHRlcm5Vbml0cz0idXNlckNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxjaXJjbGUgY3g9IjEwIiBjeT0iMTAiIHI9IjEuNSIgZmlsbD0id2hpdGUiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=')]"></div>
         </div>
 
-        <div className="container mx-auto px-4 py-32 md:py-40 lg:py-48 relative z-20">
+        <div className="container mx-auto px-4 py-24 md:py-28 lg:py-32 relative z-20">
           {[...Array(5)].map((_, i) => (
             <motion.div
               key={i}
