@@ -306,6 +306,7 @@ const Index = () => {
             </button>
           </div>
         </div>
+        </div>
       </div>
 
       {/* Features Section */}
@@ -436,6 +437,7 @@ const Index = () => {
               <ArrowRight className="w-6 h-6" />
             </button>
           </div>
+        </div>
         </div>
       </div>
 
