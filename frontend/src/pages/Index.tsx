@@ -220,7 +220,8 @@ const Index = () => {
       </div>
 
       {/* Why Choose Us Section */}
-      <div className="container mx-auto px-4 py-16">
+      <div className="bg-background">
+        <div className="container mx-auto px-4 py-16">
         <motion.h2
           className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground"
           initial={{ opacity: 0, y: 30 }}
@@ -308,7 +309,8 @@ const Index = () => {
       </div>
 
       {/* Features Section */}
-      <div className="container mx-auto px-4 py-16 relative z-10 bg-gray-50">
+      <div className="bg-gray-50">
+        <div className="container mx-auto px-4 py-16 relative z-10">
         <motion.h2 
           className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground"
           initial={{ opacity: 0, y: 30 }}
@@ -437,7 +439,6 @@ const Index = () => {
         </div>
       </div>
 
-
       {/* How It Works Section */}
       <div className="bg-[#003D7A] py-20 md:py-24">
         <div className="container mx-auto px-10 md:px-20 max-w-7xl">
@@ -482,7 +483,8 @@ const Index = () => {
       </div>
 
       {/* CTA Section */}
-      <div className="container mx-auto px-4 py-16">
+      <div className="bg-background">
+        <div className="container mx-auto px-4 py-16">
         <motion.div 
           className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-8 md:p-12 text-center"
           initial={{ opacity: 0, scale: 0.95 }}
@@ -523,6 +525,7 @@ const Index = () => {
             </Button>
           </motion.div>
         </motion.div>
+        </div>
       </div>
 
       <Footer />
