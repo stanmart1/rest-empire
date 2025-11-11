@@ -218,92 +218,6 @@ const Index = () => {
               </motion.div>
             </div>
           </div>
-
-          {/* Additional Hero Content */}
-          <motion.div 
-            className="mt-20 max-w-4xl mx-auto"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-primary-foreground">
-              Why Thousands Choose Opened Seal and Rest Empire
-            </h2>
-
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-3 gap-8"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={{
-                visible: { transition: { staggerChildren: 0.15 } }
-              }}
-            >
-              <motion.div 
-                className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 text-center"
-                variants={{
-                  hidden: { opacity: 0, y: 30 },
-                  visible: { opacity: 1, y: 0 }
-                }}
-                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}
-              >
-                <motion.div 
-                  className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <BarChart3 className="w-8 h-8 text-primary-foreground" />
-                </motion.div>
-                <h3 className="text-xl font-semibold text-primary-foreground mb-2">Wealth Education</h3>
-                <p className="text-primary-foreground/80">
-                  Our Wealth Education programs utilize cutting-edge Blockchain technology and cryptography, providing individuals with the tools to create unstoppable wealth and secure their financial futures.
-                </p>
-              </motion.div>
-
-              <motion.div 
-                className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 text-center"
-                variants={{
-                  hidden: { opacity: 0, y: 30 },
-                  visible: { opacity: 1, y: 0 }
-                }}
-                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}
-              >
-                <motion.div 
-                  className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <Zap className="w-8 h-8 text-primary-foreground" />
-                </motion.div>
-                <h3 className="text-xl font-semibold text-primary-foreground mb-2">Health Education</h3>
-                <p className="text-primary-foreground/80">
-                  In the realm of Health Education, we draw upon our extensive expertise in Naturopathic medicine to promote plant and nature-based health practices.
-                </p>
-              </motion.div>
-
-              <motion.div 
-                className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 text-center"
-                variants={{
-                  hidden: { opacity: 0, y: 30 },
-                  visible: { opacity: 1, y: 0 }
-                }}
-                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}
-              >
-                <motion.div 
-                  className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <Lock className="w-8 h-8 text-primary-foreground" />
-                </motion.div>
-                <h3 className="text-xl font-semibold text-primary-foreground mb-2">Capacity Development</h3>
-                <p className="text-primary-foreground/80">
-                  Through our Capacity Development initiatives, we are dedicated to fostering personal and professional growth by providing educational products and practices that cultivate a range of skills and knowledge.
-                </p>
-              </motion.div>
-            </motion.div>
-          </motion.div>
         </div>
 
         {/* Wave divider */}
@@ -329,6 +243,93 @@ const Index = () => {
             ></path>
           </svg>
         </div>
+      </div>
+
+      {/* Why Choose Us Section */}
+      <div className="container mx-auto px-4 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-foreground">
+            Why Thousands Choose Opened Seal and Rest Empire
+          </h2>
+
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={{
+              visible: { transition: { staggerChildren: 0.15 } }
+            }}
+          >
+            <motion.div
+              className="bg-card p-6 rounded-xl border shadow-sm text-center"
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0 }
+              }}
+              whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
+            >
+              <motion.div
+                className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <BarChart3 className="w-8 h-8 text-primary" />
+              </motion.div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Wealth Education</h3>
+              <p className="text-muted-foreground">
+                Our Wealth Education programs utilize cutting-edge Blockchain technology and cryptography, providing individuals with the tools to create unstoppable wealth and secure their financial futures.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-card p-6 rounded-xl border shadow-sm text-center"
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0 }
+              }}
+              whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
+            >
+              <motion.div
+                className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <Zap className="w-8 h-8 text-primary" />
+              </motion.div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Health Education</h3>
+              <p className="text-muted-foreground">
+                In the realm of Health Education, we draw upon our extensive expertise in Naturopathic medicine to promote plant and nature-based health practices.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-card p-6 rounded-xl border shadow-sm text-center"
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0 }
+              }}
+              whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
+            >
+              <motion.div
+                className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <Lock className="w-8 h-8 text-primary" />
+              </motion.div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Capacity Development</h3>
+              <p className="text-muted-foreground">
+                Through our Capacity Development initiatives, we are dedicated to fostering personal and professional growth by providing educational products and practices that cultivate a range of skills and knowledge.
+              </p>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* Features Section */}
