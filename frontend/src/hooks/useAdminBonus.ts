@@ -10,6 +10,7 @@ export const useBonusSettings = () => {
       const response = await api.get('/admin/config/bonus-settings');
       return response.data as BonusSettings;
     },
+    staleTime: 10 * 60 * 1000,
   });
 };
 
