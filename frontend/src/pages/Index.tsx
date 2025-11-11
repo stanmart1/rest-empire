@@ -243,12 +243,7 @@ const Index = () => {
               className="bg-card rounded-2xl shadow-lg overflow-hidden transition-all"
             >
               <div className="grid md:grid-cols-2 gap-8 items-center min-h-[400px]">
-                <div className="h-full min-h-[400px] bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center p-8">
-                  {((currentSlide - 1 + 3) % 3) === 0 && <BarChart3 className="w-32 h-32 text-primary" />}
-                  {((currentSlide - 1 + 3) % 3) === 1 && <Zap className="w-32 h-32 text-primary" />}
-                  {((currentSlide - 1 + 3) % 3) === 2 && <Lock className="w-32 h-32 text-primary" />}
-                </div>
-                <div className="p-8 md:p-12">
+                <div className="p-8 md:p-12 order-2 md:order-1">
                   {((currentSlide - 1 + 3) % 3) === 0 && (
                     <>
                       <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Wealth Education</h3>
@@ -273,6 +268,11 @@ const Index = () => {
                       </p>
                     </>
                   )}
+                </div>
+                <div className="h-full min-h-[400px] bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center p-8 order-1 md:order-2">
+                  {((currentSlide - 1 + 3) % 3) === 0 && <BarChart3 className="w-32 h-32 text-primary" />}
+                  {((currentSlide - 1 + 3) % 3) === 1 && <Zap className="w-32 h-32 text-primary" />}
+                  {((currentSlide - 1 + 3) % 3) === 2 && <Lock className="w-32 h-32 text-primary" />}
                 </div>
               </div>
             </motion.div>
