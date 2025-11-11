@@ -35,28 +35,28 @@ const Index = () => {
       subtitle: "Empire Today",
       description: "Join over 10,000+ entrepreneurs building sustainable income streams with Opened Seal and Rest Empire.",
       cta: "Create Account",
-      gradient: "from-purple-600 via-purple-500 to-yellow-500"
+      gradient: "from-purple-700 via-purple-800 to-indigo-900"
     },
     {
       title: "Unlock Financial Freedom",
-      subtitle: "Through Education",
+      subtitle: "with Opened Seal and Rest Empire",
       description: "Master wealth creation with cutting-edge Blockchain technology and cryptocurrency education.",
       cta: "Start Learning",
-      gradient: "from-yellow-500 via-yellow-400 to-purple-600"
+      gradient: "from-amber-700 via-yellow-800 to-orange-900"
     },
     {
-      title: "Transform Your Health",
-      subtitle: "Naturally",
+      title: "Transform Your Health Naturally",
+      subtitle: "with Opened Seal and Rest Empire",
       description: "Discover naturopathic medicine and plant-based health practices for a better lifestyle.",
       cta: "Explore Health",
-      gradient: "from-green-500 via-green-400 to-purple-600"
+      gradient: "from-emerald-700 via-green-800 to-teal-900"
     },
     {
       title: "Develop Your Capacity",
-      subtitle: "Grow Your Skills",
+      subtitle: "with Opened Seal and Rest Empire",
       description: "Access educational products and practices that cultivate personal and professional growth.",
       cta: "Begin Journey",
-      gradient: "from-purple-600 via-green-500 to-yellow-500"
+      gradient: "from-slate-700 via-gray-800 to-zinc-900"
     }
   ];
 
