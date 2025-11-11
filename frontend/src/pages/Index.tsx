@@ -83,7 +83,7 @@ const Index = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => prev + 1);
-    }, 3000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, []);
