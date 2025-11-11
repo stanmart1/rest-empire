@@ -330,9 +330,9 @@ const Index = () => {
               whileHover={{ scale: 1.02, boxShadow: "0 25px 50px rgba(0,0,0,0.2)" }}
               className="bg-card rounded-2xl shadow-lg overflow-hidden transition-all"
             >
-              <div className="grid md:grid-cols-2 gap-8 items-center min-h-[350px]">
+              <div className="grid md:grid-cols-2 gap-8 items-center min-h-[400px]">
                 {/* Image Side */}
-                <div className="h-full min-h-[350px] bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center p-8">
+                <div className="h-full min-h-[400px] bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center p-8">
                   {((currentSlide - 1 + 3) % 3) === 0 && (
                     <Users className="w-32 h-32 text-primary" />
                   )}
