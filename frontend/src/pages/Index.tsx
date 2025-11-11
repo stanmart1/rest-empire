@@ -39,22 +39,22 @@ const Index = () => {
     },
     {
       title: "Unlock Financial Freedom",
-      subtitle: "with Opened Seal and Rest Empire",
-      description: "Master wealth creation with cutting-edge Blockchain technology and cryptocurrency education.",
+      subtitle: "Through Education",
+      description: "Master wealth creation with cutting-edge Blockchain technology and cryptocurrency education with Opened Seal and Rest Empire.",
       cta: "Start Learning",
       gradient: "from-amber-700 via-yellow-800 to-orange-900"
     },
     {
-      title: "Transform Your Health Naturally",
-      subtitle: "with Opened Seal and Rest Empire",
-      description: "Discover naturopathic medicine and plant-based health practices for a better lifestyle.",
+      title: "Transform Your Health",
+      subtitle: "Naturally",
+      description: "Discover naturopathic medicine and plant-based health practices for a better lifestyle with Opened Seal and Rest Empire.",
       cta: "Explore Health",
       gradient: "from-emerald-700 via-green-800 to-teal-900"
     },
     {
       title: "Develop Your Capacity",
-      subtitle: "with Opened Seal and Rest Empire",
-      description: "Access educational products and practices that cultivate personal and professional growth.",
+      subtitle: "Grow Your Skills",
+      description: "Access educational products and practices that cultivate personal and professional growth with Opened Seal and Rest Empire.",
       cta: "Begin Journey",
       gradient: "from-slate-700 via-gray-800 to-zinc-900"
     }
