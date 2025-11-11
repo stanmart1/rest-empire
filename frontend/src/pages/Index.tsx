@@ -437,6 +437,49 @@ const Index = () => {
       </div>
 
 
+      {/* How It Works Section */}
+      <div className="bg-[#003D7A] py-20 md:py-24">
+        <div className="container mx-auto px-10 md:px-20 max-w-7xl">
+          <motion.h2
+            className="text-5xl md:text-6xl font-bold text-white text-center mb-16 md:mb-20"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            How It Works
+          </motion.h2>
+
+          <div className="grid md:grid-cols-2 gap-x-24 lg:gap-x-28 gap-y-14">
+            {[
+              { num: 1, title: "Join the Community", desc: "Register your account and become part of our growing network of entrepreneurs building wealth together." },
+              { num: 2, title: "Choose Your Package", desc: "Select an activation package that fits your goals and unlock access to premium features and earning potential." },
+              { num: 3, title: "Build Your Team", desc: "Share your referral link and invite others to join. Grow your network and create multiple income streams." },
+              { num: 4, title: "Access Resources", desc: "Get exclusive access to educational materials, crypto signals, training videos, and promotional tools." },
+              { num: 5, title: "Earn Bonuses", desc: "Receive commissions through our three-tier bonus system: Unilevel, Rank, and Infinity bonuses." },
+              { num: 6, title: "Advance Your Rank", desc: "Progress through our rank system from Amber to Diamond and unlock higher earning percentages and rewards." }
+            ].map((step, index) => (
+              <motion.div
+                key={step.num}
+                className="flex items-start gap-7"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <div className="flex-shrink-0 w-14 h-14 rounded-full bg-[#FFA500] flex items-center justify-center">
+                  <span className="text-white text-2xl font-bold">{step.num}</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">{step.title}</h3>
+                  <p className="text-[#E8E8E8] text-sm md:text-base leading-relaxed">{step.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* CTA Section */}
       <div className="container mx-auto px-4 py-16">
         <motion.div 
