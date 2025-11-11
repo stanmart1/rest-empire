@@ -307,7 +307,7 @@ const Index = () => {
       </div>
 
       {/* Features Section */}
-      <div className="container mx-auto px-4 py-16 relative z-10 bg-gray-200">
+      <div className="container mx-auto px-4 py-16 relative z-10 bg-gray-50">
         <motion.h2 
           className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground"
           initial={{ opacity: 0, y: 30 }}
@@ -318,247 +318,101 @@ const Index = () => {
           Powerful Features for Your Success
         </motion.h2>
 
-        {/* Desktop Grid */}
-        <motion.div 
-          className="hidden sm:grid grid-cols-1 md:grid-cols-3 gap-8"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={{
-            visible: { transition: { staggerChildren: 0.15 } }
-          }}
-        >
-          <motion.div 
-            className="bg-card p-8 rounded-xl border shadow-sm"
-            variants={{
-              hidden: { opacity: 0, y: 50 },
-              visible: { opacity: 1, y: 0 }
-            }}
-            whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.div 
-              className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 300 }}
+        {/* Full Width Carousel */}
+        <div className="relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.5 }}
+              className="bg-card rounded-2xl shadow-lg overflow-hidden"
             >
-              <Users className="w-8 h-8 text-primary" />
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                {/* Image Side */}
+                <div className="h-64 md:h-96 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center p-8">
+                  {((currentSlide - 1 + 3) % 3) === 0 && (
+                    <Users className="w-32 h-32 text-primary" />
+                  )}
+                  {((currentSlide - 1 + 3) % 3) === 1 && (
+                    <Gift className="w-32 h-32 text-primary" />
+                  )}
+                  {((currentSlide - 1 + 3) % 3) === 2 && (
+                    <TrendingUp className="w-32 h-32 text-primary" />
+                  )}
+                </div>
+
+                {/* Text Side */}
+                <div className="p-8 md:p-12">
+                  {((currentSlide - 1 + 3) % 3) === 0 && (
+                    <>
+                      <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Book Review</h3>
+                      <p className="text-lg text-muted-foreground mb-6">
+                        Access our curated library of personal development and business books with reviews and insights from our community.
+                      </p>
+                      <ul className="space-y-3">
+                        <li className="flex items-center gap-3">
+                          <CheckCircle className="w-6 h-6 text-primary flex-shrink-0" />
+                          <span className="text-base">Extensive digital library</span>
+                        </li>
+                        <li className="flex items-center gap-3">
+                          <CheckCircle className="w-6 h-6 text-primary flex-shrink-0" />
+                          <span className="text-base">Community reviews and ratings</span>
+                        </li>
+                      </ul>
+                    </>
+                  )}
+                  {((currentSlide - 1 + 3) % 3) === 1 && (
+                    <>
+                      <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Crypto Signals</h3>
+                      <p className="text-lg text-muted-foreground mb-6">
+                        Get access to expert cryptocurrency trading signals and market analysis to help you make informed investment decisions.
+                      </p>
+                      <ul className="space-y-3">
+                        <li className="flex items-center gap-3">
+                          <CheckCircle className="w-6 h-6 text-primary flex-shrink-0" />
+                          <span className="text-base">Real-time market insights</span>
+                        </li>
+                        <li className="flex items-center gap-3">
+                          <CheckCircle className="w-6 h-6 text-primary flex-shrink-0" />
+                          <span className="text-base">Expert trading recommendations</span>
+                        </li>
+                      </ul>
+                    </>
+                  )}
+                  {((currentSlide - 1 + 3) % 3) === 2 && (
+                    <>
+                      <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Video Gallery</h3>
+                      <p className="text-lg text-muted-foreground mb-6">
+                        Watch training videos, webinars, and success stories from our community to accelerate your learning and growth.
+                      </p>
+                      <ul className="space-y-3">
+                        <li className="flex items-center gap-3">
+                          <CheckCircle className="w-6 h-6 text-primary flex-shrink-0" />
+                          <span className="text-base">Training and tutorials</span>
+                        </li>
+                        <li className="flex items-center gap-3">
+                          <CheckCircle className="w-6 h-6 text-primary flex-shrink-0" />
+                          <span className="text-base">Success stories and testimonials</span>
+                        </li>
+                      </ul>
+                    </>
+                  )}
+                </div>
+              </div>
             </motion.div>
-            <h3 className="text-2xl font-semibold mb-4 text-foreground">Book Review</h3>
-            <p className="text-foreground mb-4">
-              Access our curated library of personal development and business books with reviews and insights from our community.
-            </p>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm">Extensive digital library</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm">Community reviews and ratings</span>
-              </li>
-            </ul>
-          </motion.div>
-
-          <motion.div 
-            className="bg-card p-8 rounded-xl border shadow-sm"
-            variants={{
-              hidden: { opacity: 0, y: 50 },
-              visible: { opacity: 1, y: 0 }
-            }}
-            whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.div 
-              className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <Gift className="w-8 h-8 text-primary" />
-            </motion.div>
-            <h3 className="text-2xl font-semibold mb-4 text-foreground">Crypto Signals</h3>
-            <p className="text-foreground mb-4">
-              Get access to expert cryptocurrency trading signals and market analysis to help you make informed investment decisions.
-            </p>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm">Real-time market insights</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm">Expert trading recommendations</span>
-              </li>
-            </ul>
-          </motion.div>
-
-          <motion.div 
-            className="bg-card p-8 rounded-xl border shadow-sm"
-            variants={{
-              hidden: { opacity: 0, y: 50 },
-              visible: { opacity: 1, y: 0 }
-            }}
-            whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.div 
-              className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <TrendingUp className="w-8 h-8 text-primary" />
-            </motion.div>
-            <h3 className="text-2xl font-semibold mb-4 text-foreground">Video Gallery</h3>
-            <p className="text-foreground mb-4">
-              Watch training videos, webinars, and success stories from our community to accelerate your learning and growth.
-            </p>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm">Training and tutorials</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm">Success stories and testimonials</span>
-              </li>
-            </ul>
-          </motion.div>
-        </motion.div>
-
-        {/* Mobile Carousel (visible only on mobile) */}
-        <div className="sm:hidden">
-          {/* Carousel Container */}
-          <div className="relative overflow-hidden rounded-xl">
-            {/* Slides - With clones for infinite loop */}
-            <div
-              className={`flex ${isTransitioning ? 'transition-transform duration-500 ease-in-out' : ''}`}
-              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-            >
-              {/* Clone of last slide (for backward infinite) */}
-              <div className="w-full flex-shrink-0 p-4">
-                <div className="bg-card p-6 rounded-xl border shadow-sm">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                    <TrendingUp className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Video Gallery</h3>
-                  <p className="text-foreground mb-4">
-                    Watch training videos, webinars, and success stories from our community to accelerate your learning and growth.
-                  </p>
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Training and tutorials</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Success stories and testimonials</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Slide 1 */}
-              <div className="w-full flex-shrink-0 p-4">
-                <div className="bg-card p-6 rounded-xl border shadow-sm">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                    <Users className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Book Review</h3>
-                  <p className="text-foreground mb-4">
-                    Access our curated library of personal development and business books with reviews and insights from our community.
-                  </p>
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Extensive digital library</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Community reviews and ratings</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Slide 2 */}
-              <div className="w-full flex-shrink-0 p-4">
-                <div className="bg-card p-6 rounded-xl border shadow-sm">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                    <Gift className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Crypto Signals</h3>
-                  <p className="text-foreground mb-4">
-                    Get access to expert cryptocurrency trading signals and market analysis to help you make informed investment decisions.
-                  </p>
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Real-time market insights</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Expert trading recommendations</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Slide 3 */}
-              <div className="w-full flex-shrink-0 p-4">
-                <div className="bg-card p-6 rounded-xl border shadow-sm">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                    <TrendingUp className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Video Gallery</h3>
-                  <p className="text-foreground mb-4">
-                    Watch training videos, webinars, and success stories from our community to accelerate your learning and growth.
-                  </p>
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Training and tutorials</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Success stories and testimonials</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Clone of first slide (for forward infinite) */}
-              <div className="w-full flex-shrink-0 p-4">
-                <div className="bg-card p-6 rounded-xl border shadow-sm">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                    <Users className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Book Review</h3>
-                  <p className="text-foreground mb-4">
-                    Access our curated library of personal development and business books with reviews and insights from our community.
-                  </p>
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Extensive digital library</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-primary" />
-                      <span className="text-sm">Community reviews and ratings</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
+          </AnimatePresence>
 
           {/* Pagination Dots */}
-          <div className="flex justify-center gap-2 mt-4">
+          <div className="flex justify-center gap-2 mt-8">
             {[0, 1, 2].map((index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index + 1)}
-                className={`w-3 h-3 rounded-full ${((currentSlide - 1 + 3) % 3) === index ? 'bg-primary' : 'bg-gray-300'
-                  }`}
+                className={`w-3 h-3 rounded-full transition-all ${
+                  ((currentSlide - 1 + 3) % 3) === index ? 'w-8 bg-primary' : 'bg-gray-300'
+                }`}
               />
             ))}
           </div>
@@ -567,19 +421,20 @@ const Index = () => {
           <div className="flex justify-center gap-4 mt-6">
             <button
               onClick={prevSlide}
-              className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+              className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors shadow-lg"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-6 h-6" />
             </button>
             <button
               onClick={nextSlide}
-              className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+              className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors shadow-lg"
             >
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-6 h-6" />
             </button>
           </div>
         </div>
       </div>
+
 
       {/* CTA Section */}
       <div className="container mx-auto px-4 py-16">
