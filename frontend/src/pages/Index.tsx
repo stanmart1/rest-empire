@@ -221,89 +221,90 @@ const Index = () => {
 
       {/* Why Choose Us Section */}
       <div className="container mx-auto px-4 py-16">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
+        <motion.h2
+          className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground"
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-foreground">
-            Why Thousands Choose Opened Seal and Rest Empire
-          </h2>
+          Why Thousands Choose Opened Seal and Rest Empire
+        </motion.h2>
 
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={{
-              visible: { transition: { staggerChildren: 0.15 } }
-            }}
-          >
+        <div className="relative max-w-5xl mx-auto">
+          <AnimatePresence mode="wait">
             <motion.div
-              className="bg-card p-6 rounded-xl border shadow-sm text-center"
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0 }
-              }}
-              whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
+              key={currentSlide + 10}
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.02, boxShadow: "0 25px 50px rgba(0,0,0,0.2)" }}
+              className="bg-card rounded-2xl shadow-lg overflow-hidden transition-all"
             >
-              <motion.div
-                className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <BarChart3 className="w-8 h-8 text-primary" />
-              </motion.div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">Wealth Education</h3>
-              <p className="text-muted-foreground">
-                Our Wealth Education programs utilize cutting-edge Blockchain technology and cryptography, providing individuals with the tools to create unstoppable wealth and secure their financial futures.
-              </p>
+              <div className="grid md:grid-cols-2 gap-8 items-center min-h-[400px]">
+                <div className="h-full min-h-[400px] bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center p-8">
+                  {((currentSlide - 1 + 3) % 3) === 0 && <BarChart3 className="w-32 h-32 text-primary" />}
+                  {((currentSlide - 1 + 3) % 3) === 1 && <Zap className="w-32 h-32 text-primary" />}
+                  {((currentSlide - 1 + 3) % 3) === 2 && <Lock className="w-32 h-32 text-primary" />}
+                </div>
+                <div className="p-8 md:p-12">
+                  {((currentSlide - 1 + 3) % 3) === 0 && (
+                    <>
+                      <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Wealth Education</h3>
+                      <p className="text-lg text-muted-foreground">
+                        Our Wealth Education programs utilize cutting-edge Blockchain technology and cryptography, providing individuals with the tools to create unstoppable wealth and secure their financial futures.
+                      </p>
+                    </>
+                  )}
+                  {((currentSlide - 1 + 3) % 3) === 1 && (
+                    <>
+                      <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Health Education</h3>
+                      <p className="text-lg text-muted-foreground">
+                        In the realm of Health Education, we draw upon our extensive expertise in Naturopathic medicine to promote plant and nature-based health practices.
+                      </p>
+                    </>
+                  )}
+                  {((currentSlide - 1 + 3) % 3) === 2 && (
+                    <>
+                      <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Capacity Development</h3>
+                      <p className="text-lg text-muted-foreground">
+                        Through our Capacity Development initiatives, we are dedicated to fostering personal and professional growth by providing educational products and practices that cultivate a range of skills and knowledge.
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
             </motion.div>
+          </AnimatePresence>
 
-            <motion.div
-              className="bg-card p-6 rounded-xl border shadow-sm text-center"
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0 }
-              }}
-              whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
-            >
-              <motion.div
-                className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <Zap className="w-8 h-8 text-primary" />
-              </motion.div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">Health Education</h3>
-              <p className="text-muted-foreground">
-                In the realm of Health Education, we draw upon our extensive expertise in Naturopathic medicine to promote plant and nature-based health practices.
-              </p>
-            </motion.div>
+          <div className="flex justify-center gap-2 mt-8">
+            {[0, 1, 2].map((index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index + 1)}
+                className={`w-3 h-3 rounded-full transition-all ${
+                  ((currentSlide - 1 + 3) % 3) === index ? 'w-8 bg-primary' : 'bg-gray-300'
+                }`}
+              />
+            ))}
+          </div>
 
-            <motion.div
-              className="bg-card p-6 rounded-xl border shadow-sm text-center"
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0 }
-              }}
-              whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
+          <div className="flex justify-center gap-4 mt-6">
+            <button
+              onClick={prevSlide}
+              className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors shadow-lg"
             >
-              <motion.div
-                className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <Lock className="w-8 h-8 text-primary" />
-              </motion.div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">Capacity Development</h3>
-              <p className="text-muted-foreground">
-                Through our Capacity Development initiatives, we are dedicated to fostering personal and professional growth by providing educational products and practices that cultivate a range of skills and knowledge.
-              </p>
-            </motion.div>
-          </motion.div>
-        </motion.div>
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors shadow-lg"
+            >
+              <ArrowRight className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Features Section */}
