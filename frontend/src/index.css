@@ -18,27 +18,27 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
 
-    /* Primary: Dark Green #0a2c1cff */
-    --primary: 152 63% 11%; /* Dark Green */
+    /* Primary: Royal Purple */
+    --primary: 270 60% 50%; /* Royal Purple */
     --primary-foreground: 0 0% 100%;
-    --primary-dark: 152 63% 7%; /* Darker shade for hover */
-    --primary-light: 152 63% 15%; /* Lighter shade */
+    --primary-dark: 270 60% 40%; /* Darker purple for hover */
+    --primary-light: 270 60% 60%; /* Lighter purple */
 
-    /* Secondary: Dark Green #0d311eff */
-    --secondary: 148 58% 12%; /* Dark Green */
-    --secondary-foreground: 0 0% 100%;
-    --secondary-dark: 148 58% 8%; /* Darker shade for hover */
+    /* Secondary: Gold */
+    --secondary: 45 100% 50%; /* Gold */
+    --secondary-foreground: 0 0% 0%;
+    --secondary-dark: 45 100% 40%; /* Darker gold for hover */
 
-    /* Accent: Dark Green #0a2c1cff */
-    --accent: 152 63% 11%; /* Dark Green */
-    --accent-foreground: 0 0% 100%;
+    /* Accent: Light Green */
+    --accent: 140 60% 60%; /* Light Green */
+    --accent-foreground: 0 0% 0%;
 
-    /* Muted: Dark Green #0f321eff */
-    --muted: 146 54% 13%; /* Dark Green */
-    --muted-foreground: 0 0% 60%; /* Changed from 0 0% 100% to make it visible */
+    /* Muted */
+    --muted: 240 10% 95%;
+    --muted-foreground: 240 5% 40%;
 
     /* Status colors */
-    --success: 152 63% 11%; /* Dark Green */
+    --success: 140 60% 50%; /* Light Green */
     --success-foreground: 0 0% 100%;
     
     --warning: 38 92% 50%;
@@ -47,95 +47,95 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --info: 152 63% 11%; /* Dark Green */
+    --info: 210 100% 50%;
     --info-foreground: 0 0% 100%;
 
     /* Rank colors */
-    --rank-amber: 38 92% 50%;
-    --rank-jade: 152 63% 11%; /* Dark Green */
+    --rank-amber: 45 100% 50%; /* Gold */
+    --rank-jade: 140 60% 50%; /* Light Green */
     --rank-pearl: 0 0% 85%;
-    --rank-sapphire: 152 63% 11%; /* Dark Green */
+    --rank-sapphire: 210 100% 50%;
     --rank-ruby: 0 84% 60%;
-    --rank-emerald: 152 63% 11%; /* Dark Green */
-    --rank-diamond: 152 63% 11%; /* Dark Green */
-    --rank-blue-diamond: 152 63% 11%; /* Dark Green */
-    --rank-green-diamond: 152 63% 11%; /* Dark Green */
-    --rank-purple-diamond: 262 83% 58%;
+    --rank-emerald: 140 60% 50%; /* Light Green */
+    --rank-diamond: 270 60% 50%; /* Royal Purple */
+    --rank-blue-diamond: 210 100% 50%;
+    --rank-green-diamond: 140 60% 50%; /* Light Green */
+    --rank-purple-diamond: 270 60% 50%; /* Royal Purple */
     --rank-red-diamond: 0 84% 60%;
     --rank-black-diamond: 0 0% 0%;
-    --rank-ultima-diamond: 45 93% 47%;
-    --rank-double-ultima: 45 93% 47%;
+    --rank-ultima-diamond: 45 100% 50%; /* Gold */
+    --rank-double-ultima: 45 100% 50%; /* Gold */
 
-    --border: 135 20% 85%; /* Light border */
-    --input: 135 20% 85%;
-    --ring: 152 63% 11%; /* Dark Green */
+    --border: 240 10% 85%;
+    --input: 240 10% 90%;
+    --ring: 270 60% 50%; /* Royal Purple */
 
     --radius: 0.75rem;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(152 63% 11%), hsl(152 63% 15%));
-    --gradient-success: linear-gradient(135deg, hsl(152 63% 11%), hsl(152 63% 15%));
-    --gradient-dark: linear-gradient(135deg, hsl(152 63% 7%), hsl(152 63% 11%));
+    --gradient-primary: linear-gradient(135deg, hsl(270 60% 50%), hsl(270 60% 60%));
+    --gradient-success: linear-gradient(135deg, hsl(140 60% 50%), hsl(140 60% 60%));
+    --gradient-dark: linear-gradient(135deg, hsl(270 60% 40%), hsl(270 60% 50%));
 
-    /* Sidebar - Dark Green theme */
-    --sidebar-background: 152 63% 97%; /* Very light green */
+    /* Sidebar */
+    --sidebar-background: 270 60% 98%;
     --sidebar-foreground: 0 0% 0%;
-    --sidebar-primary: 152 63% 11%; /* Dark Green */
+    --sidebar-primary: 270 60% 50%; /* Royal Purple */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 152 63% 92%; /* Light green accent */
+    --sidebar-accent: 270 60% 95%;
     --sidebar-accent-foreground: 0 0% 0%;
-    --sidebar-border: 152 20% 85%;
-    --sidebar-ring: 152 63% 11%; /* Dark Green */
-    --sidebar-muted: 152 20% 40%;
+    --sidebar-border: 240 10% 85%;
+    --sidebar-ring: 270 60% 50%; /* Royal Purple */
+    --sidebar-muted: 240 5% 40%;
 
-    /* Shadows - softer for light theme */
+    /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 2px 4px 0 rgb(0 0 0 / 0.05);
     --shadow-lg: 0 4px 8px 0 rgb(0 0 0 / 0.06);
-    --shadow-glow: 0 0 20px hsl(152 63% 11% / 0.15);
+    --shadow-glow: 0 0 20px hsl(270 60% 50% / 0.15);
 
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    /* Dark mode colors - keeping the same green palette but adjusting for dark backgrounds */
-    --background: 152 63% 7%; /* Dark green background */
-    --foreground: 0 0% 100%; /* White text */
+    /* Dark mode colors */
+    --background: 270 30% 10%;
+    --foreground: 0 0% 100%;
 
-    --card: 152 63% 9%;
+    --card: 270 30% 12%;
     --card-foreground: 0 0% 100%;
 
-    --popover: 152 63% 9%;
+    --popover: 270 30% 12%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 152 63% 14%; /* Lighter Dark Green for dark mode */
+    --primary: 270 60% 60%; /* Lighter purple for dark mode */
     --primary-foreground: 0 0% 100%;
-    --primary-dark: 152 63% 10%;
-    --primary-light: 152 63% 18%;
+    --primary-dark: 270 60% 50%;
+    --primary-light: 270 60% 70%;
 
-    --secondary: 152 20% 35%; /* Lighter Muted Olive Green */
-    --secondary-foreground: 0 0% 100%;
-    --secondary-dark: 152 20% 30%;
+    --secondary: 45 100% 60%; /* Lighter gold for dark mode */
+    --secondary-foreground: 0 0% 0%;
+    --secondary-dark: 45 100% 50%;
 
-    --accent: 152 63% 14%; /* Lighter Dark Green */
-    --accent-foreground: 0 0% 100%;
+    --accent: 140 60% 70%; /* Lighter green for dark mode */
+    --accent-foreground: 0 0% 0%;
 
-    --muted: 152 20% 30%;
-    --muted-foreground: 0 0% 80%; /* Changed from 0 0% 100% to make it visible */
+    --muted: 240 10% 20%;
+    --muted-foreground: 240 5% 70%;
 
-    --border: 152 20% 25%;
-    --input: 152 20% 25%;
-    --ring: 152 63% 14%;
+    --border: 240 10% 25%;
+    --input: 240 10% 25%;
+    --ring: 270 60% 60%;
     
-    --sidebar-background: 152 63% 11%;
+    --sidebar-background: 270 30% 12%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 152 63% 14%;
+    --sidebar-primary: 270 60% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 152 63% 10%;
+    --sidebar-accent: 270 30% 15%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 152 20% 25%;
-    --sidebar-ring: 152 63% 14%;
+    --sidebar-border: 240 10% 25%;
+    --sidebar-ring: 270 60% 60%;
   }
 }
 

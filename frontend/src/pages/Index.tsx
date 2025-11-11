@@ -4,7 +4,7 @@ import { ArrowRight, ArrowLeft, Users, Gift, TrendingUp, Shield, Award, Globe, C
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useEffect, useState, useRef } from "react";
-import { motion, useInView, useMotionValue, useTransform, animate as motionAnimate } from "motion/react";
+import { motion, AnimatePresence, useInView, useMotionValue, useTransform, animate as motionAnimate } from "motion/react";
 
 const Counter = ({ to }: { to: number }) => {
   const count = useMotionValue(0);
@@ -27,7 +27,47 @@ const Index = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Carousel state - continuous infinite scroll
+  // Hero carousel state
+  const [heroSlide, setHeroSlide] = useState(0);
+  const heroSlides = [
+    {
+      title: "Build Your Network Marketing",
+      subtitle: "Empire Today",
+      description: "Join over 10,000+ entrepreneurs building sustainable income streams with Opened Seal and Rest Empire.",
+      cta: "Create Account",
+      gradient: "from-purple-600 via-purple-500 to-yellow-500"
+    },
+    {
+      title: "Unlock Financial Freedom",
+      subtitle: "Through Education",
+      description: "Master wealth creation with cutting-edge Blockchain technology and cryptocurrency education.",
+      cta: "Start Learning",
+      gradient: "from-yellow-500 via-yellow-400 to-purple-600"
+    },
+    {
+      title: "Transform Your Health",
+      subtitle: "Naturally",
+      description: "Discover naturopathic medicine and plant-based health practices for a better lifestyle.",
+      cta: "Explore Health",
+      gradient: "from-green-500 via-green-400 to-purple-600"
+    },
+    {
+      title: "Develop Your Capacity",
+      subtitle: "Grow Your Skills",
+      description: "Access educational products and practices that cultivate personal and professional growth.",
+      cta: "Begin Journey",
+      gradient: "from-purple-600 via-green-500 to-yellow-500"
+    }
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Features carousel state - continuous infinite scroll
   const [currentSlide, setCurrentSlide] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(true);
 
@@ -74,13 +114,23 @@ const Index = () => {
       <Header />
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-secondary">
+      <div className="relative overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={heroSlide}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className={`absolute inset-0 bg-gradient-to-r ${heroSlides[heroSlide].gradient}`}
+          />
+        </AnimatePresence>
         {/* Decorative elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHBhdHRlcm5Vbml0cz0idXNlckNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxjaXJjbGUgY3g9IjEwIiBjeT0iMTAiIHI9IjEuNSIgZmlsbD0id2hpdGUiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=')]"></div>
         </div>
 
-        <div className="container mx-auto px-4 py-28 md:py-36 lg:py-44 relative z-10">
+        <div className="container mx-auto px-4 py-28 md:py-36 lg:py-44 relative z-20">
           {[...Array(5)].map((_, i) => (
             <motion.div
               key={i}
@@ -96,55 +146,53 @@ const Index = () => {
           ))}
 
           <div className="flex flex-col lg:flex-row items-center">
-            <motion.div 
-              className="lg:w-1/2 mb-20 lg:mb-0 lg:pr-12 text-center lg:text-left"
-              initial="hidden"
-              animate="visible"
-              variants={{
-                visible: { transition: { staggerChildren: 0.2 } }
-              }}
-            >
-              <motion.h1 
-                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-primary-foreground leading-tight"
-                variants={{
-                  hidden: { opacity: 0, y: 30 },
-                  visible: { opacity: 1, y: 0 }
-                }}
-              >
-                Build Your Network Marketing <span className="block">Empire Today</span>
-              </motion.h1>
-              <motion.p 
-                className="text-xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto lg:mx-0"
-                variants={{
-                  hidden: { opacity: 0, y: 30 },
-                  visible: { opacity: 1, y: 0 }
-                }}
-              >
-                Join over <Counter to={10000} />+ entrepreneurs who are building sustainable income streams with Opened Seal and Rest Empire.
-              </motion.p>
-              <motion.div 
-                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
-                variants={{
-                  hidden: { opacity: 0, y: 30 },
-                  visible: { opacity: 1, y: 0 }
-                }}
-              >
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button asChild size="lg" className="text-lg px-8 py-6 bg-white text-primary hover:bg-white/90">
-                    <Link to="/register">
-                      Create Account <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
+            <div className="lg:w-1/2 mb-20 lg:mb-0 lg:pr-12 text-center lg:text-left">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={heroSlide}
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-primary-foreground leading-tight">
+                    {heroSlides[heroSlide].title} <span className="block">{heroSlides[heroSlide].subtitle}</span>
+                  </h1>
+                  <p className="text-xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto lg:mx-0">
+                    {heroSlides[heroSlide].description}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button asChild size="lg" className="text-lg px-8 py-6 bg-white text-primary hover:bg-white/90">
+                        <Link to="/register">
+                          {heroSlides[heroSlide].cta} <ArrowRight className="ml-2 h-5 w-5" />
+                        </Link>
+                      </Button>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button asChild size="lg" className="text-lg px-8 py-6 bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+                        <Link to="/login">
+                          Login to Account
+                        </Link>
+                      </Button>
+                    </motion.div>
+                  </div>
                 </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button asChild size="lg" className="text-lg px-8 py-6 bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                    <Link to="/login">
-                      Login to Account
-                    </Link>
-                  </Button>
-                </motion.div>
-              </motion.div>
-            </motion.div>
+              </AnimatePresence>
+              
+              {/* Slide indicators */}
+              <div className="flex justify-center lg:justify-start gap-2 mt-8">
+                {heroSlides.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setHeroSlide(index)}
+                    className={`h-2 rounded-full transition-all ${
+                      heroSlide === index ? 'w-8 bg-white' : 'w-2 bg-white/40'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
 
             <div className="lg:w-1/2 flex justify-center">
               <motion.div 
