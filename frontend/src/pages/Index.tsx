@@ -308,6 +308,73 @@ const Index = () => {
         </div>
       </div>
 
+      {/* About the Founder Section */}
+      <div className="bg-background py-16">
+        <div className="container mx-auto px-4">
+          <motion.h2
+            className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            About the Founder
+          </motion.h2>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative"
+            >
+              <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src="/placeholder.svg"
+                  alt="Founder"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="space-y-6"
+            >
+              <h3 className="text-2xl md:text-3xl font-bold text-foreground">Building Empires, Transforming Lives</h3>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                With over a decade of experience in network marketing and blockchain technology, our founder has dedicated their career to empowering individuals to achieve financial freedom through education and community building.
+              </p>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Driven by a passion for naturopathic medicine and holistic wellness, they created Opened Seal and Rest Empire to merge wealth creation with health education, providing a comprehensive platform for personal and professional growth.
+              </p>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Today, the platform serves thousands of distributors worldwide, helping them build sustainable income streams while promoting natural health practices and cutting-edge financial education.
+              </p>
+              <div className="flex gap-4 pt-4">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary">10+</div>
+                  <div className="text-sm text-muted-foreground">Years Experience</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary">10K+</div>
+                  <div className="text-sm text-muted-foreground">Active Members</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary">50+</div>
+                  <div className="text-sm text-muted-foreground">Countries</div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
       {/* Features Section */}
       <div className="bg-gray-50">
         <div className="container mx-auto px-4 py-16 relative z-10">
