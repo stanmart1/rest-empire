@@ -342,8 +342,8 @@ const Index = () => {
             >
               <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl">
                 <img
-                  src="/placeholder.svg"
-                  alt="Founder"
+                  src="/founder.jpeg"
+                  alt="Ayodele Kikelomo"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -367,6 +367,7 @@ const Index = () => {
               <Button 
                 onClick={() => setFounderModalOpen(true)}
                 variant="outline" 
+                size="lg"
                 className="mt-4"
               >
                 Read More
