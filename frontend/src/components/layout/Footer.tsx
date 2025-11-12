@@ -31,7 +31,7 @@ const Footer = () => {
   return (
     <footer className="border-t border-border bg-black">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <img src="/favicon.png" alt="Logo" className="w-10 h-10" />
@@ -84,6 +84,15 @@ const Footer = () => {
               <li><Link to="/about" className="text-gray-300 hover:text-primary">About Us</Link></li>
               <li><Link to="/blog" className="text-gray-300 hover:text-primary">Blog</Link></li>
               <li><Link to="/contact" className="text-gray-300 hover:text-primary">Contact</Link></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Useful Links</h3>
+            <ul className="space-y-2">
+              <li><Link to="#" className="text-gray-300 hover:text-primary">Link One</Link></li>
+              <li><Link to="#" className="text-gray-300 hover:text-primary">Link Two</Link></li>
+              <li><Link to="#" className="text-gray-300 hover:text-primary">Link Three</Link></li>
             </ul>
           </div>
           

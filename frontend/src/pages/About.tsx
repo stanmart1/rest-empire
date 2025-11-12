@@ -99,6 +99,45 @@ const About = () => {
         </div>
       </div>
 
+      {/* About Our Team Section */}
+      <div className="bg-gray-50 py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-foreground">About Our Team</h2>
+          <p className="text-lg text-center text-muted-foreground mb-12 max-w-3xl mx-auto">
+            Meet the dedicated professionals behind Opened Seal and Rest Empire, committed to your success.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="bg-card rounded-xl overflow-hidden shadow-lg">
+              <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20"></div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-foreground mb-2">Team Member One</h3>
+                <p className="text-primary font-semibold mb-3">Position Title</p>
+                <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
+              </div>
+            </div>
+            
+            <div className="bg-card rounded-xl overflow-hidden shadow-lg">
+              <div className="aspect-square bg-gradient-to-br from-secondary/20 to-accent/20"></div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-foreground mb-2">Team Member Two</h3>
+                <p className="text-primary font-semibold mb-3">Position Title</p>
+                <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
+              </div>
+            </div>
+            
+            <div className="bg-card rounded-xl overflow-hidden shadow-lg">
+              <div className="aspect-square bg-gradient-to-br from-accent/20 to-primary/20"></div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-foreground mb-2">Team Member Three</h3>
+                <p className="text-primary font-semibold mb-3">Position Title</p>
+                <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* CTA Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-8 md:p-12 text-center">
