@@ -345,32 +345,18 @@ const Index = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="space-y-6"
+              className="space-y-5"
             >
-              <h3 className="text-3xl md:text-4xl font-bold text-foreground">Building Empires, Transforming Lives</h3>
-              <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed">
+              <h3 className="text-2xl md:text-3xl font-bold text-foreground">Building Empires, Transforming Lives</h3>
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
                 With over a decade of experience in network marketing and blockchain technology, our founder has dedicated their career to empowering individuals to achieve financial freedom through education and community building.
               </p>
-              <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed">
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
                 Driven by a passion for naturopathic medicine and holistic wellness, they created Opened Seal and Rest Empire to merge wealth creation with health education, providing a comprehensive platform for personal and professional growth.
               </p>
-              <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed">
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
                 Today, the platform serves thousands of distributors worldwide, helping them build sustainable income streams while promoting natural health practices and cutting-edge financial education.
               </p>
-              <div className="flex gap-6 pt-4">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-primary">10+</div>
-                  <div className="text-base text-muted-foreground">Years Experience</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-primary">10K+</div>
-                  <div className="text-base text-muted-foreground">Active Members</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-primary">50+</div>
-                  <div className="text-base text-muted-foreground">Countries</div>
-                </div>
-              </div>
             </motion.div>
           </div>
         </div>
