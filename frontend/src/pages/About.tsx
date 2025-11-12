@@ -117,8 +117,8 @@ const About = () => {
           
           {/* Desktop Grid */}
           <div className="hidden md:grid grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div className="bg-card rounded-xl overflow-hidden shadow-lg">
-              <div className="h-48 bg-gradient-to-br from-primary/20 to-secondary/20"></div>
+            <div className="bg-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer">
+              <div className="h-48 bg-gradient-to-br from-primary/20 to-secondary/20 transition-all duration-300 hover:from-primary/30 hover:to-secondary/30"></div>
               <div className="p-8">
                 <h3 className="text-xl font-bold text-foreground mb-2">Team Member One</h3>
                 <p className="text-primary font-semibold mb-3">Position Title</p>
@@ -126,8 +126,8 @@ const About = () => {
               </div>
             </div>
             
-            <div className="bg-card rounded-xl overflow-hidden shadow-lg">
-              <div className="h-48 bg-gradient-to-br from-secondary/20 to-accent/20"></div>
+            <div className="bg-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer">
+              <div className="h-48 bg-gradient-to-br from-secondary/20 to-accent/20 transition-all duration-300 hover:from-secondary/30 hover:to-accent/30"></div>
               <div className="p-8">
                 <h3 className="text-xl font-bold text-foreground mb-2">Team Member Two</h3>
                 <p className="text-primary font-semibold mb-3">Position Title</p>
@@ -135,8 +135,8 @@ const About = () => {
               </div>
             </div>
             
-            <div className="bg-card rounded-xl overflow-hidden shadow-lg">
-              <div className="h-48 bg-gradient-to-br from-accent/20 to-primary/20"></div>
+            <div className="bg-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer">
+              <div className="h-48 bg-gradient-to-br from-accent/20 to-primary/20 transition-all duration-300 hover:from-accent/30 hover:to-primary/30"></div>
               <div className="p-8">
                 <h3 className="text-xl font-bold text-foreground mb-2">Team Member Three</h3>
                 <p className="text-primary font-semibold mb-3">Position Title</p>
