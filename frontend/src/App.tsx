@@ -61,6 +61,7 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const MotivationalTalk = lazy(() => import("./pages/MotivationalTalk"));
 const BookReview = lazy(() => import("./pages/BookReview"));
+const ThreeX21Program = lazy(() => import("./pages/ThreeX21Program"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -94,6 +95,7 @@ const AnimatedRoutes = () => {
         <Route path="/blog/:id" element={<PageWrapper><BlogPost /></PageWrapper>} />
         <Route path="/talk" element={<PageWrapper><MotivationalTalk /></PageWrapper>} />
         <Route path="/book-review" element={<PageWrapper><BookReview /></PageWrapper>} />
+        <Route path="/3x21-program" element={<PageWrapper><ThreeX21Program /></PageWrapper>} />
         <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
         <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
         <Route path="/forgot-password" element={<PageWrapper><ForgotPassword /></PageWrapper>} />
