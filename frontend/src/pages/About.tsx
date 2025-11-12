@@ -3,11 +3,12 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 
 const About = () => {
+  const [teamSlide, setTeamSlide] = useState(0);
   const { data: aboutData, isLoading } = useQuery({
     queryKey: ['public-about'],
     queryFn: async () => {
@@ -18,6 +19,13 @@ const About = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTeamSlide((prev) => (prev + 1) % 3);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   if (isLoading) {
@@ -107,10 +115,11 @@ const About = () => {
             Meet the dedicated professionals behind Opened Seal and Rest Empire, committed to your success.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {/* Desktop Grid */}
+          <div className="hidden md:grid grid-cols-3 gap-8 max-w-6xl mx-auto">
             <div className="bg-card rounded-xl overflow-hidden shadow-lg">
-              <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20"></div>
-              <div className="p-6">
+              <div className="h-48 bg-gradient-to-br from-primary/20 to-secondary/20"></div>
+              <div className="p-8">
                 <h3 className="text-xl font-bold text-foreground mb-2">Team Member One</h3>
                 <p className="text-primary font-semibold mb-3">Position Title</p>
                 <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
@@ -118,8 +127,8 @@ const About = () => {
             </div>
             
             <div className="bg-card rounded-xl overflow-hidden shadow-lg">
-              <div className="aspect-square bg-gradient-to-br from-secondary/20 to-accent/20"></div>
-              <div className="p-6">
+              <div className="h-48 bg-gradient-to-br from-secondary/20 to-accent/20"></div>
+              <div className="p-8">
                 <h3 className="text-xl font-bold text-foreground mb-2">Team Member Two</h3>
                 <p className="text-primary font-semibold mb-3">Position Title</p>
                 <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
@@ -127,12 +136,61 @@ const About = () => {
             </div>
             
             <div className="bg-card rounded-xl overflow-hidden shadow-lg">
-              <div className="aspect-square bg-gradient-to-br from-accent/20 to-primary/20"></div>
-              <div className="p-6">
+              <div className="h-48 bg-gradient-to-br from-accent/20 to-primary/20"></div>
+              <div className="p-8">
                 <h3 className="text-xl font-bold text-foreground mb-2">Team Member Three</h3>
                 <p className="text-primary font-semibold mb-3">Position Title</p>
                 <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
               </div>
+            </div>
+          </div>
+          
+          {/* Mobile Carousel */}
+          <div className="md:hidden relative max-w-md mx-auto">
+            <div className="overflow-hidden">
+              <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${teamSlide * 100}%)` }}>
+                <div className="w-full flex-shrink-0">
+                  <div className="bg-card rounded-xl overflow-hidden shadow-lg">
+                    <div className="h-48 bg-gradient-to-br from-primary/20 to-secondary/20"></div>
+                    <div className="p-8">
+                      <h3 className="text-xl font-bold text-foreground mb-2">Team Member One</h3>
+                      <p className="text-primary font-semibold mb-3">Position Title</p>
+                      <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="w-full flex-shrink-0">
+                  <div className="bg-card rounded-xl overflow-hidden shadow-lg">
+                    <div className="h-48 bg-gradient-to-br from-secondary/20 to-accent/20"></div>
+                    <div className="p-8">
+                      <h3 className="text-xl font-bold text-foreground mb-2">Team Member Two</h3>
+                      <p className="text-primary font-semibold mb-3">Position Title</p>
+                      <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="w-full flex-shrink-0">
+                  <div className="bg-card rounded-xl overflow-hidden shadow-lg">
+                    <div className="h-48 bg-gradient-to-br from-accent/20 to-primary/20"></div>
+                    <div className="p-8">
+                      <h3 className="text-xl font-bold text-foreground mb-2">Team Member Three</h3>
+                      <p className="text-primary font-semibold mb-3">Position Title</p>
+                      <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-center gap-2 mt-6">
+              {[0, 1, 2].map((index) => (
+                <button
+                  key={index}
+                  onClick={() => setTeamSlide(index)}
+                  className={`w-3 h-3 rounded-full transition-all ${
+                    teamSlide === index ? 'w-8 bg-primary' : 'bg-gray-300'
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </div>

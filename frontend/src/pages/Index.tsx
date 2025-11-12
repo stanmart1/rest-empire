@@ -70,6 +70,7 @@ const Index = () => {
   // Features carousel state - continuous infinite scroll
   const [currentSlide, setCurrentSlide] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(true);
+  const [featureSlide, setFeatureSlide] = useState(0);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => prev + 1);
@@ -108,6 +109,13 @@ const Index = () => {
       }, 50);
     }
   }, [currentSlide]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFeatureSlide((prev) => (prev + 1) % 3);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -375,8 +383,9 @@ const Index = () => {
           Powerful Features for Your Success
         </motion.h2>
 
+        {/* Desktop Grid */}
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="hidden md:grid grid-cols-3 gap-8"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -477,6 +486,88 @@ const Index = () => {
             </ul>
           </motion.div>
         </motion.div>
+
+        {/* Mobile Carousel */}
+        <div className="md:hidden relative max-w-md mx-auto">
+          <div className="overflow-hidden">
+            <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${featureSlide * 100}%)` }}>
+              <div className="w-full flex-shrink-0 px-2">
+                <div className="bg-card p-8 rounded-xl border shadow-sm">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                    <Users className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Book Review</h3>
+                  <p className="text-foreground mb-4">
+                    Access our curated library of personal development and business books with reviews and insights from our community.
+                  </p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Extensive digital library</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Community reviews and ratings</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div className="w-full flex-shrink-0 px-2">
+                <div className="bg-card p-8 rounded-xl border shadow-sm">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                    <Gift className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Crypto Signals</h3>
+                  <p className="text-foreground mb-4">
+                    Get access to expert cryptocurrency trading signals and market analysis to help you make informed investment decisions.
+                  </p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Real-time market insights</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Expert trading recommendations</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div className="w-full flex-shrink-0 px-2">
+                <div className="bg-card p-8 rounded-xl border shadow-sm">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                    <TrendingUp className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Video Gallery</h3>
+                  <p className="text-foreground mb-4">
+                    Watch training videos, webinars, and success stories from our community to accelerate your learning and growth.
+                  </p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Training and tutorials</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-primary" />
+                      <span className="text-sm">Success stories and testimonials</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-center gap-2 mt-6">
+            {[0, 1, 2].map((index) => (
+              <button
+                key={index}
+                onClick={() => setFeatureSlide(index)}
+                className={`w-3 h-3 rounded-full transition-all ${
+                  featureSlide === index ? 'w-8 bg-primary' : 'bg-gray-300'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
         </div>
       </div>
 
