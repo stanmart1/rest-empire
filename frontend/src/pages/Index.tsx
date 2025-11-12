@@ -120,11 +120,11 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Header />
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden min-h-[600px] md:min-h-[700px]">
+      <div className="relative overflow-hidden min-h-[600px] md:min-h-[700px] w-full">
         {heroSlides.map((slide, index) => (
           <motion.div
             key={index}
