@@ -9,7 +9,7 @@ const Header = () => {
 
   return (
     <>
-    <header className="bg-background border-b border-border">
+    <header className="bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-30">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -33,10 +33,10 @@ const Header = () => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button asChild variant="outline" size="sm">
+            <Button asChild variant="outline" size="lg" className="bg-[hsl(45,100%,80%)] hover:bg-[hsl(45,100%,50%)] text-gray-900 border-[hsl(45,100%,70%)] hover:border-[hsl(45,100%,50%)] font-semibold">
               <Link to="/login">Login</Link>
             </Button>
-            <Button asChild size="sm">
+            <Button asChild size="lg">
               <Link to="/register">Sign Up</Link>
             </Button>
           </div>
@@ -147,10 +147,10 @@ const Header = () => {
               }}
               className="flex flex-col space-y-3 pt-6 border-t border-border"
             >
-              <Button asChild variant="outline" className="w-full">
+              <Button asChild variant="outline" size="lg" className="w-full bg-[hsl(45,100%,80%)] hover:bg-[hsl(45,100%,50%)] text-gray-900 border-[hsl(45,100%,70%)] hover:border-[hsl(45,100%,50%)] font-semibold">
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)}>Login</Link>
               </Button>
-              <Button asChild className="w-full">
+              <Button asChild size="lg" className="w-full">
                 <Link to="/register" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link>
               </Button>
             </motion.div>
