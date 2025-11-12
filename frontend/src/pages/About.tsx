@@ -149,7 +149,7 @@ const About = () => {
           <div className="md:hidden relative max-w-md mx-auto">
             <div className="overflow-hidden">
               <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${teamSlide * 100}%)` }}>
-                <div className="w-full flex-shrink-0">
+                <div className="w-full flex-shrink-0 px-2">
                   <div className="bg-card rounded-xl overflow-hidden shadow-lg">
                     <div className="h-48 bg-gradient-to-br from-primary/20 to-secondary/20"></div>
                     <div className="p-8">
@@ -159,7 +159,7 @@ const About = () => {
                     </div>
                   </div>
                 </div>
-                <div className="w-full flex-shrink-0">
+                <div className="w-full flex-shrink-0 px-2">
                   <div className="bg-card rounded-xl overflow-hidden shadow-lg">
                     <div className="h-48 bg-gradient-to-br from-secondary/20 to-accent/20"></div>
                     <div className="p-8">
@@ -169,7 +169,7 @@ const About = () => {
                     </div>
                   </div>
                 </div>
-                <div className="w-full flex-shrink-0">
+                <div className="w-full flex-shrink-0 px-2">
                   <div className="bg-card rounded-xl overflow-hidden shadow-lg">
                     <div className="h-48 bg-gradient-to-br from-accent/20 to-primary/20"></div>
                     <div className="p-8">
