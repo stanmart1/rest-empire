@@ -446,7 +446,7 @@ const Index = () => {
             >
               <Gift className="w-8 h-8 text-primary" />
             </motion.div>
-            <h3 className="text-2xl font-semibold mb-4 text-foreground">Crypto Signals</h3>
+            <h3 className="text-2xl font-semibold mb-4 text-foreground">Trading Signals</h3>
             <p className="text-foreground mb-4">
               Get access to expert cryptocurrency trading signals and market analysis to help you make informed investment decisions.
             </p>
@@ -524,7 +524,7 @@ const Index = () => {
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <Gift className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Crypto Signals</h3>
+                  <h3 className="text-2xl font-semibold mb-4 text-foreground">Trading Signals</h3>
                   <p className="text-foreground mb-4">
                     Get access to expert cryptocurrency trading signals and market analysis to help you make informed investment decisions.
                   </p>
