@@ -10,8 +10,8 @@ class CSRFMiddleware(BaseHTTPMiddleware):
     """CSRF protection middleware"""
     
     EXEMPT_METHODS = {'GET', 'HEAD', 'OPTIONS'}
-    EXEMPT_PATHS = {'/api/v1/auth/login', '/api/v1/auth/register', '/api/v1/auth/refresh', '/docs', '/redoc', '/openapi.json'}
-    EXEMPT_PATH_PREFIXES = {'/api/v1/admin/', '/api/v1/contact/'}
+    EXEMPT_PATHS = {'/docs', '/redoc', '/openapi.json', '/health', '/'}
+    EXEMPT_PATH_PREFIXES = {'/uploads/', '/api/v1/'}  # Exempt all API endpoints from CSRF
     
     def generate_csrf_token(self) -> str:
         """Generate CSRF token"""
@@ -43,7 +43,7 @@ class CSRFMiddleware(BaseHTTPMiddleware):
             return response
         
         # Skip CSRF check for exempt paths
-        if request.url.path in self.EXEMPT_PATHS or request.url.path.startswith('/uploads'):
+        if request.url.path in self.EXEMPT_PATHS:
             return await call_next(request)
         
         # Skip CSRF check for exempt path prefixes
