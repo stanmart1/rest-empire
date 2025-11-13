@@ -136,7 +136,11 @@ const About = () => {
                 'from-accent/20 to-primary/20 hover:from-accent/30 hover:to-primary/30'
               ];
               return (
-                <div key={member.id} className="bg-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl flex flex-col h-full">
+                <div 
+                  key={member.id} 
+                  onClick={() => setSelectedMember(member)}
+                  className="bg-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl flex flex-col h-full cursor-pointer"
+                >
                   {member.image_url ? (
                     <img src={member.image_url} alt={member.name} className="h-48 w-full object-cover" />
                   ) : (
@@ -146,7 +150,7 @@ const About = () => {
                     <h3 className="text-xl font-bold text-foreground mb-2">{member.name}</h3>
                     <p className="text-primary font-semibold mb-3">{member.position}</p>
                     <div className="text-muted-foreground line-clamp-3 flex-1" dangerouslySetInnerHTML={{ __html: member.description }} />
-                    <Button variant="link" className="mt-4 p-0 h-auto" onClick={() => setSelectedMember(member)}>
+                    <Button variant="link" className="mt-4 p-0 h-auto">
                       Read More
                     </Button>
                   </div>
@@ -167,7 +171,10 @@ const About = () => {
                   ];
                   return (
                     <div key={member.id} className="w-full flex-shrink-0 px-2">
-                      <div className="bg-card rounded-xl overflow-hidden shadow-lg flex flex-col">
+                      <div 
+                        onClick={() => setSelectedMember(member)}
+                        className="bg-card rounded-xl overflow-hidden shadow-lg flex flex-col cursor-pointer"
+                      >
                         {member.image_url ? (
                           <img src={member.image_url} alt={member.name} className="h-48 w-full object-cover" />
                         ) : (
@@ -177,7 +184,7 @@ const About = () => {
                           <h3 className="text-xl font-bold text-foreground mb-2">{member.name}</h3>
                           <p className="text-primary font-semibold mb-3">{member.position}</p>
                           <div className="text-muted-foreground line-clamp-3" dangerouslySetInnerHTML={{ __html: member.description }} />
-                          <Button variant="link" className="mt-4 p-0 h-auto" onClick={() => setSelectedMember(member)}>
+                          <Button variant="link" className="mt-4 p-0 h-auto">
                             Read More
                           </Button>
                         </div>
@@ -221,16 +228,25 @@ const About = () => {
 
       {/* Team Member Modal */}
       <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">{selectedMember?.name}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {selectedMember?.image_url && (
-              <img src={selectedMember.image_url} alt={selectedMember.name} className="w-full h-64 object-cover rounded-lg" />
-            )}
-            <p className="text-primary font-semibold text-lg">{selectedMember?.position}</p>
-            <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: selectedMember?.description }} />
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+          {selectedMember?.image_url && (
+            <div className="relative w-full h-64 md:h-80">
+              <img 
+                src={selectedMember.image_url} 
+                alt={selectedMember.name} 
+                className="w-full h-full object-cover" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            </div>
+          )}
+          <div className="p-6 md:p-8">
+            <DialogHeader className="mb-6">
+              <DialogTitle className="text-3xl md:text-4xl font-bold text-foreground">
+                {selectedMember?.name}
+              </DialogTitle>
+              <p className="text-primary font-semibold text-xl mt-2">{selectedMember?.position}</p>
+            </DialogHeader>
+            <div className="prose prose-base md:prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: selectedMember?.description }} />
           </div>
         </DialogContent>
       </Dialog>

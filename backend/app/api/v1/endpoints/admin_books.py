@@ -6,7 +6,7 @@ from app.api.deps import require_permission
 from app.models.user import User
 from app.models.book import Book, BookReview
 from app.schemas.book import BookResponse, BookReviewResponse
-from app.core.storage import save_file, get_file_url
+from app.core.storage import save_file, get_file_url, normalize_image_url
 import os
 from datetime import datetime
 
@@ -19,6 +19,10 @@ def get_all_books(
 ):
     """Get all books (admin only)"""
     books = db.query(Book).all()
+    # Normalize cover image URLs
+    for book in books:
+        if book.cover_image:
+            book.cover_image = normalize_image_url(book.cover_image)
     return books
 
 @router.post("/books", response_model=BookResponse)
