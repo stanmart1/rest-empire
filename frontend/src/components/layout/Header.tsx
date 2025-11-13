@@ -9,7 +9,7 @@ const Header = () => {
 
   return (
     <>
-    <header className="bg-background/60 backdrop-blur-xl border-b border-border/30 sticky top-0 z-30 shadow-lg">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/60 backdrop-blur-md border-b border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.15)]" style={{ backdropFilter: 'blur(10px) saturate(180%)' }}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -33,7 +33,7 @@ const Header = () => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button asChild variant="outline" size="lg" className="bg-[hsl(45,100%,80%)] hover:bg-[hsl(45,100%,50%)] text-gray-900 border-[hsl(45,100%,70%)] hover:border-[hsl(45,100%,50%)] font-semibold">
+            <Button asChild variant="outline" size="lg" className="bg-[hsl(45,100%,55%)] hover:bg-[hsl(45,100%,50%)] text-gray-900 border-[hsl(45,100%,45%)] hover:border-[hsl(45,100%,50%)] font-semibold">
               <Link to="/login">Login</Link>
             </Button>
             <Button asChild size="lg">
@@ -147,7 +147,7 @@ const Header = () => {
               }}
               className="flex flex-col space-y-3 pt-6 border-t border-border"
             >
-              <Button asChild variant="outline" size="lg" className="w-full bg-[hsl(45,100%,80%)] hover:bg-[hsl(45,100%,50%)] text-gray-900 border-[hsl(45,100%,70%)] hover:border-[hsl(45,100%,50%)] font-semibold">
+              <Button asChild variant="outline" size="lg" className="w-full bg-[hsl(45,100%,55%)] hover:bg-[hsl(45,100%,50%)] text-gray-900 border-[hsl(45,100%,45%)] hover:border-[hsl(45,100%,50%)] font-semibold">
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)}>Login</Link>
               </Button>
               <Button asChild size="lg" className="w-full">
