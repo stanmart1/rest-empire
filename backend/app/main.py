@@ -58,16 +58,12 @@ logger.info(f"APP_NAME: {settings.APP_NAME}")
 logger.info("="*60)
 
 # CORS - Dynamic based on environment
-allowed_origins = [
-    "http://localhost:8080",
-    "http://localhost:5173",
-]
+allowed_origins = list(settings.CORS_ORIGINS) if isinstance(settings.CORS_ORIGINS, list) else [settings.CORS_ORIGINS]
 
-if ENVIRONMENT == "production":
+if ENVIRONMENT != "production":
     allowed_origins.extend([
-        "https://restempire.com",
-        "https://www.restempire.com",
-        "https://api.restempire.com",
+        "http://localhost:8080",
+        "http://localhost:5173",
     ])
 
 # Add CSRF protection first (executes last)
