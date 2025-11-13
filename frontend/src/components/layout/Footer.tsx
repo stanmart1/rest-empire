@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from '@tanstack/react-query';
+import { ArrowUp } from 'lucide-react';
 import api from '@/lib/api';
 
 const Footer = () => {
@@ -127,10 +128,24 @@ const Footer = () => {
             <p className="text-gray-400 text-sm mb-4 md:mb-0">
               © {new Date().getFullYear()} Opened Seal and Rest Empire. All rights reserved.
             </p>
-            <div className="flex space-x-6">
+            <div className="flex items-center space-x-6">
               <Link to="/privacy" className="text-gray-400 hover:text-primary text-sm">Privacy Policy</Link>
               <Link to="/terms" className="text-gray-400 hover:text-primary text-sm">Terms of Service</Link>
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="flex items-center gap-1 text-gray-400 hover:text-primary text-sm transition-colors"
+                aria-label="Scroll to top"
+              >
+                <ArrowUp className="w-4 h-4" />
+                Back to Top
+              </button>
             </div>
+          </div>
+          <div className="text-center mt-4">
+            <p className="text-gray-400 text-sm flex items-center justify-center gap-1">
+              Created with <span className="text-red-500 text-base" style={{ animation: 'pulse 1.33s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>❤</span> by{' '}
+              <a href="tel:+2347062750516" className="text-blue-500 hover:underline">ScaleITPro</a>
+            </p>
           </div>
         </div>
       </div>
