@@ -169,9 +169,12 @@ async def upload_payment_proof(
         raise HTTPException(status_code=404, detail="Transaction not found")
     
     # Save payment proof
+    import uuid
+    file_extension = file.filename.split(".")[-1] if "." in file.filename else ""
+    unique_filename = f"{transaction_id}_{uuid.uuid4()}.{file_extension}" if file_extension else f"{transaction_id}_{uuid.uuid4()}"
+    
     file_data = await file.read()
-    file_name = f"{transaction_id}_{file.filename}"
-    file_path = save_file(file_data, file_name, "payment_proofs")
+    file_path = save_file(file_data, unique_filename, "payment_proofs")
     file_url = get_file_url(file_path)
     
     transaction.meta_data = {

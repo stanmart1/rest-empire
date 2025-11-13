@@ -228,96 +228,6 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Why Choose Us Section */}
-      <div className="bg-background">
-        <div className="container mx-auto px-4 py-16">
-        <motion.h2
-          className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          Why Thousands Choose Opened Seal and Rest Empire
-        </motion.h2>
-
-        <div className="relative max-w-5xl mx-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentSlide + 10}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.5 }}
-              whileHover={{ scale: 1.02, boxShadow: "0 25px 50px rgba(0,0,0,0.2)" }}
-              className="bg-card rounded-2xl shadow-lg overflow-hidden transition-all"
-            >
-              <div className="grid md:grid-cols-2 gap-8 items-center min-h-[400px]">
-                <div className="p-8 md:p-12 order-2 md:order-1">
-                  {((currentSlide - 1 + 3) % 3) === 0 && (
-                    <>
-                      <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Wealth Education</h3>
-                      <p className="text-lg text-muted-foreground">
-                        Our Wealth Education programs utilize cutting-edge Blockchain technology and cryptography, providing individuals with the tools to create unstoppable wealth and secure their financial futures.
-                      </p>
-                    </>
-                  )}
-                  {((currentSlide - 1 + 3) % 3) === 1 && (
-                    <>
-                      <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Health Education</h3>
-                      <p className="text-lg text-muted-foreground">
-                        In the realm of Health Education, we draw upon our extensive expertise in Naturopathic medicine to promote plant and nature-based health practices.
-                      </p>
-                    </>
-                  )}
-                  {((currentSlide - 1 + 3) % 3) === 2 && (
-                    <>
-                      <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Capacity Development</h3>
-                      <p className="text-lg text-muted-foreground">
-                        Through our Capacity Development initiatives, we are dedicated to fostering personal and professional growth by providing educational products and practices that cultivate a range of skills and knowledge.
-                      </p>
-                    </>
-                  )}
-                </div>
-                <div className="h-full min-h-[400px] bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center p-8 order-1 md:order-2">
-                  {((currentSlide - 1 + 3) % 3) === 0 && <BarChart3 className="w-32 h-32 text-primary" />}
-                  {((currentSlide - 1 + 3) % 3) === 1 && <Zap className="w-32 h-32 text-primary" />}
-                  {((currentSlide - 1 + 3) % 3) === 2 && <Lock className="w-32 h-32 text-primary" />}
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          <div className="flex justify-center gap-2 mt-8">
-            {[0, 1, 2].map((index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index + 1)}
-                className={`w-3 h-3 rounded-full transition-all ${
-                  ((currentSlide - 1 + 3) % 3) === index ? 'w-8 bg-primary' : 'bg-gray-300'
-                }`}
-              />
-            ))}
-          </div>
-
-          <div className="flex justify-center gap-4 mt-6">
-            <button
-              onClick={prevSlide}
-              className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors shadow-lg"
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </button>
-            <button
-              onClick={nextSlide}
-              className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors shadow-lg"
-            >
-              <ArrowRight className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-        </div>
-      </div>
-
       {/* About the Founder Section */}
       <div className="bg-background py-16">
         <div className="container mx-auto px-4">
@@ -378,6 +288,114 @@ const Index = () => {
               </Button>
             </motion.div>
           </div>
+        </div>
+      </div>
+
+      {/* Why Choose Us Section */}
+      <div className="bg-background">
+        <div className="container mx-auto px-4 py-16">
+        <motion.h2
+          className="text-3xl md:text-4xl font-bold text-center mb-16 text-foreground"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          Why Thousands Choose Opened Seal and Rest Empire
+        </motion.h2>
+
+        <div className="relative max-w-5xl mx-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide + 10}
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.02, boxShadow: "0 25px 50px rgba(0,0,0,0.2)" }}
+              className="bg-card rounded-2xl shadow-lg overflow-hidden transition-all"
+            >
+              <div className="grid md:grid-cols-2 gap-8 items-center min-h-[400px]">
+                <div className="p-8 md:p-12 order-2 md:order-1">
+                  {((currentSlide - 1 + 3) % 3) === 0 && (
+                    <>
+                      <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Wealth Education</h3>
+                      <p className="text-lg text-muted-foreground">
+                        Our Wealth Education programs utilize cutting-edge Blockchain technology and cryptography, providing individuals with the tools to create unstoppable wealth and secure their financial futures.
+                      </p>
+                    </>
+                  )}
+                  {((currentSlide - 1 + 3) % 3) === 1 && (
+                    <>
+                      <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Health Education</h3>
+                      <p className="text-lg text-muted-foreground">
+                        In the realm of Health Education, we draw upon our extensive expertise in Naturopathic medicine to promote plant and nature-based health practices.
+                      </p>
+                    </>
+                  )}
+                  {((currentSlide - 1 + 3) % 3) === 2 && (
+                    <>
+                      <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Capacity Development</h3>
+                      <p className="text-lg text-muted-foreground">
+                        Through our Capacity Development initiatives, we are dedicated to fostering personal and professional growth by providing educational products and practices that cultivate a range of skills and knowledge.
+                      </p>
+                    </>
+                  )}
+                </div>
+                <div className="h-full min-h-[400px] overflow-hidden order-1 md:order-2">
+                  {((currentSlide - 1 + 3) % 3) === 0 && (
+                    <img 
+                      src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=600&fit=crop" 
+                      alt="Wealth Education - Cryptocurrency and Blockchain" 
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                  {((currentSlide - 1 + 3) % 3) === 1 && (
+                    <img 
+                      src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop" 
+                      alt="Health Education - Natural Medicine" 
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                  {((currentSlide - 1 + 3) % 3) === 2 && (
+                    <img 
+                      src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop" 
+                      alt="Capacity Development - Learning and Growth" 
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="flex justify-center gap-2 mt-8">
+            {[0, 1, 2].map((index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index + 1)}
+                className={`w-3 h-3 rounded-full transition-all ${
+                  ((currentSlide - 1 + 3) % 3) === index ? 'w-8 bg-primary' : 'bg-gray-300'
+                }`}
+              />
+            ))}
+          </div>
+
+          <div className="flex justify-center gap-4 mt-6">
+            <button
+              onClick={prevSlide}
+              className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors shadow-lg"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors shadow-lg"
+            >
+              <ArrowRight className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
         </div>
       </div>
 

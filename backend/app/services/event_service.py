@@ -64,8 +64,15 @@ def get_event_by_id(db: Session, event_id: int, user_id: Optional[int] = None) -
 
 def create_event(db: Session, event_data: EventCreate, created_by: int) -> Event:
     """Create new event"""
+    import uuid
+    event_dict = event_data.dict()
+    
+    # Generate public link if event is public
+    if event_dict.get('is_public'):
+        event_dict['public_link'] = str(uuid.uuid4())[:12]
+    
     event = Event(
-        **event_data.dict(),
+        **event_dict,
         created_by=created_by
     )
     db.add(event)
@@ -75,11 +82,20 @@ def create_event(db: Session, event_data: EventCreate, created_by: int) -> Event
 
 def update_event(db: Session, event_id: int, event_data: EventUpdate) -> Optional[Event]:
     """Update event"""
+    import uuid
     event = db.query(Event).filter(Event.id == event_id).first()
     if not event:
         return None
     
     update_data = event_data.dict(exclude_unset=True)
+    
+    # Generate public link if changing to public and no link exists
+    if update_data.get('is_public') and not event.public_link:
+        update_data['public_link'] = str(uuid.uuid4())[:12]
+    # Remove public link if changing to private
+    elif update_data.get('is_public') == False:
+        update_data['public_link'] = None
+    
     for field, value in update_data.items():
         setattr(event, field, value)
     

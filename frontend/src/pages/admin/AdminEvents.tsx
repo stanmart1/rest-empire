@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -43,12 +43,15 @@ const AdminEvents = () => {
     price_ngn: '',
     price_usdt: '',
     allowed_payment_methods: [] as string[],
+    is_public: false,
   });
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
 
-  useState(() => {
+  useEffect(() => {
     import('@/services/api').then(api => {
-      api.default.payment.getMethods().then(setPaymentMethods).catch(() => {});
+      api.default.payment.getMethods().then(data => {
+        setPaymentMethods(data.methods || []);
+      }).catch(() => {});
     });
   }, []);
   const createMutation = useCreateEvent({
@@ -86,6 +89,7 @@ const AdminEvents = () => {
       price_ngn: '',
       price_usdt: '',
       allowed_payment_methods: [],
+      is_public: false,
     });
   };
 
@@ -114,6 +118,7 @@ const AdminEvents = () => {
       price_ngn: event.price_ngn?.toString() || '',
       price_usdt: event.price_usdt?.toString() || '',
       allowed_payment_methods: allowedMethods,
+      is_public: event.is_public || false,
     });
     setEditDialogOpen(true);
   };
@@ -141,6 +146,7 @@ const AdminEvents = () => {
       price_ngn: formData.price_ngn ? parseFloat(formData.price_ngn) : undefined,
       price_usdt: formData.price_usdt ? parseFloat(formData.price_usdt) : undefined,
       allowed_payment_methods: formData.is_paid && formData.allowed_payment_methods.length > 0 ? JSON.stringify(formData.allowed_payment_methods) : undefined,
+      is_public: formData.is_public,
       status: formData.status,
     };
     
@@ -299,6 +305,13 @@ const AdminEvents = () => {
                 />
               </div>
               <div className="flex items-center justify-between">
+                <Label>Public Event (No login required)</Label>
+                <Switch
+                  checked={formData.is_public}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_public: checked })}
+                />
+              </div>
+              <div className="flex items-center justify-between">
                 <Label>Paid Event</Label>
                 <Switch
                   checked={formData.is_paid}
@@ -331,17 +344,17 @@ const AdminEvents = () => {
                   <div>
                     <Label>Allowed Payment Methods</Label>
                     <div className="space-y-2 mt-2">
-                      {paymentMethods.map(method => (
+                      {Array.isArray(paymentMethods) && paymentMethods.map(method => (
                         <div key={method.id} className="flex items-center space-x-2">
                           <input
                             type="checkbox"
                             id={`method-${method.id}`}
-                            checked={formData.allowed_payment_methods.includes(method.method_type)}
+                            checked={formData.allowed_payment_methods.includes(method.id)}
                             onChange={(e) => {
                               if (e.target.checked) {
-                                setFormData({ ...formData, allowed_payment_methods: [...formData.allowed_payment_methods, method.method_type] });
+                                setFormData({ ...formData, allowed_payment_methods: [...formData.allowed_payment_methods, method.id] });
                               } else {
-                                setFormData({ ...formData, allowed_payment_methods: formData.allowed_payment_methods.filter(m => m !== method.method_type) });
+                                setFormData({ ...formData, allowed_payment_methods: formData.allowed_payment_methods.filter(m => m !== method.id) });
                               }
                             }}
                             className="rounded"
@@ -661,6 +674,13 @@ const AdminEvents = () => {
               </div>
             )}
             <div className="flex items-center justify-between">
+              <Label>Public Event (No login required)</Label>
+              <Switch
+                checked={formData.is_public}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_public: checked })}
+              />
+            </div>
+            <div className="flex items-center justify-between">
               <Label>Paid Event</Label>
               <Switch
                 checked={formData.is_paid}
@@ -693,17 +713,17 @@ const AdminEvents = () => {
                 <div>
                   <Label>Allowed Payment Methods</Label>
                   <div className="space-y-2 mt-2">
-                    {paymentMethods.map(method => (
+                    {Array.isArray(paymentMethods) && paymentMethods.map(method => (
                       <div key={method.id} className="flex items-center space-x-2">
                         <input
                           type="checkbox"
                           id={`edit-method-${method.id}`}
-                          checked={formData.allowed_payment_methods.includes(method.method_type)}
+                          checked={formData.allowed_payment_methods.includes(method.id)}
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setFormData({ ...formData, allowed_payment_methods: [...formData.allowed_payment_methods, method.method_type] });
+                              setFormData({ ...formData, allowed_payment_methods: [...formData.allowed_payment_methods, method.id] });
                             } else {
-                              setFormData({ ...formData, allowed_payment_methods: formData.allowed_payment_methods.filter(m => m !== method.method_type) });
+                              setFormData({ ...formData, allowed_payment_methods: formData.allowed_payment_methods.filter(m => m !== method.id) });
                             }
                           }}
                           className="rounded"

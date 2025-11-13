@@ -124,17 +124,13 @@ class BankTransferService:
         from app.utils.payment_helpers import get_bank_transfer_config
         
         config = get_bank_transfer_config(db)
-        bank_name = config["bank_name"]
-        account_number = config["account_number"]
-        account_name = config["account_name"]
+        accounts = config.get("accounts", [])
         
         return {
-            "bank_name": bank_name,
-            "account_number": account_number,
-            "account_name": account_name,
+            "accounts": accounts,
             "transaction_reference": f"REST{transaction_id:08d}",
             "instructions": [
-                "Transfer the exact amount to the account above",
+                "Transfer the exact amount to any of the accounts above",
                 "Use the transaction reference as your payment description",
                 "Upload proof of payment after transfer",
                 "Payment will be confirmed within 24 hours"

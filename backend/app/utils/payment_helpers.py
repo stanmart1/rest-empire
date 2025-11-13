@@ -47,11 +47,29 @@ def get_providus_config(db: Session = None) -> Dict:
 def get_bank_transfer_config(db: Session = None) -> Dict:
     """Get Bank Transfer configuration"""
     default = {
-        "bank_name": settings.BANK_NAME,
-        "account_number": settings.BANK_ACCOUNT_NUMBER,
-        "account_name": settings.BANK_ACCOUNT_NAME
+        "accounts": [
+            {
+                "bank_name": settings.BANK_NAME,
+                "account_number": settings.BANK_ACCOUNT_NUMBER,
+                "account_name": settings.BANK_ACCOUNT_NAME
+            }
+        ]
     }
-    return get_gateway_config(db, "bank_transfer", default)
+    config = get_gateway_config(db, "bank_transfer", default)
+    
+    # Support legacy single account format
+    if "bank_name" in config and "accounts" not in config:
+        config = {
+            "accounts": [
+                {
+                    "bank_name": config["bank_name"],
+                    "account_number": config["account_number"],
+                    "account_name": config["account_name"]
+                }
+            ]
+        }
+    
+    return config
 
 def get_crypto_config(db: Session = None) -> Dict:
     """Get Crypto payment configuration"""

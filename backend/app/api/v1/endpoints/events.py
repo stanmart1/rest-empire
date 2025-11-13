@@ -12,7 +12,7 @@ from app.api.deps import get_current_user, check_feature_access
 from app.models.user import User
 from app.models.event import EventType, EventStatus
 from app.schemas.event import (
-    EventResponse, EventCreate, EventUpdate, EventRegistrationResponse, EventStats, EventPaymentRequest
+    EventResponse, EventCreate, EventUpdate, EventRegistrationResponse, EventStats, EventPaymentRequest, PublicEventRegistration
 )
 from app.services.event_service import (
     get_events, get_event_by_id, create_event, update_event, delete_event,
@@ -89,10 +89,31 @@ def get_my_events(
 
 @router.get("/stats", response_model=EventStats)
 def get_events_stats(
-    current_user: User = Depends(check_feature_access("events")),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Get event statistics"""
+    from app.core.rbac import has_role
+    
+    is_admin = has_role(db, current_user, 'super_admin') or has_role(db, current_user, 'admin')
+    
+    if not is_admin:
+        from app.models.activation import UserActivation
+        from datetime import datetime
+        
+        if not current_user.is_active:
+            raise HTTPException(status_code=403, detail="Please activate your account to access this feature")
+        
+        activation = db.query(UserActivation).filter(
+            UserActivation.user_id == current_user.id
+        ).first()
+        
+        if not activation or activation.status != "active":
+            raise HTTPException(status_code=403, detail="Please activate your account to access this feature")
+        
+        if activation.expires_at and datetime.utcnow() > activation.expires_at:
+            raise HTTPException(status_code=403, detail="Your subscription has expired")
+    
     return get_event_stats(db)
 
 @router.get("/{event_id}", response_model=EventResponse)
@@ -391,3 +412,90 @@ def scan_attendance(
         "user_email": registration.user.email,
         "attendance_status": "attended"
     }
+
+@router.get("/public/{public_link}", response_model=EventResponse)
+def get_public_event(
+    public_link: str,
+    db: Session = Depends(get_db)
+):
+    """Get public event by link"""
+    event = db.query(Event).filter(
+        Event.public_link == public_link,
+        Event.is_public == True
+    ).first()
+    
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    event.current_attendees = len(event.registrations)
+    event.is_registered = False
+    return event
+
+@router.post("/public/{public_link}/register", response_model=EventRegistrationResponse)
+async def register_public_event(
+    public_link: str,
+    registration: PublicEventRegistration,
+    db: Session = Depends(get_db)
+):
+    """Register for public event without account"""
+    from app.models.event import EventRegistration, PaymentStatus
+    from app.schemas.event import PublicEventRegistration
+    import json
+    
+    event = db.query(Event).filter(
+        Event.public_link == public_link,
+        Event.is_public == True
+    ).first()
+    
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    # Check if already registered with this email
+    existing = db.query(EventRegistration).filter(
+        EventRegistration.event_id == event.id,
+        EventRegistration.guest_email == registration.guest_email
+    ).first()
+    
+    if existing:
+        raise HTTPException(status_code=400, detail="Already registered with this email")
+    
+    # For paid events, validate payment method
+    if event.is_paid:
+        if not registration.payment_method or not registration.currency:
+            raise HTTPException(status_code=400, detail="Payment method and currency required for paid events")
+        
+        if event.allowed_payment_methods:
+            allowed_methods = json.loads(event.allowed_payment_methods)
+            if registration.payment_method not in allowed_methods:
+                raise HTTPException(status_code=400, detail="Payment method not allowed for this event")
+        
+        amount = event.price_ngn if registration.currency == "NGN" else event.price_usdt
+        if not amount:
+            raise HTTPException(status_code=400, detail=f"Price not set for {registration.currency}")
+        
+        reg = EventRegistration(
+            event_id=event.id,
+            guest_name=registration.guest_name,
+            guest_email=registration.guest_email,
+            guest_phone=registration.guest_phone,
+            payment_status=PaymentStatus.pending,
+            payment_method=registration.payment_method,
+            amount_paid=amount,
+            currency=registration.currency,
+            payment_proof=registration.payment_proof
+        )
+    else:
+        reg = EventRegistration(
+            event_id=event.id,
+            guest_name=registration.guest_name,
+            guest_email=registration.guest_email,
+            guest_phone=registration.guest_phone,
+            payment_status=PaymentStatus.paid
+        )
+    
+    db.add(reg)
+    db.commit()
+    db.refresh(reg)
+    
+    reg.registration_code = f"EVT-{event.id}-GUEST-{reg.id}"
+    return reg

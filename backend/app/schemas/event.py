@@ -20,6 +20,7 @@ class EventBase(BaseModel):
     price_ngn: Optional[Decimal] = None
     price_usdt: Optional[Decimal] = None
     allowed_payment_methods: Optional[str] = None
+    is_public: bool = False
 
 class EventCreate(EventBase):
     pass
@@ -40,6 +41,7 @@ class EventUpdate(BaseModel):
     price_ngn: Optional[Decimal] = None
     price_usdt: Optional[Decimal] = None
     allowed_payment_methods: Optional[str] = None
+    is_public: Optional[bool] = None
     status: Optional[EventStatus] = None
 
 class EventResponse(EventBase):
@@ -47,6 +49,7 @@ class EventResponse(EventBase):
     status: EventStatus
     current_attendees: int
     is_registered: bool = False
+    public_link: Optional[str] = None
     created_by: int
     created_at: datetime
     updated_at: datetime
@@ -57,7 +60,10 @@ class EventResponse(EventBase):
 class EventRegistrationResponse(BaseModel):
     id: int
     event_id: int
-    user_id: int
+    user_id: Optional[int] = None
+    guest_name: Optional[str] = None
+    guest_email: Optional[str] = None
+    guest_phone: Optional[str] = None
     registered_at: datetime
     attendance_status: AttendanceStatus
     payment_status: PaymentStatus
@@ -82,3 +88,11 @@ class EventStats(BaseModel):
     upcoming_events: int
     completed_events: int
     total_registrations: int
+
+class PublicEventRegistration(BaseModel):
+    guest_name: str
+    guest_email: str
+    guest_phone: Optional[str] = None
+    payment_method: Optional[str] = None
+    currency: Optional[str] = None
+    payment_proof: Optional[str] = None
