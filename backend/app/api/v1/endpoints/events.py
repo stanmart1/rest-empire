@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -30,25 +31,22 @@ def list_events(
     public_only: bool = False,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
+    request: Request = None,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False)),
     db: Session = Depends(get_db)
 ):
     """Get all events (public endpoint - returns only public events if not authenticated)"""
     from app.core.rbac import has_role
-    from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-    from fastapi import Request
     
     # Try to get current user if authenticated
     current_user = None
     is_admin = False
-    try:
-        security = HTTPBearer(auto_error=False)
-        credentials = security(Request(scope={'type': 'http', 'headers': []}))
-        if credentials:
-            from app.api.deps import get_current_user as get_user
-            current_user = get_user(Request(scope={'type': 'http', 'headers': []}), credentials, db)
+    if credentials:
+        try:
+            current_user = get_current_user(request, credentials, db)
             is_admin = has_role(db, current_user, 'super_admin') or has_role(db, current_user, 'admin')
-    except:
-        pass
+        except:
+            pass
     
     # If not authenticated or requesting public only, filter for public events
     if not current_user or public_only:
