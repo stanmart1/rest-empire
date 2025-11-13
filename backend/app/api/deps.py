@@ -121,6 +121,10 @@ def check_feature_access(feature_name: str):
         from datetime import datetime
         from app.services.config_service import get_config
         
+        # Admins and super admins bypass all feature access checks
+        if has_role(db, current_user, 'super_admin') or has_role(db, current_user, 'admin'):
+            return current_user
+        
         # Check if activation packages are enabled
         activation_packages_enabled = (get_config(db, "activation_packages_enabled") or "true") == "true"
         

@@ -93,8 +93,7 @@ def admin_create_user(
     
     # Assign activation package if provided
     if user_data.package_id:
-        from app.models.activation_package import ActivationPackage
-        from app.models.user_activation import UserActivation
+        from app.models.activation import ActivationPackage, UserActivation
         
         package = db.query(ActivationPackage).filter(ActivationPackage.id == user_data.package_id).first()
         if package:
