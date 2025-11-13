@@ -29,7 +29,12 @@ Add to production environment variables in Coolify:
 
 ```
 API_BASE_URL=https://api.restempire.com
+ENVIRONMENT=production
 ```
+
+**IMPORTANT**: Both variables must be set for the fix to work.
+- `ENVIRONMENT=production` tells the app it's in production mode
+- `API_BASE_URL=https://api.restempire.com` sets the correct domain for file URLs
 
 ## How It Works
 1. File uploaded to `/app/storage/team/` in production

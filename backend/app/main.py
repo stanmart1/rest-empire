@@ -25,12 +25,24 @@ logger.info(f"UPLOAD_DIR: {UPLOAD_DIR}")
 logger.info(f"APP_NAME: {settings.APP_NAME}")
 logger.info("="*60)
 
-# CORS
+# CORS - Dynamic based on environment
+allowed_origins = [
+    "http://localhost:8080",
+    "http://localhost:5173",
+]
+
+if ENVIRONMENT == "production":
+    allowed_origins.extend([
+        "https://restempire.com",
+        "https://www.restempire.com",
+        "https://api.restempire.com",
+    ])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080", "https://restempire.com"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
 )
 
