@@ -142,12 +142,12 @@ const Dashboard = () => {
                   {dashboardStats?.is_active ? 'Active' : 'Inactive'}
                 </Badge>
                 {dashboardStats?.is_active && dashboardStats?.activated_at && (
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-foreground/70 mt-1 font-medium">
                     since {new Date(dashboardStats.activated_at).toLocaleDateString()}
                   </p>
                 )}
                 {!dashboardStats?.is_active && dashboardStats?.deactivated_at && (
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-foreground/70 mt-1 font-medium">
                     since {new Date(dashboardStats.deactivated_at).toLocaleDateString()}
                   </p>
                 )}

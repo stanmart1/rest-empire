@@ -37,11 +37,9 @@ async def create_book(
     """Create a new book (admin only)"""
     cover_image_path = None
     
-    if cover_image:
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-        filename = f"{timestamp}_{cover_image.filename}"
+    if cover_image and cover_image.filename:
         file_data = await cover_image.read()
-        file_path = save_file(file_data, filename, "books")
+        file_path = save_file(file_data, cover_image.filename, "books")
         cover_image_path = get_file_url(file_path)
     
     book = Book(
@@ -75,11 +73,9 @@ async def update_book(
     book.author = author
     book.description = description
     
-    if cover_image:
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-        filename = f"{timestamp}_{cover_image.filename}"
+    if cover_image and cover_image.filename:
         file_data = await cover_image.read()
-        file_path = save_file(file_data, filename, "books")
+        file_path = save_file(file_data, cover_image.filename, "books")
         book.cover_image = get_file_url(file_path)
     
     db.commit()

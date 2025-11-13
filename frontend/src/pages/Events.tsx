@@ -39,12 +39,14 @@ const Events = () => {
     status: statusFilter !== 'all' ? statusFilter : undefined,
   });
 
-  const { data: myEvents, isLoading: myEventsLoading } = useMyEvents(true);
-  const { data: eventStats, isLoading: statsLoading } = useEventStats();
+  const { data: myEvents, isLoading: myEventsLoading, error: myEventsError } = useMyEvents(true);
+  const { data: eventStats, isLoading: statsLoading, error: statsError } = useEventStats();
 
   if (eventsError && (eventsError as any)?.response?.status === 403) {
     return <FeatureRestricted message={(eventsError as any)?.response?.data?.detail} />;
   }
+  
+  const hasFeatureAccess = !myEventsError && !statsError;
 
   const registerMutation = useMutation({
     mutationFn: (eventId: number) => apiService.events.registerForEvent(eventId),
@@ -318,7 +320,7 @@ const Events = () => {
       </div>
 
       {/* Event Stats */}
-      {!statsLoading && eventStats && (
+      {hasFeatureAccess && !statsLoading && eventStats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-4">

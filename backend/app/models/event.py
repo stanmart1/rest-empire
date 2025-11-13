@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text, ForeignKey, Enum, Numeric
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
@@ -22,6 +22,12 @@ class AttendanceStatus(enum.Enum):
     attended = "attended"
     no_show = "no_show"
 
+class PaymentStatus(enum.Enum):
+    pending = "pending"
+    paid = "paid"
+    failed = "failed"
+    refunded = "refunded"
+
 class Event(Base):
     __tablename__ = "events"
     
@@ -37,6 +43,9 @@ class Event(Base):
     max_attendees = Column(Integer, nullable=True)
     registration_required = Column(Boolean, default=True)
     registration_deadline = Column(DateTime, nullable=True)
+    is_paid = Column(Boolean, default=False)
+    price_ngn = Column(Numeric(10, 2), nullable=True)
+    price_usdt = Column(Numeric(10, 2), nullable=True)
     status = Column(Enum(EventStatus), default=EventStatus.upcoming, index=True)
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -54,6 +63,13 @@ class EventRegistration(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     registered_at = Column(DateTime, default=datetime.utcnow)
     attendance_status = Column(Enum(AttendanceStatus), default=AttendanceStatus.registered)
+    payment_status = Column(Enum(PaymentStatus), default=PaymentStatus.pending)
+    payment_method = Column(String(50), nullable=True)
+    payment_reference = Column(String(255), nullable=True)
+    amount_paid = Column(Numeric(10, 2), nullable=True)
+    currency = Column(String(10), nullable=True)
+    payment_proof = Column(String(500), nullable=True)
+    paid_at = Column(DateTime, nullable=True)
     
     # Relationships
     event = relationship("Event", back_populates="registrations")
