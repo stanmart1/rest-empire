@@ -84,6 +84,8 @@ async def update_book(
     
     db.commit()
     db.refresh(book)
+    if book.cover_image:
+        book.cover_image = normalize_image_url(book.cover_image)
     return book
 
 @router.delete("/books/{book_id}")

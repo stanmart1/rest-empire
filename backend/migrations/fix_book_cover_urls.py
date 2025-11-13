@@ -1,49 +1,43 @@
-import sys
+import psycopg2
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from dotenv import load_dotenv
 
-from sqlalchemy import create_engine, text
-from app.core.config import settings
+load_dotenv()
 
 def fix_book_cover_urls():
-    """Fix book cover and file URLs to use production domain"""
-    engine = create_engine(settings.DATABASE_URL)
+    conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+    cur = conn.cursor()
     
-    with engine.connect() as conn:
-        # Get all books with localhost URLs in cover_image or file_path
-        result = conn.execute(text("""
-            SELECT id, title, cover_image, file_path 
-            FROM books 
-            WHERE cover_image LIKE '%localhost:8000%' OR file_path LIKE '%localhost:8000%'
-        """))
+    try:
+        # Fix URLs that start with http:// or https:// (malformed)
+        cur.execute("""
+            UPDATE books 
+            SET cover_image = REPLACE(cover_image, 'https//', 'https://')
+            WHERE cover_image LIKE '%https//%'
+        """)
         
-        books = result.fetchall()
+        cur.execute("""
+            UPDATE books 
+            SET cover_image = REPLACE(cover_image, 'http//', 'http://')
+            WHERE cover_image LIKE '%http//%'
+        """)
         
-        if not books:
-            print("✓ No book covers or files need updating")
-            return
-        
-        print(f"Found {len(books)} book(s) with localhost URLs")
-        
-        # Update each book
-        for book_id, title, cover_image, file_path in books:
-            new_cover = cover_image.replace('http://localhost:8000', 'https://api.restempire.com') if cover_image else cover_image
-            new_file = file_path.replace('http://localhost:8000', 'https://api.restempire.com') if file_path else file_path
-            
-            conn.execute(text("""
-                UPDATE books 
-                SET cover_image = :cover, file_path = :file 
-                WHERE id = :id
-            """), {"cover": new_cover, "file": new_file, "id": book_id})
-            
-            print(f"  Updated book: {title}")
-            if cover_image and 'localhost' in cover_image:
-                print(f"    Cover: {cover_image} -> {new_cover}")
-            if file_path and 'localhost' in file_path:
-                print(f"    File: {file_path} -> {new_file}")
+        # Fix localhost URLs to production
+        cur.execute("""
+            UPDATE books 
+            SET cover_image = REPLACE(cover_image, 'http://localhost:8000', 'https://api.restempire.com')
+            WHERE cover_image LIKE 'http://localhost:8000%'
+        """)
         
         conn.commit()
-        print(f"✓ Successfully updated {len(books)} book(s)")
+        print("Book cover URLs fixed successfully")
+        
+    except Exception as e:
+        conn.rollback()
+        print(f"Error: {e}")
+    finally:
+        cur.close()
+        conn.close()
 
 if __name__ == "__main__":
     fix_book_cover_urls()

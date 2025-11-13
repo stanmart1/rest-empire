@@ -6,6 +6,7 @@ from app.api.deps import get_current_user, check_feature_access
 from app.models.user import User
 from app.models.book import Book, BookReview
 from app.schemas.book import BookResponse, BookReviewCreate, BookReviewResponse
+from app.core.storage import normalize_image_url
 
 router = APIRouter()
 
@@ -18,6 +19,9 @@ def get_books(
 ):
     """Get all books"""
     books = db.query(Book).offset(skip).limit(limit).all()
+    for book in books:
+        if book.cover_image:
+            book.cover_image = normalize_image_url(book.cover_image)
     return books
 
 @router.post("/{book_id}/reviews", response_model=BookReviewResponse)
