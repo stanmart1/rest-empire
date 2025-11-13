@@ -143,9 +143,18 @@ const Footer = () => {
           </div>
           <div className="text-center mt-4">
             <p className="text-gray-400 text-sm flex items-center justify-center gap-1">
-              Created with <span className="text-red-500 text-base" style={{ animation: 'pulse 1.33s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>❤</span> by{' '}
+              Created with <span className="text-red-500 text-base inline-block" style={{ animation: 'heartbeat 1.5s ease-in-out infinite' }}>❤</span> by{' '}
               <a href="tel:+2347062750516" className="text-blue-500 hover:underline">ScaleITPro</a>
             </p>
+            <style>{`
+              @keyframes heartbeat {
+                0%, 100% { transform: scale(1); }
+                10% { transform: scale(1.2); }
+                20% { transform: scale(1); }
+                30% { transform: scale(1.2); }
+                40% { transform: scale(1); }
+              }
+            `}</style>
           </div>
         </div>
       </div>
