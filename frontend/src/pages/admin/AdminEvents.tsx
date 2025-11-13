@@ -39,7 +39,18 @@ const AdminEvents = () => {
     registration_required: true,
     registration_deadline: '',
     status: 'upcoming',
+    is_paid: false,
+    price_ngn: '',
+    price_usdt: '',
+    allowed_payment_methods: [] as string[],
   });
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
+
+  useState(() => {
+    import('@/services/api').then(api => {
+      api.default.payment.getMethods().then(setPaymentMethods).catch(() => {});
+    });
+  }, []);
   const createMutation = useCreateEvent({
     onSuccess: () => {
       setCreateDialogOpen(false);
@@ -71,11 +82,21 @@ const AdminEvents = () => {
       registration_required: true,
       registration_deadline: '',
       status: 'upcoming',
+      is_paid: false,
+      price_ngn: '',
+      price_usdt: '',
+      allowed_payment_methods: [],
     });
   };
 
   const handleEdit = (event: Event) => {
     setEditingEvent(event);
+    let allowedMethods: string[] = [];
+    if (event.allowed_payment_methods) {
+      try {
+        allowedMethods = JSON.parse(event.allowed_payment_methods);
+      } catch {}
+    }
     setFormData({
       title: event.title,
       description: event.description,
@@ -89,6 +110,10 @@ const AdminEvents = () => {
       registration_required: true,
       registration_deadline: '',
       status: event.status,
+      is_paid: event.is_paid || false,
+      price_ngn: event.price_ngn?.toString() || '',
+      price_usdt: event.price_usdt?.toString() || '',
+      allowed_payment_methods: allowedMethods,
     });
     setEditDialogOpen(true);
   };
@@ -112,6 +137,10 @@ const AdminEvents = () => {
       max_attendees: formData.max_attendees ? parseInt(formData.max_attendees) : undefined,
       registration_required: formData.registration_required,
       registration_deadline: formData.registration_deadline ? new Date(formData.registration_deadline).toISOString() : undefined,
+      is_paid: formData.is_paid,
+      price_ngn: formData.price_ngn ? parseFloat(formData.price_ngn) : undefined,
+      price_usdt: formData.price_usdt ? parseFloat(formData.price_usdt) : undefined,
+      allowed_payment_methods: formData.is_paid && formData.allowed_payment_methods.length > 0 ? JSON.stringify(formData.allowed_payment_methods) : undefined,
       status: formData.status,
     };
     
@@ -269,6 +298,61 @@ const AdminEvents = () => {
                   onChange={(e) => setFormData({ ...formData, registration_deadline: e.target.value })}
                 />
               </div>
+              <div className="flex items-center justify-between">
+                <Label>Paid Event</Label>
+                <Switch
+                  checked={formData.is_paid}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_paid: checked })}
+                />
+              </div>
+              {formData.is_paid && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="price_ngn">Price (NGN)</Label>
+                      <Input
+                        id="price_ngn"
+                        type="number"
+                        value={formData.price_ngn}
+                        onChange={(e) => setFormData({ ...formData, price_ngn: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="price_usdt">Price (USDT)</Label>
+                      <Input
+                        id="price_usdt"
+                        type="number"
+                        step="0.01"
+                        value={formData.price_usdt}
+                        onChange={(e) => setFormData({ ...formData, price_usdt: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Allowed Payment Methods</Label>
+                    <div className="space-y-2 mt-2">
+                      {paymentMethods.map(method => (
+                        <div key={method.id} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`method-${method.id}`}
+                            checked={formData.allowed_payment_methods.includes(method.method_type)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setFormData({ ...formData, allowed_payment_methods: [...formData.allowed_payment_methods, method.method_type] });
+                              } else {
+                                setFormData({ ...formData, allowed_payment_methods: formData.allowed_payment_methods.filter(m => m !== method.method_type) });
+                              }
+                            }}
+                            className="rounded"
+                          />
+                          <label htmlFor={`method-${method.id}`} className="text-sm">{method.name}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
               <Button type="submit" className="w-full" disabled={createMutation.isPending}>
                 {createMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 {createMutation.isPending ? 'Creating...' : 'Create Event'}
@@ -575,6 +659,61 @@ const AdminEvents = () => {
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 />
               </div>
+            )}
+            <div className="flex items-center justify-between">
+              <Label>Paid Event</Label>
+              <Switch
+                checked={formData.is_paid}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_paid: checked })}
+              />
+            </div>
+            {formData.is_paid && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="edit-price_ngn">Price (NGN)</Label>
+                    <Input
+                      id="edit-price_ngn"
+                      type="number"
+                      value={formData.price_ngn}
+                      onChange={(e) => setFormData({ ...formData, price_ngn: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-price_usdt">Price (USDT)</Label>
+                    <Input
+                      id="edit-price_usdt"
+                      type="number"
+                      step="0.01"
+                      value={formData.price_usdt}
+                      onChange={(e) => setFormData({ ...formData, price_usdt: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Allowed Payment Methods</Label>
+                  <div className="space-y-2 mt-2">
+                    {paymentMethods.map(method => (
+                      <div key={method.id} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={`edit-method-${method.id}`}
+                          checked={formData.allowed_payment_methods.includes(method.method_type)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData({ ...formData, allowed_payment_methods: [...formData.allowed_payment_methods, method.method_type] });
+                            } else {
+                              setFormData({ ...formData, allowed_payment_methods: formData.allowed_payment_methods.filter(m => m !== method.method_type) });
+                            }
+                          }}
+                          className="rounded"
+                        />
+                        <label htmlFor={`edit-method-${method.id}`} className="text-sm">{method.name}</label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
             )}
             <Button type="submit" className="w-full" disabled={updateMutation.isPending}>
               {updateMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

@@ -49,7 +49,15 @@ const Events = () => {
   const hasFeatureAccess = !myEventsError && !statsError;
 
   const registerMutation = useMutation({
-    mutationFn: (eventId: number) => apiService.events.registerForEvent(eventId),
+    mutationFn: (params: { eventId: number; paymentData?: any } | number) => {
+      if (typeof params === 'number') {
+        return apiService.events.registerForEvent(params);
+      }
+      if (params.paymentData) {
+        return apiService.events.registerForPaidEvent(params.eventId, params.paymentData);
+      }
+      return apiService.events.registerForEvent(params.eventId);
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       queryClient.invalidateQueries({ queryKey: ['my-events'] });
@@ -80,6 +88,13 @@ const Events = () => {
       phone: user?.phone_number || '',
     });
     setIsRegisterModalOpen(true);
+  };
+
+  const handleRegistrationSubmit = async (eventId: number, paymentData?: any) => {
+    if (paymentData) {
+      return await registerMutation.mutateAsync({ eventId, paymentData });
+    }
+    return await registerMutation.mutateAsync(eventId);
   };
 
   const unregisterMutation = useMutation({
@@ -171,6 +186,17 @@ const Events = () => {
         )}
         
         <div className="space-y-2 text-sm">
+          {event.is_paid && (
+            <div className="flex items-center gap-2 font-semibold text-primary">
+              <span>₦{event.price_ngn?.toLocaleString()}</span>
+              {event.price_usdt && <span>/ ${event.price_usdt}</span>}
+              {event.payment_status && (
+                <Badge className={event.payment_status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}>
+                  {event.payment_status}
+                </Badge>
+              )}
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
             <span>{formatDate(event.start_date)}</span>
@@ -295,9 +321,7 @@ const Events = () => {
           setIsRegisterModalOpen(false);
           setRegisteringEvent(null);
         }}
-        onSubmit={async (eventId) => {
-          return await registerMutation.mutateAsync(eventId);
-        }}
+        onSubmit={handleRegistrationSubmit}
         isSubmitting={registerMutation.isPending}
         defaultData={registrationData}
       />

@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
-from app.models.event import EventType, EventStatus, AttendanceStatus
+from decimal import Decimal
+from app.models.event import EventType, EventStatus, AttendanceStatus, PaymentStatus
 
 class EventBase(BaseModel):
     title: str
@@ -15,6 +16,10 @@ class EventBase(BaseModel):
     max_attendees: Optional[int] = None
     registration_required: bool = True
     registration_deadline: Optional[datetime] = None
+    is_paid: bool = False
+    price_ngn: Optional[Decimal] = None
+    price_usdt: Optional[Decimal] = None
+    allowed_payment_methods: Optional[str] = None
 
 class EventCreate(EventBase):
     pass
@@ -31,6 +36,10 @@ class EventUpdate(BaseModel):
     max_attendees: Optional[int] = None
     registration_required: Optional[bool] = None
     registration_deadline: Optional[datetime] = None
+    is_paid: Optional[bool] = None
+    price_ngn: Optional[Decimal] = None
+    price_usdt: Optional[Decimal] = None
+    allowed_payment_methods: Optional[str] = None
     status: Optional[EventStatus] = None
 
 class EventResponse(EventBase):
@@ -51,11 +60,22 @@ class EventRegistrationResponse(BaseModel):
     user_id: int
     registered_at: datetime
     attendance_status: AttendanceStatus
+    payment_status: PaymentStatus
+    payment_method: Optional[str] = None
+    payment_reference: Optional[str] = None
+    amount_paid: Optional[Decimal] = None
+    currency: Optional[str] = None
+    paid_at: Optional[datetime] = None
     registration_code: Optional[str] = None
     user: Optional[dict] = None
     
     class Config:
         from_attributes = True
+
+class EventPaymentRequest(BaseModel):
+    payment_method: str
+    currency: str
+    payment_proof: Optional[str] = None
 
 class EventStats(BaseModel):
     total_events: int

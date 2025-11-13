@@ -12,8 +12,12 @@ export interface Event {
   current_attendees: number;
   is_registered: boolean;
   attendance_status?: 'registered' | 'attended' | 'no_show';
+  payment_status?: 'pending' | 'paid' | 'failed' | 'refunded';
   registration_required: boolean;
   registration_deadline?: string;
+  is_paid: boolean;
+  price_ngn?: number;
+  price_usdt?: number;
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
   created_by: number;
   created_at: string;

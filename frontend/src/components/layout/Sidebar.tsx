@@ -146,8 +146,8 @@ const Sidebar = () => {
                 </div>
               </div>
               <div className="text-center py-2 bg-muted rounded-lg">
-                <p className="text-xs text-white mb-1">{dashboardStats?.is_active ? "Active" : "Inactive"}</p>
-                <p className="text-sm font-medium text-white">since {getStatusDate()}</p>
+                <p className="text-xs text-foreground mb-1">{dashboardStats?.is_active ? 'Active' : 'Inactive'}</p>
+                <p className="text-sm font-medium text-foreground">since {getStatusDate()}</p>
               </div>
             </div>
 
@@ -295,8 +295,8 @@ const Sidebar = () => {
             </div>
           </div>
           <div className="text-center py-2 bg-muted rounded-lg">
-            <p className="text-xs text-white mb-1">{dashboardStats?.is_active ? "Active" : "Inactive"}</p>
-            <p className="text-sm font-medium text-white">since {getStatusDate()}</p>
+            <p className="text-xs text-foreground mb-1">{dashboardStats?.is_active ? 'Active' : 'Inactive'}</p>
+            <p className="text-sm font-medium text-foreground">since {getStatusDate()}</p>
           </div>
         </div>
 

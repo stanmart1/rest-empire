@@ -11,6 +11,10 @@ export interface Event {
   max_attendees?: number;
   status: string;
   current_attendees: number;
+  is_paid?: boolean;
+  price_ngn?: number;
+  price_usdt?: number;
+  allowed_payment_methods?: string;
 }
 
 export interface Attendee {

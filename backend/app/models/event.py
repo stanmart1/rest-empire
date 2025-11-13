@@ -46,6 +46,7 @@ class Event(Base):
     is_paid = Column(Boolean, default=False)
     price_ngn = Column(Numeric(10, 2), nullable=True)
     price_usdt = Column(Numeric(10, 2), nullable=True)
+    allowed_payment_methods = Column(Text, nullable=True)
     status = Column(Enum(EventStatus), default=EventStatus.upcoming, index=True)
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -12,7 +12,7 @@ from app.api.deps import get_current_user, check_feature_access
 from app.models.user import User
 from app.models.event import EventType, EventStatus
 from app.schemas.event import (
-    EventResponse, EventCreate, EventUpdate, EventRegistrationResponse, EventStats
+    EventResponse, EventCreate, EventUpdate, EventRegistrationResponse, EventStats, EventPaymentRequest
 )
 from app.services.event_service import (
     get_events, get_event_by_id, create_event, update_event, delete_event,
@@ -156,7 +156,14 @@ def register_for_existing_event(
     current_user: User = Depends(check_feature_access("events")),
     db: Session = Depends(get_db)
 ):
-    """Register for event"""
+    """Register for event (free events only)"""
+    event = get_event_by_id(db, event_id, current_user.id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    if event.is_paid:
+        raise HTTPException(status_code=400, detail="This is a paid event. Please use the payment endpoint.")
+    
     registration = register_for_event(db, event_id, current_user.id)
     if not registration:
         raise HTTPException(
@@ -164,7 +171,62 @@ def register_for_existing_event(
             detail="Cannot register for this event. Check capacity, deadline, or existing registration."
         )
     
-    # Add registration code
+    registration.registration_code = f"EVT-{event_id}-USR-{current_user.id}"
+    return registration
+
+@router.post("/{event_id}/register-paid", response_model=EventRegistrationResponse)
+async def register_for_paid_event(
+    event_id: int,
+    payment_data: EventPaymentRequest,
+    current_user: User = Depends(check_feature_access("events")),
+    db: Session = Depends(get_db)
+):
+    """Register for paid event with payment"""
+    from app.models.event import EventRegistration, PaymentStatus
+    import json
+    
+    event = get_event_by_id(db, event_id, current_user.id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    if not event.is_paid:
+        raise HTTPException(status_code=400, detail="This is a free event. Use the regular registration endpoint.")
+    
+    # Verify payment method is allowed
+    if event.allowed_payment_methods:
+        allowed_methods = json.loads(event.allowed_payment_methods)
+        if payment_data.payment_method not in allowed_methods:
+            raise HTTPException(status_code=400, detail="Payment method not allowed for this event")
+    
+    # Check if already registered
+    existing = db.query(EventRegistration).filter(
+        EventRegistration.event_id == event_id,
+        EventRegistration.user_id == current_user.id
+    ).first()
+    
+    if existing:
+        raise HTTPException(status_code=400, detail="Already registered for this event")
+    
+    # Determine amount based on currency
+    amount = event.price_ngn if payment_data.currency == "NGN" else event.price_usdt
+    if not amount:
+        raise HTTPException(status_code=400, detail=f"Price not set for {payment_data.currency}")
+    
+    # Create registration with pending payment
+    registration = EventRegistration(
+        event_id=event_id,
+        user_id=current_user.id,
+        payment_status=PaymentStatus.pending,
+        payment_method=payment_data.payment_method,
+        amount_paid=amount,
+        currency=payment_data.currency,
+        payment_proof=payment_data.payment_proof
+    )
+    
+    db.add(registration)
+    db.commit()
+    db.refresh(registration)
+    
     registration.registration_code = f"EVT-{event_id}-USR-{current_user.id}"
     return registration
 
@@ -205,6 +267,33 @@ def update_user_attendance(
         raise HTTPException(status_code=404, detail="Registration not found")
     
     return {"message": "Attendance status updated successfully"}
+
+@router.put("/{event_id}/payment/{user_id}")
+def update_payment_status(
+    event_id: int,
+    user_id: int,
+    payment_status: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update payment status (admin only)"""
+    from app.models.event import EventRegistration, PaymentStatus
+    from datetime import datetime
+    
+    registration = db.query(EventRegistration).filter(
+        EventRegistration.event_id == event_id,
+        EventRegistration.user_id == user_id
+    ).first()
+    
+    if not registration:
+        raise HTTPException(status_code=404, detail="Registration not found")
+    
+    registration.payment_status = PaymentStatus[payment_status]
+    if payment_status == "paid":
+        registration.paid_at = datetime.utcnow()
+    
+    db.commit()
+    return {"message": "Payment status updated successfully"}
 
 @router.get("/{event_id}/qrcode")
 def get_event_qrcode(

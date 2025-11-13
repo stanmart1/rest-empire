@@ -203,6 +203,15 @@ export const eventsAPI = {
     return response.data;
   },
 
+  registerForPaidEvent: async (id: number, paymentData: {
+    payment_method: string;
+    currency: string;
+    payment_proof?: string;
+  }) => {
+    const response = await api.post(`/events/${id}/register-paid`, paymentData);
+    return response.data;
+  },
+
   unregisterFromEvent: async (id: number) => {
     const response = await api.delete(`/events/${id}/register`);
     return response.data;
