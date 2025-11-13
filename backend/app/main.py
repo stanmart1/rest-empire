@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -27,6 +28,26 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+# Global exception handler to ensure CORS headers on all responses
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
+    
+    # Get origin from request
+    origin = request.headers.get("origin", "")
+    
+    # Check if origin is allowed
+    cors_headers = {}
+    if origin in allowed_origins:
+        cors_headers["Access-Control-Allow-Origin"] = origin
+        cors_headers["Access-Control-Allow-Credentials"] = "true"
+    
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"},
+        headers=cors_headers
+    )
+
 # Log configuration on startup
 logger.info("="*60)
 logger.info(f"Application Starting...")
@@ -49,6 +70,10 @@ if ENVIRONMENT == "production":
         "https://api.restempire.com",
     ])
 
+# Add CSRF protection first (executes last)
+app.add_middleware(CSRFMiddleware)
+
+# Add CORS middleware last (executes first)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
@@ -56,9 +81,6 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With", "X-CSRF-Token"],
 )
-
-# Add CSRF protection
-app.add_middleware(CSRFMiddleware)
 
 # Mount static files
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
