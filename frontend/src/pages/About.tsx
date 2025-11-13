@@ -17,16 +17,26 @@ const About = () => {
     },
   });
 
+  const { data: teamMembers = [] } = useQuery({
+    queryKey: ['team-members'],
+    queryFn: async () => {
+      const response = await api.get('/team-members/');
+      return response.data;
+    },
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTeamSlide((prev) => (prev + 1) % 3);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+    if (teamMembers.length > 0) {
+      const interval = setInterval(() => {
+        setTeamSlide((prev) => (prev + 1) % teamMembers.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [teamMembers.length]);
 
   if (isLoading) {
     return (
@@ -117,72 +127,60 @@ const About = () => {
           
           {/* Desktop Grid */}
           <div className="hidden md:grid grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div className="bg-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer">
-              <div className="h-48 bg-gradient-to-br from-primary/20 to-secondary/20 transition-all duration-300 hover:from-primary/30 hover:to-secondary/30"></div>
-              <div className="p-8">
-                <h3 className="text-xl font-bold text-foreground mb-2">Team Member One</h3>
-                <p className="text-primary font-semibold mb-3">Position Title</p>
-                <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
-              </div>
-            </div>
-            
-            <div className="bg-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer">
-              <div className="h-48 bg-gradient-to-br from-secondary/20 to-accent/20 transition-all duration-300 hover:from-secondary/30 hover:to-accent/30"></div>
-              <div className="p-8">
-                <h3 className="text-xl font-bold text-foreground mb-2">Team Member Two</h3>
-                <p className="text-primary font-semibold mb-3">Position Title</p>
-                <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
-              </div>
-            </div>
-            
-            <div className="bg-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer">
-              <div className="h-48 bg-gradient-to-br from-accent/20 to-primary/20 transition-all duration-300 hover:from-accent/30 hover:to-primary/30"></div>
-              <div className="p-8">
-                <h3 className="text-xl font-bold text-foreground mb-2">Team Member Three</h3>
-                <p className="text-primary font-semibold mb-3">Position Title</p>
-                <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
-              </div>
-            </div>
+            {teamMembers.map((member: any, index: number) => {
+              const gradients = [
+                'from-primary/20 to-secondary/20 hover:from-primary/30 hover:to-secondary/30',
+                'from-secondary/20 to-accent/20 hover:from-secondary/30 hover:to-accent/30',
+                'from-accent/20 to-primary/20 hover:from-accent/30 hover:to-primary/30'
+              ];
+              return (
+                <div key={member.id} className="bg-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer">
+                  {member.image_url ? (
+                    <img src={member.image_url} alt={member.name} className="h-48 w-full object-cover" />
+                  ) : (
+                    <div className={`h-48 bg-gradient-to-br ${gradients[index % 3]} transition-all duration-300`}></div>
+                  )}
+                  <div className="p-8">
+                    <h3 className="text-xl font-bold text-foreground mb-2">{member.name}</h3>
+                    <p className="text-primary font-semibold mb-3">{member.position}</p>
+                    <div className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: member.description }} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
           
           {/* Mobile Carousel */}
           <div className="md:hidden relative max-w-md mx-auto">
             <div className="overflow-hidden">
               <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${teamSlide * 100}%)` }}>
-                <div className="w-full flex-shrink-0 px-2">
-                  <div className="bg-card rounded-xl overflow-hidden shadow-lg">
-                    <div className="h-48 bg-gradient-to-br from-primary/20 to-secondary/20"></div>
-                    <div className="p-8">
-                      <h3 className="text-xl font-bold text-foreground mb-2">Team Member One</h3>
-                      <p className="text-primary font-semibold mb-3">Position Title</p>
-                      <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
+                {teamMembers.map((member: any, index: number) => {
+                  const gradients = [
+                    'from-primary/20 to-secondary/20',
+                    'from-secondary/20 to-accent/20',
+                    'from-accent/20 to-primary/20'
+                  ];
+                  return (
+                    <div key={member.id} className="w-full flex-shrink-0 px-2">
+                      <div className="bg-card rounded-xl overflow-hidden shadow-lg">
+                        {member.image_url ? (
+                          <img src={member.image_url} alt={member.name} className="h-48 w-full object-cover" />
+                        ) : (
+                          <div className={`h-48 bg-gradient-to-br ${gradients[index % 3]}`}></div>
+                        )}
+                        <div className="p-8">
+                          <h3 className="text-xl font-bold text-foreground mb-2">{member.name}</h3>
+                          <p className="text-primary font-semibold mb-3">{member.position}</p>
+                          <div className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: member.description }} />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="w-full flex-shrink-0 px-2">
-                  <div className="bg-card rounded-xl overflow-hidden shadow-lg">
-                    <div className="h-48 bg-gradient-to-br from-secondary/20 to-accent/20"></div>
-                    <div className="p-8">
-                      <h3 className="text-xl font-bold text-foreground mb-2">Team Member Two</h3>
-                      <p className="text-primary font-semibold mb-3">Position Title</p>
-                      <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full flex-shrink-0 px-2">
-                  <div className="bg-card rounded-xl overflow-hidden shadow-lg">
-                    <div className="h-48 bg-gradient-to-br from-accent/20 to-primary/20"></div>
-                    <div className="p-8">
-                      <h3 className="text-xl font-bold text-foreground mb-2">Team Member Three</h3>
-                      <p className="text-primary font-semibold mb-3">Position Title</p>
-                      <p className="text-muted-foreground">Brief description about team member and their role in the organization.</p>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
             </div>
             <div className="flex justify-center gap-2 mt-6">
-              {[0, 1, 2].map((index) => (
+              {teamMembers.map((_: any, index: number) => (
                 <button
                   key={index}
                   onClick={() => setTeamSlide(index)}

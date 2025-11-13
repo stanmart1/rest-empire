@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     auth, users, transactions, team, ranks, bonuses, 
     admin, admin_users, admin_bonuses, admin_support, admin_analytics, admin_config, admin_books, admin_promo_materials, admin_activation, admin_bonus, admin_email, admin_videos,
-    payments, payouts, notifications, events, promo_materials, books, activation, support, verification, crypto_signals, dashboard, videos, content, faq, blog, about, contact, social, upload, rbac
+    payments, payouts, notifications, events, promo_materials, books, activation, support, verification, crypto_signals, dashboard, videos, content, faq, blog, about, contact, social, upload, rbac, team_members
 )
 
 api_router = APIRouter()
@@ -46,3 +46,4 @@ api_router.include_router(admin_analytics.router, prefix="/admin", tags=["Admin 
 api_router.include_router(admin_books.router, prefix="/admin", tags=["Admin - Books"])
 api_router.include_router(admin_promo_materials.router, prefix="/admin", tags=["Admin - Promo Materials"])
 api_router.include_router(admin_activation.router, prefix="/admin", tags=["Admin - Activation Payments"])
+api_router.include_router(team_members.router, prefix="/team-members", tags=["Team Members"])

@@ -52,14 +52,14 @@ const AdminCryptoSignals = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Crypto Signals</h1>
+        <h1 className="text-3xl font-bold">Trading Signals</h1>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button><Plus className="w-4 h-4 mr-2" />Create Signal</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create Crypto Signal</DialogTitle>
+              <DialogTitle>Create Trading Signal</DialogTitle>
             </DialogHeader>
             <SignalForm onSubmit={handleSubmit} isLoading={createMutation.isPending} />
           </DialogContent>
@@ -84,7 +84,7 @@ const AdminCryptoSignals = () => {
                 <div>
                   <h3 className="text-lg font-semibold mb-1">No Signals Yet</h3>
                   <p className="text-muted-foreground text-sm">
-                    Create your first crypto trading signal to get started.
+                    Create your first trading signal to get started.
                   </p>
                 </div>
               </div>

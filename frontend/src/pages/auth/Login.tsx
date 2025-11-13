@@ -50,8 +50,38 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-200 p-4">
-      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-8 items-center py-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          className="absolute w-96 h-96 bg-purple-300/20 rounded-full blur-3xl"
+          style={{ top: '10%', left: '10%' }}
+          animate={{
+            y: [0, 50, 0],
+            x: [0, 30, 0],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute w-96 h-96 bg-blue-300/20 rounded-full blur-3xl"
+          style={{ bottom: '10%', right: '10%' }}
+          animate={{
+            y: [0, -50, 0],
+            x: [0, -30, 0],
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute w-64 h-64 bg-indigo-300/20 rounded-full blur-3xl"
+          style={{ top: '50%', right: '20%' }}
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-8 items-center py-8 relative z-10">
         {/* Back to Home Button */}
         <div className="relative lg:col-span-2 mb-4">
           <Link to="/">
@@ -67,7 +97,7 @@ const Login = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-        <Card className="w-full">
+        <Card className="w-full backdrop-blur-sm bg-white/95 shadow-2xl border-white/20">
           <CardHeader className="space-y-1">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">

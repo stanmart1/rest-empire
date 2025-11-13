@@ -3,6 +3,7 @@ from app.models.transaction import Transaction, TransactionType, TransactionStat
 from app.models.bonus import Bonus, BonusType, BonusStatus
 from app.models.rank import Rank
 from app.models.team import TeamMember
+from app.models.team_member import TeamMember as AboutTeamMember
 from app.models.payout import Payout, PayoutStatus
 from app.models.support import SupportTicket, SupportResponse, TicketStatus, TicketPriority
 from app.models.activity import ActivityLog
@@ -24,6 +25,7 @@ __all__ = [
     "Bonus", "BonusType", "BonusStatus",
     "Rank",
     "TeamMember",
+    "AboutTeamMember",
     "Payout", "PayoutStatus",
     "SupportTicket", "SupportResponse", "TicketStatus", "TicketPriority",
     "ActivityLog",

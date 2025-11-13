@@ -51,6 +51,12 @@ const AdminContentManagement = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [teamOpen, setTeamOpen] = useState(false);
+  const [editingTeam, setEditingTeam] = useState<any>(null);
+  const [teamFormData, setTeamFormData] = useState({ name: '', position: '', description: '', image_url: '', display_order: 0 });
+  const [teamImageFile, setTeamImageFile] = useState<File | null>(null);
+  const [teamImagePreview, setTeamImagePreview] = useState<string>('');
+  const [uploadingTeamImage, setUploadingTeamImage] = useState(false);
 
   // Fetch current logo
   const { data: logoData } = useQuery({
@@ -127,6 +133,14 @@ const AdminContentManagement = () => {
     queryKey: ['blogs'],
     queryFn: async () => {
       const response = await api.get('/blog/');
+      return response.data;
+    },
+  });
+
+  const { data: teamMembers } = useQuery({
+    queryKey: ['team-members'],
+    queryFn: async () => {
+      const response = await api.get('/team-members/');
       return response.data;
     },
   });
@@ -345,6 +359,96 @@ const AdminContentManagement = () => {
     setBlogOpen(true);
   };
 
+  const createTeamMutation = useMutation({
+    mutationFn: async (data: typeof teamFormData) => {
+      await api.post('/team-members/', data);
+    },
+    onSuccess: () => {
+      toast({ title: 'Success', description: 'Team member created successfully' });
+      queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      setTeamOpen(false);
+      setTeamFormData({ name: '', position: '', description: '', image_url: '', display_order: 0 });
+    },
+  });
+
+  const updateTeamMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: typeof teamFormData }) => {
+      await api.put(`/team-members/${id}`, data);
+    },
+    onSuccess: () => {
+      toast({ title: 'Success', description: 'Team member updated successfully' });
+      queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      setTeamOpen(false);
+      setEditingTeam(null);
+      setTeamFormData({ name: '', position: '', description: '', image_url: '', display_order: 0 });
+    },
+  });
+
+  const deleteTeamMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await api.delete(`/team-members/${id}`);
+    },
+    onSuccess: () => {
+      toast({ title: 'Success', description: 'Team member deleted successfully' });
+      queryClient.invalidateQueries({ queryKey: ['team-members'] });
+    },
+  });
+
+  const handleTeamSubmit = async () => {
+    let imageUrl = teamFormData.image_url;
+
+    if (teamImageFile) {
+      setUploadingTeamImage(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', teamImageFile);
+        formData.append('subfolder', 'team');
+
+        const uploadResponse = await api.post('/upload/', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        imageUrl = uploadResponse.data.file_url;
+      } catch (error: any) {
+        toast({
+          title: 'Error',
+          description: error.response?.data?.detail || 'Failed to upload image',
+          variant: 'destructive'
+        });
+        setUploadingTeamImage(false);
+        return;
+      }
+      setUploadingTeamImage(false);
+    }
+
+    const data = { ...teamFormData, image_url: imageUrl };
+
+    if (editingTeam) {
+      updateTeamMutation.mutate({ id: editingTeam.id, data });
+    } else {
+      createTeamMutation.mutate(data);
+    }
+
+    setTeamImageFile(null);
+    setTeamImagePreview('');
+  };
+
+  const handleEditTeam = (member: any) => {
+    setEditingTeam(member);
+    setTeamFormData({ name: member.name, position: member.position, description: member.description, image_url: member.image_url || '', display_order: member.display_order });
+    setTeamImagePreview(member.image_url || '');
+    setTeamImageFile(null);
+    setTeamOpen(true);
+  };
+
+  const handleAddTeam = () => {
+    setEditingTeam(null);
+    setTeamFormData({ name: '', position: '', description: '', image_url: '', display_order: 0 });
+    setTeamImagePreview('');
+    setTeamImageFile(null);
+    setTeamOpen(true);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -366,11 +470,12 @@ const AdminContentManagement = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="blog">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="blog">Blog</TabsTrigger>
               <TabsTrigger value="faq">FAQ</TabsTrigger>
               <TabsTrigger value="logo">Logo</TabsTrigger>
               <TabsTrigger value="about">About</TabsTrigger>
+              <TabsTrigger value="team">Team</TabsTrigger>
               <TabsTrigger value="contact">Contact</TabsTrigger>
               <TabsTrigger value="social">Social Links</TabsTrigger>
             </TabsList>
@@ -700,6 +805,133 @@ const AdminContentManagement = () => {
                     )}
                   </div>
                 </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="team" className="space-y-4">
+              <div className="flex justify-end">
+                <Dialog open={teamOpen} onOpenChange={setTeamOpen}>
+                  <DialogTrigger asChild>
+                    <Button onClick={handleAddTeam}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Team Member
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>{editingTeam ? 'Edit Team Member' : 'Add Team Member'}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label>Name</Label>
+                        <Input
+                          value={teamFormData.name}
+                          onChange={(e) => setTeamFormData({ ...teamFormData, name: e.target.value })}
+                          placeholder="Enter name"
+                        />
+                      </div>
+                      <div>
+                        <Label>Position</Label>
+                        <Input
+                          value={teamFormData.position}
+                          onChange={(e) => setTeamFormData({ ...teamFormData, position: e.target.value })}
+                          placeholder="Enter position"
+                        />
+                      </div>
+                      <div>
+                        <Label>Description</Label>
+                        <RichTextEditor
+                          value={teamFormData.description}
+                          onChange={(value) => setTeamFormData({ ...teamFormData, description: value })}
+                          placeholder="Enter description"
+                          minHeight="150px"
+                        />
+                      </div>
+                      <div>
+                        <Label>Team Member Image (Optional)</Label>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Upload an image or enter a URL. Recommended: Square image (e.g., 400x400px). Max size: 2MB
+                        </p>
+                        <Input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              if (file.size > 2 * 1024 * 1024) {
+                                toast({
+                                  title: 'Error',
+                                  description: 'File size must be less than 2MB',
+                                  variant: 'destructive'
+                                });
+                                return;
+                              }
+                              setTeamImageFile(file);
+                              setTeamImagePreview(URL.createObjectURL(file));
+                              setTeamFormData({ ...teamFormData, image_url: '' });
+                            }
+                          }}
+                        />
+                        {teamImagePreview && (
+                          <div className="mt-2">
+                            <img src={teamImagePreview} alt="Preview" className="w-24 h-24 rounded-full object-cover" />
+                          </div>
+                        )}
+                        <div className="mt-2">
+                          <Label>Or enter image URL</Label>
+                          <Input
+                            value={teamFormData.image_url || ''}
+                            onChange={(e) => {
+                              setTeamFormData({ ...teamFormData, image_url: e.target.value });
+                              setTeamImageFile(null);
+                              setTeamImagePreview(e.target.value);
+                            }}
+                            placeholder="https://example.com/image.jpg"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Display Order</Label>
+                        <Input
+                          type="number"
+                          value={teamFormData.display_order}
+                          onChange={(e) => setTeamFormData({ ...teamFormData, display_order: parseInt(e.target.value) || 0 })}
+                        />
+                      </div>
+                      <Button onClick={handleTeamSubmit} disabled={createTeamMutation.isPending || updateTeamMutation.isPending || uploadingTeamImage}>
+                        {(createTeamMutation.isPending || updateTeamMutation.isPending || uploadingTeamImage) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                        {editingTeam ? 'Update' : 'Create'}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <div className="space-y-4">
+                {teamMembers?.map((member: any) => (
+                  <div key={member.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex gap-4 flex-1">
+                        {member.image_url && (
+                          <img src={member.image_url} alt={member.name} className="w-16 h-16 rounded-full object-cover" />
+                        )}
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{member.name}</h3>
+                          <p className="text-sm text-primary font-medium">{member.position}</p>
+                          <div className="text-sm mt-2 text-muted-foreground line-clamp-2" dangerouslySetInnerHTML={{ __html: member.description }} />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => handleEditTeam(member)}>
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button size="sm" variant="destructive" onClick={() => deleteTeamMutation.mutate(member.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </TabsContent>
 

@@ -209,7 +209,7 @@ const AdminActivationPackages = () => {
                 <Label>Allowed Features</Label>
                 <div className="grid grid-cols-2 gap-3 mt-2">
                   {[
-                    { id: 'crypto_signals', label: 'Crypto Signals' },
+                    { id: 'crypto_signals', label: 'Trading Signals' },
                     { id: 'events', label: 'Events' },
                     { id: 'promo_materials', label: 'Promo Materials' },
                     { id: 'book_review', label: 'Book Review' },
@@ -471,7 +471,7 @@ const AdminActivationPackages = () => {
               <Label>Allowed Features</Label>
               <div className="grid grid-cols-2 gap-3 mt-2">
                 {[
-                  { id: 'crypto_signals', label: 'Crypto Signals' },
+                  { id: 'crypto_signals', label: 'Trading Signals' },
                   { id: 'events', label: 'Events' },
                   { id: 'promo_materials', label: 'Promo Materials' },
                   { id: 'book_review', label: 'Book Review' },

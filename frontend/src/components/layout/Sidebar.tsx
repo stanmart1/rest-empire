@@ -66,7 +66,7 @@ const Sidebar = () => {
     { to: '/status', icon: Users, label: 'My Status', enabled: bonusConfig?.rank_bonus_enabled },
     { to: '/team', icon: Users, label: 'My Team' },
     { to: '/video-gallery', icon: TrendingUp, label: 'Video Gallery' },
-    { to: '/crypto-signals', icon: TrendingUp, label: 'Crypto Signals' },
+    { to: '/crypto-signals', icon: TrendingUp, label: 'Trading Signals' },
     { to: '/events', icon: Calendar, label: 'Our Events' },
     { to: '/promo-materials', icon: Megaphone, label: 'Promo Materials' },
     { to: '/books', icon: BookOpen, label: 'Books' },

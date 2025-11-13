@@ -102,8 +102,38 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-200 p-4">
-      <div className="w-full max-w-5xl relative py-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 p-4 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          className="absolute w-96 h-96 bg-emerald-300/20 rounded-full blur-3xl"
+          style={{ top: '5%', left: '5%' }}
+          animate={{
+            y: [0, 60, 0],
+            x: [0, 40, 0],
+          }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute w-96 h-96 bg-teal-300/20 rounded-full blur-3xl"
+          style={{ bottom: '5%', right: '5%' }}
+          animate={{
+            y: [0, -60, 0],
+            x: [0, -40, 0],
+          }}
+          transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute w-72 h-72 bg-cyan-300/20 rounded-full blur-3xl"
+          style={{ top: '40%', right: '15%' }}
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.4, 0.2],
+          }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+      <div className="w-full max-w-5xl relative py-8 z-10">
         {/* Back to Home Button */}
         <div className="relative mb-4">
           <Link to="/">
@@ -115,7 +145,7 @@ const Register = () => {
         </div>
         <div className="flex flex-col lg:flex-row gap-8 items-center">
           {/* Registration Form */}
-          <Card className={`w-full lg:w-1/2 transition-all duration-500 ease-in-out ${step === 1 ? 'lg:translate-x-0' : 'lg:translate-x-[calc(100%+2rem)]'}`}>
+          <Card className={`w-full lg:w-1/2 transition-all duration-500 ease-in-out backdrop-blur-sm bg-white/95 shadow-2xl border-white/20 ${step === 1 ? 'lg:translate-x-0' : 'lg:translate-x-[calc(100%+2rem)]'}`}>
             <CardHeader className="space-y-1 pb-4">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">

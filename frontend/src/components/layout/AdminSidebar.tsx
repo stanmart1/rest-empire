@@ -49,7 +49,7 @@ const AdminSidebar = () => {
     { to: '/admin/finance', icon: DollarSign, label: 'Finance', permission: 'finance:view' },
     { to: '/admin/bonuses', icon: Gift, label: 'Bonuses', permission: 'bonuses:list' },
     { to: '/admin/activation-packages', icon: Package, label: 'Activation Packages', permission: 'packages:list' },
-    { to: '/admin/crypto-signals', icon: TrendingUp, label: 'Crypto Signals', permission: 'crypto_signals:list' },
+    { to: '/admin/crypto-signals', icon: TrendingUp, label: 'Trading Signals', permission: 'crypto_signals:list' },
     { to: '/admin/books', icon: BookOpen, label: 'Books', permission: 'books:list' },
     { to: '/admin/events', icon: Calendar, label: 'Events', permission: 'events:list' },
     { to: '/admin/promo-materials', icon: FileText, label: 'Promo Materials', permission: 'promo_materials:list' },
