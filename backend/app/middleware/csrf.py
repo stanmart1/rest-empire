@@ -11,6 +11,7 @@ class CSRFMiddleware(BaseHTTPMiddleware):
     
     EXEMPT_METHODS = {'GET', 'HEAD', 'OPTIONS'}
     EXEMPT_PATHS = {'/api/v1/auth/login', '/api/v1/auth/register', '/api/v1/auth/refresh', '/docs', '/redoc', '/openapi.json'}
+    EXEMPT_PATH_PREFIXES = {'/api/v1/admin/', '/api/v1/contact/'}
     
     def generate_csrf_token(self) -> str:
         """Generate CSRF token"""
@@ -44,6 +45,11 @@ class CSRFMiddleware(BaseHTTPMiddleware):
         # Skip CSRF check for exempt paths
         if request.url.path in self.EXEMPT_PATHS or request.url.path.startswith('/uploads'):
             return await call_next(request)
+        
+        # Skip CSRF check for exempt path prefixes
+        for prefix in self.EXEMPT_PATH_PREFIXES:
+            if request.url.path.startswith(prefix):
+                return await call_next(request)
         
         # Get CSRF token from header and cookie
         csrf_token_header = request.headers.get('X-CSRF-Token')
