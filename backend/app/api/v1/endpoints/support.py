@@ -6,6 +6,7 @@ from app.api.deps import get_current_user
 from app.models.user import User
 from app.models.support import SupportTicket, SupportResponse, TicketStatus
 from app.schemas.support import SupportTicketCreate, SupportTicketResponse
+from app.core.sanitization import sanitize_text
 
 router = APIRouter()
 
@@ -18,9 +19,9 @@ def create_support_ticket(
     """Create a new support ticket"""
     ticket = SupportTicket(
         user_id=current_user.id,
-        subject=ticket_data.subject,
+        subject=sanitize_text(ticket_data.subject),
         category=ticket_data.category or "general",
-        message=ticket_data.message,
+        message=sanitize_text(ticket_data.message),
         status=TicketStatus.open
     )
     
@@ -29,7 +30,7 @@ def create_support_ticket(
     db.refresh(ticket)
     
     return {
-        "message": "Support ticket created successfully",
+        "message": "Support ticket created successfully. Our team will respond within 24 hours.",
         "ticket_id": ticket.id,
         "status": "open"
     }

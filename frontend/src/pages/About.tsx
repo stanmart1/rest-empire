@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import RichTextDisplay from '@/components/ui/rich-text-display';
 
 const About = () => {
   const [teamSlide, setTeamSlide] = useState(0);
@@ -112,9 +113,7 @@ const About = () => {
       <div className="container mx-auto px-4 py-16 relative z-10 bg-background">
         <div className="max-w-4xl mx-auto">
           <div className="bg-card rounded-xl border p-8">
-            <div className="prose prose-lg max-w-none whitespace-pre-wrap text-foreground">
-              {aboutData?.content}
-            </div>
+            <RichTextDisplay content={aboutData?.content || ''} className="prose-lg" />
           </div>
         </div>
       </div>
@@ -149,7 +148,9 @@ const About = () => {
                   <div className="p-8 flex flex-col flex-1">
                     <h3 className="text-xl font-bold text-foreground mb-2">{member.name}</h3>
                     <p className="text-primary font-semibold mb-3">{member.position}</p>
-                    <div className="text-muted-foreground line-clamp-3 flex-1" dangerouslySetInnerHTML={{ __html: member.description }} />
+                    <div className="text-muted-foreground line-clamp-3 flex-1">
+                      <RichTextDisplay content={member.description} />
+                    </div>
                     <Button variant="link" className="mt-4 p-0 h-auto">
                       Read More
                     </Button>
@@ -183,7 +184,9 @@ const About = () => {
                         <div className="p-8 flex flex-col">
                           <h3 className="text-xl font-bold text-foreground mb-2">{member.name}</h3>
                           <p className="text-primary font-semibold mb-3">{member.position}</p>
-                          <div className="text-muted-foreground line-clamp-3" dangerouslySetInnerHTML={{ __html: member.description }} />
+                          <div className="text-muted-foreground line-clamp-3">
+                            <RichTextDisplay content={member.description} />
+                          </div>
                           <Button variant="link" className="mt-4 p-0 h-auto">
                             Read More
                           </Button>
@@ -246,7 +249,7 @@ const About = () => {
               </DialogTitle>
               <p className="text-primary font-semibold text-xl mt-2">{selectedMember?.position}</p>
             </DialogHeader>
-            <div className="prose prose-base md:prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: selectedMember?.description }} />
+            <RichTextDisplay content={selectedMember?.description || ''} className="prose-base md:prose-lg" />
           </div>
         </DialogContent>
       </Dialog>

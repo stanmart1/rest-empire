@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { Textarea } from '@/components/ui/textarea';
+import RichTextDisplay from '@/components/ui/rich-text-display';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -168,10 +169,7 @@ const Contact = () => {
                             </div>
                             <div>
                               <h3 className="font-semibold text-foreground">Business Hours</h3>
-                              <div
-                                className="text-foreground"
-                                dangerouslySetInnerHTML={{ __html: data.business_hours }}
-                              />
+                              <RichTextDisplay content={data.business_hours || ''} />
                             </div>
                           </div>
                         </>

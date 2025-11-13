@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import RichTextEditor from '@/components/ui/rich-text-editor';
+import RichTextDisplay from '@/components/ui/rich-text-display';
 import { Loader2, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -243,7 +244,7 @@ const Support = () => {
               <div className="space-y-4">
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <p className="text-sm font-medium mb-1">Your Message</p>
-                  <p className="text-sm whitespace-pre-wrap">{selectedTicket.message}</p>
+                  <RichTextDisplay content={selectedTicket.message} className="prose-sm" />
                 </div>
 
                 {selectedTicket.responses && selectedTicket.responses.length > 0 && (
@@ -257,7 +258,7 @@ const Support = () => {
                             {new Date(response.created_at).toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-sm whitespace-pre-wrap">{response.message}</p>
+                        <RichTextDisplay content={response.message} className="prose-sm" />
                       </div>
                     ))}
                   </div>

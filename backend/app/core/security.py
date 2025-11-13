@@ -4,6 +4,7 @@ import bcrypt
 from app.core.config import settings
 from app.services.config_service import get_config
 import secrets
+from fastapi import Response
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
@@ -43,3 +44,27 @@ def generate_verification_token() -> str:
 
 def generate_reset_token() -> str:
     return secrets.token_urlsafe(32)
+
+def set_auth_cookies(response: Response, access_token: str, refresh_token: str, secure: bool = False):
+    """Set authentication tokens in httpOnly cookies"""
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=secure,
+        samesite="lax",
+        max_age=1800  # 30 minutes
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=secure,
+        samesite="lax",
+        max_age=604800  # 7 days
+    )
+
+def clear_auth_cookies(response: Response):
+    """Clear authentication cookies"""
+    response.delete_cookie(key="access_token", samesite="lax")
+    response.delete_cookie(key="refresh_token", samesite="lax")

@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from app.core.database import get_db
 from app.core.security import (
     verify_password, get_password_hash, create_access_token, 
-    create_refresh_token, generate_verification_token, generate_reset_token
+    create_refresh_token, generate_verification_token, generate_reset_token,
+    set_auth_cookies, clear_auth_cookies
 )
 from app.models.user import User
 from app.models.team import TeamMember
@@ -20,8 +23,10 @@ from app.core.config import settings
 import secrets
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 @router.post("/register", response_model=UserResponse)
+@limiter.limit("5/minute")
 async def register(user_data: UserCreate, request: Request, db: Session = Depends(get_db)):
     # Check if registration is enabled
     registration_enabled = (get_config(db, "registration_enabled") or "true") == "true"
@@ -117,7 +122,8 @@ async def register(user_data: UserCreate, request: Request, db: Session = Depend
     return user
 
 @router.post("/login", response_model=Token)
-def login(credentials: UserLogin, request: Request, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def login(credentials: UserLogin, request: Request, response: Response, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == credentials.email).first()
     
     if not user or not verify_password(credentials.password, user.hashed_password):
@@ -142,6 +148,10 @@ def login(credentials: UserLogin, request: Request, db: Session = Depends(get_db
     access_token = create_access_token(data={"sub": str(user.id)}, db=db)
     refresh_token = create_refresh_token(data={"sub": str(user.id)}, db=db)
     
+    # Set tokens in httpOnly cookies
+    from app.core.storage import ENVIRONMENT
+    set_auth_cookies(response, access_token, refresh_token, secure=(ENVIRONMENT == "production"))
+    
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
@@ -149,7 +159,8 @@ def login(credentials: UserLogin, request: Request, db: Session = Depends(get_db
     }
 
 @router.post("/refresh", response_model=Token)
-def refresh_token(token_data: TokenRefresh, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def refresh_token(token_data: TokenRefresh, request: Request, response: Response, db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(token_data.refresh_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         user_id: int = int(payload.get("sub"))
@@ -172,11 +183,15 @@ def refresh_token(token_data: TokenRefresh, db: Session = Depends(get_db)):
     
     # Create new tokens
     access_token = create_access_token(data={"sub": str(user.id)}, db=db)
-    refresh_token = create_refresh_token(data={"sub": str(user.id)}, db=db)
+    new_refresh_token = create_refresh_token(data={"sub": str(user.id)}, db=db)
+    
+    # Set tokens in httpOnly cookies
+    from app.core.storage import ENVIRONMENT
+    set_auth_cookies(response, access_token, new_refresh_token, secure=(ENVIRONMENT == "production"))
     
     return {
         "access_token": access_token,
-        "refresh_token": refresh_token,
+        "refresh_token": new_refresh_token,
         "token_type": "bearer"
     }
 
@@ -203,46 +218,61 @@ async def verify_email(verification: EmailVerification, db: Session = Depends(ge
     return {"message": "Email verified successfully"}
 
 @router.post("/request-password-reset")
-async def request_password_reset(request_data: PasswordResetRequest, db: Session = Depends(get_db)):
+@limiter.limit("3/minute")
+async def request_password_reset(request_data: PasswordResetRequest, request: Request, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == request_data.email).first()
     
     # Always return success to prevent email enumeration
     if user:
+        # Invalidate old reset tokens
+        user.password_reset_token = None
+        user.password_reset_expires = None
+        db.commit()
+        
+        # Generate new token
         reset_token = generate_reset_token()
         user.password_reset_token = reset_token
         user.password_reset_expires = datetime.utcnow() + timedelta(hours=2)
         db.commit()
         
-        # Log password reset request
-        log_activity(db, user.id, "password_reset_requested")
+        # Log password reset request with IP
+        log_activity(db, user.id, "password_reset_requested", ip_address=request.client.host)
         
         # Send password reset email
         await send_password_reset_email(user.email, reset_token, db)
     
-    return {"message": "If the email exists, a reset link has been sent"}
+    return {"message": "If the email exists, a password reset link has been sent. Please check your inbox and spam folder."}
 
 @router.post("/reset-password")
-def reset_password(reset: PasswordReset, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def reset_password(reset: PasswordReset, request: Request, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.password_reset_token == reset.token).first()
     
     if not user:
-        raise HTTPException(status_code=400, detail="Invalid reset token")
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token. Please request a new password reset link.")
     
     if user.password_reset_expires < datetime.utcnow():
-        raise HTTPException(status_code=400, detail="Reset token expired")
+        raise HTTPException(status_code=400, detail="Reset token has expired. Please request a new password reset link.")
     
     user.hashed_password = get_password_hash(reset.new_password)
     user.password_reset_token = None
     user.password_reset_expires = None
     db.commit()
     
-    # Log password reset
-    log_activity(db, user.id, "password_reset_completed")
+    # Log password reset with IP
+    log_activity(db, user.id, "password_reset_completed", ip_address=request.client.host)
     
-    return {"message": "Password reset successfully"}
+    return {"message": "Password reset successfully. You can now log in with your new password."}
+
+@router.post("/logout")
+def logout(response: Response):
+    """Logout user by clearing auth cookies"""
+    clear_auth_cookies(response)
+    return {"message": "Logged out successfully"}
 
 @router.post("/resend-verification")
-async def resend_verification(email_data: PasswordResetRequest, db: Session = Depends(get_db)):
+@limiter.limit("3/minute")
+async def resend_verification(email_data: PasswordResetRequest, request: Request, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == email_data.email).first()
     
     if not user:

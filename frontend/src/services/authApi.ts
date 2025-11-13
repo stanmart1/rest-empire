@@ -60,10 +60,10 @@ export const authAPI = {
     return response.data;
   },
 
-  // Logout (client-side only, no backend endpoint)
+  // Logout (clears httpOnly cookies on backend)
   logout: async (): Promise<{ message: string }> => {
-    // No backend endpoint, just return success
-    return { message: 'Logged out successfully' };
+    const response = await api.post('/auth/logout');
+    return response.data;
   }
 };
 

@@ -6,6 +6,7 @@ from app.core.database import get_db
 from app.api.deps import require_permission, check_feature_access
 from app.models.crypto_signal import CryptoSignal, SignalStatus
 from app.schemas.crypto_signal import CryptoSignalCreate, CryptoSignalUpdate, CryptoSignalResponse
+from app.core.sanitization import sanitize_html
 
 router = APIRouter()
 
@@ -28,7 +29,14 @@ def create_signal(
     db: Session = Depends(get_db),
     current_user = Depends(require_permission("crypto_signals:create"))
 ):
-    db_signal = CryptoSignal(**signal.dict())
+    signal_data = signal.dict()
+    # Sanitize HTML fields
+    if 'description' in signal_data:
+        signal_data['description'] = sanitize_html(signal_data['description'])
+    if 'analysis' in signal_data:
+        signal_data['analysis'] = sanitize_html(signal_data['analysis'])
+    
+    db_signal = CryptoSignal(**signal_data)
     db.add(db_signal)
     db.commit()
     db.refresh(db_signal)
@@ -46,6 +54,11 @@ def update_signal(
         raise HTTPException(status_code=404, detail="Signal not found")
     
     for key, value in signal.dict(exclude_unset=True).items():
+        # Sanitize HTML fields
+        if key == 'description' and value:
+            value = sanitize_html(value)
+        elif key == 'analysis' and value:
+            value = sanitize_html(value)
         setattr(db_signal, key, value)
     
     if signal.status == "closed" and not db_signal.closed_at:

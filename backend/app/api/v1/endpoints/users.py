@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from app.core.database import get_db
 from app.api.deps import get_current_user
 from app.models.user import User
+from app.core.sanitization import sanitize_text
 from app.models.team import TeamMember
 from app.models.transaction import Transaction, TransactionStatus
 from app.models.bonus import Bonus, BonusStatus
@@ -56,10 +57,10 @@ def update_profile(
     request: Request = None
 ):
     if profile_data.full_name is not None:
-        current_user.full_name = profile_data.full_name
+        current_user.full_name = sanitize_text(profile_data.full_name)
     
     if profile_data.phone_number is not None:
-        current_user.phone_number = profile_data.phone_number
+        current_user.phone_number = sanitize_text(profile_data.phone_number)
     
     if profile_data.gender is not None:
         current_user.gender = profile_data.gender
@@ -72,7 +73,7 @@ def update_profile(
             current_user.date_of_birth = None
     
     if profile_data.occupation is not None:
-        current_user.occupation = profile_data.occupation
+        current_user.occupation = sanitize_text(profile_data.occupation)
     
     if profile_data.profile_picture is not None:
         current_user.profile_picture = profile_data.profile_picture
@@ -143,7 +144,7 @@ def change_password(
     
     log_activity(db, current_user.id, "password_changed", ip_address=request.client.host if request else None)
     
-    return {"message": "Password changed successfully"}
+    return {"message": "Password changed successfully. Please use your new password for future logins."}
 
 @router.get("/dashboard", response_model=DashboardStats)
 def get_dashboard_stats(
