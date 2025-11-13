@@ -16,6 +16,7 @@ class Settings(BaseSettings):
 
     # Frontend
     FRONTEND_URL: str = "http://localhost:8080"
+    API_BASE_URL: str = "http://localhost:8000"
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"

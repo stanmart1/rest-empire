@@ -6,9 +6,11 @@ import Footer from "@/components/layout/Footer";
 import { useEffect, useState } from "react";
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const About = () => {
   const [teamSlide, setTeamSlide] = useState(0);
+  const [selectedMember, setSelectedMember] = useState<any>(null);
   const { data: aboutData, isLoading } = useQuery({
     queryKey: ['public-about'],
     queryFn: async () => {
@@ -134,16 +136,19 @@ const About = () => {
                 'from-accent/20 to-primary/20 hover:from-accent/30 hover:to-primary/30'
               ];
               return (
-                <div key={member.id} className="bg-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer">
+                <div key={member.id} className="bg-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl flex flex-col h-full">
                   {member.image_url ? (
                     <img src={member.image_url} alt={member.name} className="h-48 w-full object-cover" />
                   ) : (
                     <div className={`h-48 bg-gradient-to-br ${gradients[index % 3]} transition-all duration-300`}></div>
                   )}
-                  <div className="p-8">
+                  <div className="p-8 flex flex-col flex-1">
                     <h3 className="text-xl font-bold text-foreground mb-2">{member.name}</h3>
                     <p className="text-primary font-semibold mb-3">{member.position}</p>
-                    <div className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: member.description }} />
+                    <div className="text-muted-foreground line-clamp-3 flex-1" dangerouslySetInnerHTML={{ __html: member.description }} />
+                    <Button variant="link" className="mt-4 p-0 h-auto" onClick={() => setSelectedMember(member)}>
+                      Read More
+                    </Button>
                   </div>
                 </div>
               );
@@ -162,16 +167,19 @@ const About = () => {
                   ];
                   return (
                     <div key={member.id} className="w-full flex-shrink-0 px-2">
-                      <div className="bg-card rounded-xl overflow-hidden shadow-lg">
+                      <div className="bg-card rounded-xl overflow-hidden shadow-lg flex flex-col">
                         {member.image_url ? (
                           <img src={member.image_url} alt={member.name} className="h-48 w-full object-cover" />
                         ) : (
                           <div className={`h-48 bg-gradient-to-br ${gradients[index % 3]}`}></div>
                         )}
-                        <div className="p-8">
+                        <div className="p-8 flex flex-col">
                           <h3 className="text-xl font-bold text-foreground mb-2">{member.name}</h3>
                           <p className="text-primary font-semibold mb-3">{member.position}</p>
-                          <div className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: member.description }} />
+                          <div className="text-muted-foreground line-clamp-3" dangerouslySetInnerHTML={{ __html: member.description }} />
+                          <Button variant="link" className="mt-4 p-0 h-auto" onClick={() => setSelectedMember(member)}>
+                            Read More
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -210,6 +218,22 @@ const About = () => {
       </div>
       
       <Footer />
+
+      {/* Team Member Modal */}
+      <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">{selectedMember?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedMember?.image_url && (
+              <img src={selectedMember.image_url} alt={selectedMember.name} className="w-full h-64 object-cover rounded-lg" />
+            )}
+            <p className="text-primary font-semibold text-lg">{selectedMember?.position}</p>
+            <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: selectedMember?.description }} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

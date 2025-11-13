@@ -340,13 +340,17 @@ const Index = () => {
               transition={{ duration: 0.6 }}
               className="relative"
             >
-              <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl">
+              <motion.div 
+                className="aspect-square rounded-2xl overflow-hidden shadow-2xl"
+                animate={{ y: [0, -9, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              >
                 <img
                   src="/founder.jpeg"
                   alt="Ayodele Kikelomo"
                   className="w-full h-full object-cover"
                 />
-              </div>
+              </motion.div>
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
             </motion.div>
 
