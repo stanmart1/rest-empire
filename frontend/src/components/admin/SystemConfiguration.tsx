@@ -5,7 +5,10 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useUpdateSystemSettings } from '@/hooks/useSystemSettings';
 import { SystemSettings } from '@/types/system';
 import { useQuery } from '@tanstack/react-query';
@@ -26,7 +29,7 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
   const [accessTokenExpireMinutes, setAccessTokenExpireMinutes] = useState('30');
   const [refreshTokenExpireDays, setRefreshTokenExpireDays] = useState('7');
   const [defaultSponsorId, setDefaultSponsorId] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [open, setOpen] = useState(false);
 
   const updateMutation = useUpdateSystemSettings();
 
@@ -39,12 +42,7 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
     },
   });
 
-  // Filter users based on search query
-  const filteredUsers = users?.filter(user =>
-    user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.id.toString().includes(searchQuery)
-  ) || [];
+
 
   useEffect(() => {
     if (settings) {
@@ -178,33 +176,66 @@ const SystemConfiguration = ({ settings }: SystemConfigurationProps) => {
           </p>
           <div className="space-y-2">
             <Label>Default Sponsor</Label>
-            <div className="space-y-2">
-              <Input
-                type="text"
-                placeholder="Search by name, email, or ID..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="mb-2"
-              />
-              <Select value={defaultSponsorId || "none"} onValueChange={(value) => setDefaultSponsorId(value === "none" ? "" : value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select default sponsor (optional)" />
-                </SelectTrigger>
-                <SelectContent className="max-h-[300px]">
-                  <SelectItem value="none">No Default Sponsor</SelectItem>
-                  {filteredUsers.slice(0, 50).map((user) => (
-                    <SelectItem key={user.id} value={user.id.toString()}>
-                      {user.full_name} ({user.email})
-                    </SelectItem>
-                  ))}
-                  {filteredUsers.length > 50 && (
-                    <div className="px-2 py-1.5 text-xs text-muted-foreground">
-                      Showing first 50 results. Refine your search for more.
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="w-full justify-between"
+                >
+                  {defaultSponsorId
+                    ? users?.find((user) => user.id.toString() === defaultSponsorId)
+                        ? `${users.find((user) => user.id.toString() === defaultSponsorId)?.full_name} (${users.find((user) => user.id.toString() === defaultSponsorId)?.email})`
+                        : "Select sponsor..."
+                    : "No default sponsor"}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput placeholder="Search by name, email, or ID..." />
+                  <CommandList>
+                    <CommandEmpty>No user found.</CommandEmpty>
+                    <CommandGroup>
+                      <CommandItem
+                        value="none"
+                        onSelect={() => {
+                          setDefaultSponsorId("");
+                          setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            !defaultSponsorId ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        No Default Sponsor
+                      </CommandItem>
+                      {users?.map((user) => (
+                        <CommandItem
+                          key={user.id}
+                          value={`${user.full_name} ${user.email} ${user.id}`}
+                          onSelect={() => {
+                            setDefaultSponsorId(user.id.toString());
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              defaultSponsorId === user.id.toString() ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {user.full_name} ({user.email})
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
             <p className="text-xs text-muted-foreground">
               Users registering without a referral code will be automatically assigned to this sponsor. Leave empty to allow orphaned registrations.
             </p>
