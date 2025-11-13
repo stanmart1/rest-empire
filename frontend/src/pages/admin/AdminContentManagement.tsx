@@ -57,6 +57,7 @@ const AdminContentManagement = () => {
   const [teamImageFile, setTeamImageFile] = useState<File | null>(null);
   const [teamImagePreview, setTeamImagePreview] = useState<string>('');
   const [uploadingTeamImage, setUploadingTeamImage] = useState(false);
+  const [teamStep, setTeamStep] = useState(1);
 
   // Fetch current logo
   const { data: logoData } = useQuery({
@@ -446,6 +447,7 @@ const AdminContentManagement = () => {
     setTeamFormData({ name: '', position: '', description: '', image_url: '', display_order: 0 });
     setTeamImagePreview('');
     setTeamImageFile(null);
+    setTeamStep(1);
     setTeamOpen(true);
   };
 
@@ -817,91 +819,120 @@ const AdminContentManagement = () => {
                       Add Team Member
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
+                  <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
                     <DialogHeader>
-                      <DialogTitle>{editingTeam ? 'Edit Team Member' : 'Add Team Member'}</DialogTitle>
+                      <DialogTitle>{editingTeam ? 'Edit Team Member' : 'Add Team Member'} - Step {teamStep} of 2</DialogTitle>
                     </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label>Name</Label>
-                        <Input
-                          value={teamFormData.name}
-                          onChange={(e) => setTeamFormData({ ...teamFormData, name: e.target.value })}
-                          placeholder="Enter name"
-                        />
-                      </div>
-                      <div>
-                        <Label>Position</Label>
-                        <Input
-                          value={teamFormData.position}
-                          onChange={(e) => setTeamFormData({ ...teamFormData, position: e.target.value })}
-                          placeholder="Enter position"
-                        />
-                      </div>
-                      <div>
-                        <Label>Description</Label>
-                        <RichTextEditor
-                          value={teamFormData.description}
-                          onChange={(value) => setTeamFormData({ ...teamFormData, description: value })}
-                          placeholder="Enter description"
-                          minHeight="150px"
-                        />
-                      </div>
-                      <div>
-                        <Label>Team Member Image (Optional)</Label>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Upload an image or enter a URL. Recommended: Square image (e.g., 400x400px). Max size: 2MB
-                        </p>
-                        <Input
-                          type="file"
-                          accept="image/png,image/jpeg,image/jpg"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              if (file.size > 2 * 1024 * 1024) {
-                                toast({
-                                  title: 'Error',
-                                  description: 'File size must be less than 2MB',
-                                  variant: 'destructive'
-                                });
-                                return;
-                              }
-                              setTeamImageFile(file);
-                              setTeamImagePreview(URL.createObjectURL(file));
-                              setTeamFormData({ ...teamFormData, image_url: '' });
-                            }
-                          }}
-                        />
-                        {teamImagePreview && (
-                          <div className="mt-2">
-                            <img src={teamImagePreview} alt="Preview" className="w-24 h-24 rounded-full object-cover" />
+                    <div className="flex-1 overflow-y-auto px-1">
+                      {teamStep === 1 ? (
+                        <div className="space-y-4 py-4">
+                          <div>
+                            <Label>Name *</Label>
+                            <Input
+                              value={teamFormData.name}
+                              onChange={(e) => setTeamFormData({ ...teamFormData, name: e.target.value })}
+                              placeholder="Enter name"
+                            />
                           </div>
-                        )}
-                        <div className="mt-2">
-                          <Label>Or enter image URL</Label>
-                          <Input
-                            value={teamFormData.image_url || ''}
-                            onChange={(e) => {
-                              setTeamFormData({ ...teamFormData, image_url: e.target.value });
-                              setTeamImageFile(null);
-                              setTeamImagePreview(e.target.value);
-                            }}
-                            placeholder="https://example.com/image.jpg"
-                          />
+                          <div>
+                            <Label>Position *</Label>
+                            <Input
+                              value={teamFormData.position}
+                              onChange={(e) => setTeamFormData({ ...teamFormData, position: e.target.value })}
+                              placeholder="Enter position"
+                            />
+                          </div>
+                          <div>
+                            <Label>Display Order</Label>
+                            <Input
+                              type="number"
+                              value={teamFormData.display_order}
+                              onChange={(e) => setTeamFormData({ ...teamFormData, display_order: parseInt(e.target.value) || 0 })}
+                              placeholder="0"
+                            />
+                          </div>
                         </div>
-                      </div>
-                      <div>
-                        <Label>Display Order</Label>
-                        <Input
-                          type="number"
-                          value={teamFormData.display_order}
-                          onChange={(e) => setTeamFormData({ ...teamFormData, display_order: parseInt(e.target.value) || 0 })}
-                        />
-                      </div>
-                      <Button onClick={handleTeamSubmit} disabled={createTeamMutation.isPending || updateTeamMutation.isPending || uploadingTeamImage}>
-                        {(createTeamMutation.isPending || updateTeamMutation.isPending || uploadingTeamImage) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                        {editingTeam ? 'Update' : 'Create'}
-                      </Button>
+                      ) : (
+                        <div className="space-y-4 py-4">
+                          <div>
+                            <Label>Description *</Label>
+                            <RichTextEditor
+                              value={teamFormData.description}
+                              onChange={(value) => setTeamFormData({ ...teamFormData, description: value })}
+                              placeholder="Enter description"
+                              minHeight="200px"
+                            />
+                          </div>
+                          <div>
+                            <Label>Team Member Image (Optional)</Label>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              Upload an image or enter a URL. Recommended: Square image (e.g., 400x400px). Max size: 2MB
+                            </p>
+                            <Input
+                              type="file"
+                              accept="image/png,image/jpeg,image/jpg"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  if (file.size > 2 * 1024 * 1024) {
+                                    toast({
+                                      title: 'Error',
+                                      description: 'File size must be less than 2MB',
+                                      variant: 'destructive'
+                                    });
+                                    return;
+                                  }
+                                  setTeamImageFile(file);
+                                  setTeamImagePreview(URL.createObjectURL(file));
+                                  setTeamFormData({ ...teamFormData, image_url: '' });
+                                }
+                              }}
+                            />
+                            {teamImagePreview && (
+                              <div className="mt-2">
+                                <img src={teamImagePreview} alt="Preview" className="w-24 h-24 rounded-full object-cover" />
+                              </div>
+                            )}
+                            <div className="mt-2">
+                              <Label>Or enter image URL</Label>
+                              <Input
+                                value={teamFormData.image_url || ''}
+                                onChange={(e) => {
+                                  setTeamFormData({ ...teamFormData, image_url: e.target.value });
+                                  setTeamImageFile(null);
+                                  setTeamImagePreview(e.target.value);
+                                }}
+                                placeholder="https://example.com/image.jpg"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex justify-between gap-2 pt-4 border-t">
+                      {teamStep === 2 && (
+                        <Button variant="outline" onClick={() => setTeamStep(1)}>
+                          Back
+                        </Button>
+                      )}
+                      {teamStep === 1 ? (
+                        <Button 
+                          onClick={() => setTeamStep(2)} 
+                          disabled={!teamFormData.name || !teamFormData.position}
+                          className="ml-auto"
+                        >
+                          Next
+                        </Button>
+                      ) : (
+                        <Button 
+                          onClick={handleTeamSubmit} 
+                          disabled={createTeamMutation.isPending || updateTeamMutation.isPending || uploadingTeamImage || !teamFormData.description}
+                          className="ml-auto"
+                        >
+                          {(createTeamMutation.isPending || updateTeamMutation.isPending || uploadingTeamImage) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                          {editingTeam ? 'Update' : 'Create'}
+                        </Button>
+                      )}
                     </div>
                   </DialogContent>
                 </Dialog>
