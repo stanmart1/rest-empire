@@ -56,9 +56,7 @@ app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 def root():
     return {
         "message": settings.APP_NAME,
-        "status": "running",
-        "environment": ENVIRONMENT,
-        "storage_path": STORAGE_PATH
+        "status": "running"
     }
 
 @app.get("/health")

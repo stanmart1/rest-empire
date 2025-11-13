@@ -42,3 +42,19 @@ def get_file_url(file_path: str) -> str:
         return f"{api_base}/uploads/{relative_path.replace(os.sep, '/')}"
     
     return f"/uploads/{relative_path.replace(os.sep, '/')}"
+
+def normalize_image_url(url: str) -> str:
+    """Normalize image URL to use correct domain based on environment"""
+    if not url:
+        return url
+    
+    # In production, replace any localhost URLs with production domain
+    if ENVIRONMENT == "production":
+        api_base = settings.API_BASE_URL or "https://api.restempire.com"
+        if "localhost" in url:
+            # Extract the path after /uploads/
+            if "/uploads/" in url:
+                path = url.split("/uploads/")[1]
+                return f"{api_base}/uploads/{path}"
+    
+    return url

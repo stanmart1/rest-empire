@@ -4,12 +4,18 @@ from typing import List
 from app.api import deps
 from app.models.team_member import TeamMember
 from app.schemas.team_member import TeamMember as TeamMemberSchema, TeamMemberCreate, TeamMemberUpdate
+from app.core.storage import normalize_image_url
 
 router = APIRouter()
 
 @router.get("/", response_model=List[TeamMemberSchema])
 def get_team_members(db: Session = Depends(deps.get_db)):
-    return db.query(TeamMember).filter(TeamMember.is_active == True).order_by(TeamMember.display_order).all()
+    members = db.query(TeamMember).filter(TeamMember.is_active == True).order_by(TeamMember.display_order).all()
+    # Normalize image URLs
+    for member in members:
+        if member.image_url:
+            member.image_url = normalize_image_url(member.image_url)
+    return members
 
 @router.post("/", response_model=TeamMemberSchema)
 def create_team_member(team_member: TeamMemberCreate, db: Session = Depends(deps.get_db), current_user = Depends(deps.get_admin_user)):
