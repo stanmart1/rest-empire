@@ -54,11 +54,8 @@ const About = () => {
       <Header />
       
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-secondary">
-        {/* Decorative elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxjaXJjbGUgY3g9IjEwIiBjeT0iMTAiIHI9IjEuNSIgZmlsbD0id2hpdGUiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=')]"></div>
-        </div>
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary from-0% via-purple-900 via-75% to-secondary to-100%">
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-yellow-400/30 to-transparent rounded-full blur-3xl" />
         
         <div className="container mx-auto px-4 py-28 md:py-36 lg:py-44 relative z-10">
           <div className="text-center">
@@ -141,9 +138,9 @@ const About = () => {
                   className="bg-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl flex flex-col h-full cursor-pointer"
                 >
                   {member.image_url ? (
-                    <img src={member.image_url} alt={member.name} className="h-48 w-full object-cover" />
+                    <img src={member.image_url} alt={member.name} className="h-64 w-full object-cover object-top" />
                   ) : (
-                    <div className={`h-48 bg-gradient-to-br ${gradients[index % 3]} transition-all duration-300`}></div>
+                    <div className={`h-64 bg-gradient-to-br ${gradients[index % 3]} transition-all duration-300`}></div>
                   )}
                   <div className="p-8 flex flex-col flex-1">
                     <h3 className="text-xl font-bold text-foreground mb-2">{member.name}</h3>
@@ -177,9 +174,9 @@ const About = () => {
                         className="bg-card rounded-xl overflow-hidden shadow-lg flex flex-col cursor-pointer"
                       >
                         {member.image_url ? (
-                          <img src={member.image_url} alt={member.name} className="h-48 w-full object-cover" />
+                          <img src={member.image_url} alt={member.name} className="h-64 w-full object-cover object-top" />
                         ) : (
-                          <div className={`h-48 bg-gradient-to-br ${gradients[index % 3]}`}></div>
+                          <div className={`h-64 bg-gradient-to-br ${gradients[index % 3]}`}></div>
                         )}
                         <div className="p-8 flex flex-col">
                           <h3 className="text-xl font-bold text-foreground mb-2">{member.name}</h3>
@@ -233,13 +230,12 @@ const About = () => {
       <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
           {selectedMember?.image_url && (
-            <div className="relative w-full h-64 md:h-80">
+            <div className="relative w-full h-80 md:h-96 bg-muted">
               <img 
                 src={selectedMember.image_url} 
                 alt={selectedMember.name} 
-                className="w-full h-full object-cover" 
+                className="w-full h-full object-contain" 
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             </div>
           )}
           <div className="p-6 md:p-8">

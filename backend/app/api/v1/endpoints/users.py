@@ -118,7 +118,7 @@ async def change_email(
     )
     
     # Send verification email to new address
-    await send_verification_email(email_data.new_email, verification_token)
+    await send_verification_email(email_data.new_email, verification_token, db)
     
     return {"message": "Email updated. Please verify your new email address."}
 

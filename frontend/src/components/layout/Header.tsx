@@ -27,6 +27,7 @@ const Header = () => {
             <Link to="/" className="text-foreground hover:text-primary font-medium">Home</Link>
             <Link to="/about" className="text-foreground hover:text-primary font-medium">About</Link>
             <Link to="/blog" className="text-foreground hover:text-primary font-medium">Blog</Link>
+            <Link to="/public-events" className="text-foreground hover:text-primary font-medium">Events</Link>
             <Link to="/contact" className="text-foreground hover:text-primary font-medium">Contact</Link>
             <Link to="/faq" className="text-foreground hover:text-primary font-medium">FAQ</Link>
           </nav>
@@ -119,6 +120,7 @@ const Header = () => {
                 { to: "/", label: "Home" },
                 { to: "/about", label: "About" },
                 { to: "/blog", label: "Blog" },
+                { to: "/public-events", label: "Events" },
                 { to: "/contact", label: "Contact" },
                 { to: "/faq", label: "FAQ" }
               ].map((link) => (

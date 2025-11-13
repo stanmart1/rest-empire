@@ -19,6 +19,8 @@ const Contact = () => {
     subject: "",
     message: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formTimestamp] = useState(Math.floor(Date.now() / 1000));
 
   const { data: contactData, isLoading: contactLoading } = useQuery({
     queryKey: ['public-contact'],
@@ -45,11 +47,27 @@ const Contact = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Form submission logic would go here
-    alert("Thank you for your message! We'll get back to you soon.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    setIsSubmitting(true);
+    
+    try {
+      await api.post('/contact/submit', {
+        ...formData,
+        honeypot: "",
+        timestamp: formTimestamp
+      });
+      alert("Thank you for your message! We'll get back to you soon.");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (error: any) {
+      if (error.response?.status === 429) {
+        alert("Please wait 5 minutes before sending another message.");
+      } else {
+        alert("Failed to send message. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -57,12 +75,13 @@ const Contact = () => {
       <Header />
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-secondary">
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary from-0% via-purple-900 via-75% to-secondary to-100%">
         {/* Decorative elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxjaXJjbGUgY3g9IjEwIiBjeT0iMTAiIHI9IjEuNSIgZmlsbD0id2hpdGUiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=')]"></div>
         </div>
 
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-yellow-400/30 to-transparent rounded-full blur-3xl" />
         <div className="container mx-auto px-4 py-28 md:py-36 lg:py-44 relative z-10">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white leading-tight">
@@ -243,8 +262,18 @@ const Contact = () => {
                       />
                     </div>
 
-                    <Button type="submit" className="w-full">
-                      Send Message
+                    {/* Honeypot field - hidden from users */}
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      style={{ position: 'absolute', left: '-9999px' }}
+                    />
+
+                    <Button type="submit" className="w-full" disabled={isSubmitting}>
+                      {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
                     </Button>
                   </form>
                 </CardContent>

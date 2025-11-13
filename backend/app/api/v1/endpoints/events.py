@@ -27,16 +27,48 @@ def list_events(
     event_type: Optional[EventType] = None,
     status: Optional[EventStatus] = None,
     upcoming_only: bool = False,
+    public_only: bool = False,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get all events"""
+    """Get all events (public endpoint - returns only public events if not authenticated)"""
     from app.core.rbac import has_role
+    from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+    from fastapi import Request
     
-    # Allow admins and superadmins to bypass feature access check
-    is_admin = has_role(db, current_user, 'super_admin') or has_role(db, current_user, 'admin')
+    # Try to get current user if authenticated
+    current_user = None
+    is_admin = False
+    try:
+        security = HTTPBearer(auto_error=False)
+        credentials = security(Request(scope={'type': 'http', 'headers': []}))
+        if credentials:
+            from app.api.deps import get_current_user as get_user
+            current_user = get_user(Request(scope={'type': 'http', 'headers': []}), credentials, db)
+            is_admin = has_role(db, current_user, 'super_admin') or has_role(db, current_user, 'admin')
+    except:
+        pass
+    
+    # If not authenticated or requesting public only, filter for public events
+    if not current_user or public_only:
+        from app.models.event import Event
+        from datetime import datetime
+        
+        query = db.query(Event).filter(Event.is_public == True)
+        
+        if event_type:
+            query = query.filter(Event.event_type == event_type)
+        if status:
+            query = query.filter(Event.status == status)
+        if upcoming_only:
+            query = query.filter(Event.start_date > datetime.utcnow())
+        
+        events = query.offset(skip).limit(limit).all()
+        for event in events:
+            event.current_attendees = len(event.registrations)
+            event.is_registered = False
+        return events
     
     if not is_admin:
         # Check feature access for regular users
@@ -58,7 +90,7 @@ def list_events(
     
     events = get_events(
         db=db,
-        user_id=current_user.id,
+        user_id=current_user.id if current_user else None,
         event_type=event_type,
         status=status,
         upcoming_only=upcoming_only,

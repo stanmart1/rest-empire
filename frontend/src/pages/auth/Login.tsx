@@ -50,7 +50,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-blue-100 to-indigo-200 p-4 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -85,7 +85,7 @@ const Login = () => {
         {/* Back to Home Button */}
         <div className="relative lg:col-span-2 mb-4">
           <Link to="/">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="backdrop-blur-sm bg-white/95 shadow-2xl border-white/20">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
             </Button>

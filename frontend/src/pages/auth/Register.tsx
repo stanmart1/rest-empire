@@ -102,7 +102,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-300 from-0% via-teal-100 via-80% to-cyan-200 to-100% p-4 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -137,7 +137,7 @@ const Register = () => {
         {/* Back to Home Button */}
         <div className="relative mb-4">
           <Link to="/">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="backdrop-blur-sm bg-white/95 shadow-2xl border-white/20">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
             </Button>

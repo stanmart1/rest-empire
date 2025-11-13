@@ -19,6 +19,7 @@ import {
   Package,
   Video,
   FileEdit,
+  Mail,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -55,6 +56,7 @@ const AdminSidebar = () => {
     { to: '/admin/promo-materials', icon: FileText, label: 'Promo Materials', permission: 'promo_materials:list' },
     { to: '/admin/video-gallery', icon: Video, label: 'Video Gallery', permission: 'videos:list' },
     { to: '/admin/content-management', icon: FileEdit, label: 'Content Management', permission: 'content:list' },
+    { to: '/admin/contact-messages', icon: Mail, label: 'Contact Messages', permission: 'support:list' },
     { to: '/admin/support', icon: HelpCircle, label: 'Support', permission: 'support:list' },
     { to: '/admin/settings', icon: Settings, label: 'Settings', permission: 'settings' },
   ];

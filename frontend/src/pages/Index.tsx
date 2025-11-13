@@ -124,7 +124,7 @@ const Index = () => {
       <Header />
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden min-h-[600px] md:min-h-[700px] w-full">
+      <div className="relative overflow-hidden h-[600px] md:h-[700px] w-full">
         {heroSlides.map((slide, index) => (
           <motion.div
             key={index}
@@ -163,10 +163,10 @@ const Index = () => {
                 exit={{ opacity: 0, y: -30 }}
                 transition={{ duration: 0.5 }}
               >
-                <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 text-primary-foreground leading-tight">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-5 text-primary-foreground leading-tight">
                   {heroSlides[heroSlide].title} <span className="block">{heroSlides[heroSlide].subtitle}</span>
                 </h1>
-                <p className="text-xl md:text-2xl text-primary-foreground/90 mb-10 max-w-3xl mx-auto">
+                <p className="text-lg md:text-xl text-primary-foreground/90 mb-8 max-w-3xl mx-auto">
                   {heroSlides[heroSlide].description}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -308,15 +308,19 @@ const Index = () => {
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide + 10}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.5 }}
-              whileHover={{ scale: 1.02, boxShadow: "0 25px 50px rgba(0,0,0,0.2)" }}
-              className="bg-card rounded-2xl shadow-lg overflow-hidden transition-all"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+              className="bg-card rounded-2xl shadow-lg overflow-hidden"
             >
-              <div className="grid md:grid-cols-2 gap-8 items-center min-h-[400px]">
-                <div className="p-8 md:p-12 order-2 md:order-1">
+              <div className="grid md:grid-cols-2 gap-0 items-center min-h-[400px]">
+                <motion.div 
+                  className="p-8 md:p-12 order-2 md:order-1"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
                   {((currentSlide - 1 + 3) % 3) === 0 && (
                     <>
                       <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Wealth Education</h3>
@@ -341,30 +345,44 @@ const Index = () => {
                       </p>
                     </>
                   )}
-                </div>
-                <div className="h-full min-h-[400px] overflow-hidden order-1 md:order-2">
+                </motion.div>
+                <motion.div 
+                  className="h-full min-h-[400px] overflow-hidden order-1 md:order-2 relative"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                >
                   {((currentSlide - 1 + 3) % 3) === 0 && (
-                    <img 
+                    <motion.img 
                       src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=600&fit=crop" 
                       alt="Wealth Education - Cryptocurrency and Blockchain" 
                       className="w-full h-full object-cover"
+                      initial={{ scale: 1.1 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
                     />
                   )}
                   {((currentSlide - 1 + 3) % 3) === 1 && (
-                    <img 
+                    <motion.img 
                       src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop" 
                       alt="Health Education - Natural Medicine" 
                       className="w-full h-full object-cover"
+                      initial={{ scale: 1.1 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
                     />
                   )}
                   {((currentSlide - 1 + 3) % 3) === 2 && (
-                    <img 
+                    <motion.img 
                       src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop" 
                       alt="Capacity Development - Learning and Growth" 
                       className="w-full h-full object-cover"
+                      initial={{ scale: 1.1 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
                     />
                   )}
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           </AnimatePresence>

@@ -47,6 +47,8 @@ const AdminBooks = lazy(() => import("./pages/admin/AdminBooks"));
 const AdminEvents = lazy(() => import("./pages/admin/AdminEvents"));
 const AdminPromoMaterials = lazy(() => import("./pages/admin/AdminPromoMaterials"));
 const AdminSupport = lazy(() => import("./pages/admin/AdminSupport"));
+const AdminContactMessages = lazy(() => import("./pages/admin/AdminContactMessages"));
+const PublicEvents = lazy(() => import("./pages/PublicEvents"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminActivationPackages = lazy(() => import("./pages/admin/AdminActivationPackages"));
 const AdminVideoGallery = lazy(() => import("./pages/admin/AdminVideoGallery"));
@@ -88,6 +90,7 @@ const AnimatedRoutes = () => {
         <Route path="/home" element={<PageWrapper><Index /></PageWrapper>} />
         <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
         <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
+        <Route path="/public-events" element={<PageWrapper><PublicEvents /></PageWrapper>} />
         <Route path="/faq" element={<PageWrapper><FAQ /></PageWrapper>} />
         <Route path="/privacy" element={<PageWrapper><Privacy /></PageWrapper>} />
         <Route path="/terms" element={<PageWrapper><Terms /></PageWrapper>} />
@@ -132,6 +135,7 @@ const AnimatedRoutes = () => {
         <Route path="/admin/books" element={<AdminRoute><DashboardLayout><PageWrapper><AdminBooks /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/events" element={<AdminRoute><DashboardLayout><PageWrapper><AdminEvents /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/promo-materials" element={<AdminRoute><DashboardLayout><PageWrapper><AdminPromoMaterials /></PageWrapper></DashboardLayout></AdminRoute>} />
+        <Route path="/admin/contact-messages" element={<AdminRoute><DashboardLayout><PageWrapper><AdminContactMessages /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/support" element={<AdminRoute><DashboardLayout><PageWrapper><AdminSupport /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><DashboardLayout><PageWrapper><AdminSettings /></PageWrapper></DashboardLayout></AdminRoute>} />
         <Route path="/admin/video-gallery" element={<AdminRoute><DashboardLayout><PageWrapper><AdminVideoGallery /></PageWrapper></DashboardLayout></AdminRoute>} />
