@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -60,23 +61,40 @@ logger.info("="*60)
 # CORS - Dynamic based on environment
 allowed_origins = list(settings.CORS_ORIGINS) if isinstance(settings.CORS_ORIGINS, list) else [settings.CORS_ORIGINS]
 
-if ENVIRONMENT != "production":
+if ENVIRONMENT == "production":
+    # Ensure production origins are included
+    production_origins = [
+        "https://restempire.com",
+        "https://www.restempire.com",
+        "https://api.restempire.com"
+    ]
+    for origin in production_origins:
+        if origin not in allowed_origins:
+            allowed_origins.append(origin)
+else:
     allowed_origins.extend([
         "http://localhost:8080",
         "http://localhost:5173",
     ])
 
-# Add CSRF protection first (executes last)
-app.add_middleware(CSRFMiddleware)
+logger.info(f"Allowed CORS Origins: {allowed_origins}")
 
-# Add CORS middleware last (executes first)
+# Add CORS middleware first (executes first for preflight)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With", "X-CSRF-Token"],
+    expose_headers=["Content-Type", "Authorization", "X-CSRF-Token"],
+    max_age=3600,
 )
+
+# Add CSRF protection after CORS
+app.add_middleware(CSRFMiddleware)
+
+# Add GZip compression
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Mount static files
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
