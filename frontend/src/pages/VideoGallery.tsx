@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Video, Play } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -15,6 +15,10 @@ interface VideoItem {
 }
 
 const VideoGallery = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
   
   const { data: videos, isLoading } = useQuery({

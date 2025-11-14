@@ -30,6 +30,10 @@ const Books = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     if (books) {
       books.forEach((book: Book) => {
         apiService.books.getBookReviews(book.id).then((reviews) => {

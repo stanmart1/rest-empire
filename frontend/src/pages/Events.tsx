@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +18,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import RichTextDisplay from '@/components/ui/rich-text-display';
 
 const Events = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();

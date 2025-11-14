@@ -43,6 +43,10 @@ const Register = () => {
 
   const referralCode = searchParams.get('ref');
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const { data: settings } = useQuery({
     queryKey: ['systemSettings'],
     queryFn: async () => {

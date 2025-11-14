@@ -13,6 +13,10 @@ const Ranks = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const fetchRanks = async () => {
       try {
         const [ranksRes, currentRes, historyRes] = await Promise.all([
