@@ -11,6 +11,7 @@ import { Book } from '@/types/admin-books';
 import { useBooks, useBookReviews, useUploadBook, useDeleteBook } from '@/hooks/useAdminBooks';
 import RichTextEditor from '@/components/ui/rich-text-editor';
 import RichTextDisplay from '@/components/ui/rich-text-display';
+import { getImageUrl } from '@/utils/imageUtils';
 
 const AdminBooks = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -200,7 +201,7 @@ const AdminBooks = () => {
                 <Card key={book.id} className="flex flex-col hover:shadow-lg transition-shadow cursor-pointer" onClick={() => handleViewReviews(book)}>
                   <div className="aspect-[3/4] overflow-hidden rounded-t-lg bg-gray-200 relative">
                     <img
-                      src={book.cover_image ? `${import.meta.env.VITE_API_BASE_URL}${book.cover_image}` : '/placeholder-book.png'}
+                      src={getImageUrl(book.cover_image)}
                       alt={book.title}
                       className="w-full h-full object-contain"
                       onError={(e) => {
@@ -244,7 +245,7 @@ const AdminBooks = () => {
                   {books.map((book) => (
                     <div key={book.id} className="flex items-center gap-4 p-4 hover:bg-muted/30 cursor-pointer transition-colors" onClick={() => handleViewReviews(book)}>
                       <img
-                        src={book.cover_image ? `${import.meta.env.VITE_API_BASE_URL}${book.cover_image}` : '/placeholder-book.png'}
+                        src={getImageUrl(book.cover_image)}
                         alt={book.title}
                         className="w-16 h-24 object-contain rounded"
                         onError={(e) => {

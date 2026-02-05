@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import api from '@/lib/api';
 import { AdminVerification } from '@/lib/admin-types';
 import RichTextEditor from '@/components/ui/rich-text-editor';
+import { getImageUrl } from '@/utils/imageUtils';
 
 const AdminVerifications = () => {
   const [selectedVerification, setSelectedVerification] = useState<AdminVerification | null>(null);
@@ -271,13 +272,13 @@ const AdminVerifications = () => {
             <div className="w-full h-[70vh] overflow-auto">
               {selectedVerification.document_file_path.toLowerCase().endsWith('.pdf') ? (
                 <iframe
-                  src={`${import.meta.env.VITE_API_BASE_URL}${selectedVerification.document_file_path}`}
+                  src={getImageUrl(selectedVerification.document_file_path)}
                   className="w-full h-full border-0"
                   title="Verification Document"
                 />
               ) : (
                 <img
-                  src={`${import.meta.env.VITE_API_BASE_URL}${selectedVerification.document_file_path}`}
+                  src={getImageUrl(selectedVerification.document_file_path)}
                   alt="Verification Document"
                   className="w-full h-auto"
                 />

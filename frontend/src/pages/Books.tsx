@@ -12,6 +12,7 @@ import { Book, BookReview } from '@/types/books';
 import FeatureRestricted from '@/components/common/FeatureRestricted';
 import RichTextEditor from '@/components/ui/rich-text-editor';
 import RichTextDisplay from '@/components/ui/rich-text-display';
+import { getImageUrl } from '@/utils/imageUtils';
 
 const BOOKS_PER_PAGE = 12;
 
@@ -138,7 +139,7 @@ const Books = () => {
           <Card key={book.id} className="flex flex-col hover:shadow-lg transition-shadow duration-300">
             <div className="aspect-[3/4] overflow-hidden rounded-t-lg bg-gray-200">
               <img 
-                src={book.cover_image ? `${import.meta.env.VITE_API_BASE_URL}${book.cover_image}` : '/placeholder-book.png'} 
+                src={getImageUrl(book.cover_image)} 
                 alt={book.title}
                 className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                 onError={(e) => {

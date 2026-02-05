@@ -491,44 +491,48 @@ const AdminContentManagement = () => {
                       Add Blog
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
+                  <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
                     <DialogHeader>
                       <DialogTitle>{editingBlog ? 'Edit Blog' : 'Add Blog'}</DialogTitle>
                     </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label>Title</Label>
-                        <Input
-                          value={blogFormData.title}
-                          onChange={(e) => setBlogFormData({ ...blogFormData, title: e.target.value })}
-                          placeholder="Enter blog title"
-                        />
+                    <div className="flex-1 overflow-y-auto px-1">
+                      <div className="space-y-4 py-4">
+                        <div>
+                          <Label>Title</Label>
+                          <Input
+                            value={blogFormData.title}
+                            onChange={(e) => setBlogFormData({ ...blogFormData, title: e.target.value })}
+                            placeholder="Enter blog title"
+                          />
+                        </div>
+                        <div>
+                          <Label>Author</Label>
+                          <Input
+                            value={blogFormData.author}
+                            onChange={(e) => setBlogFormData({ ...blogFormData, author: e.target.value })}
+                            placeholder="Enter author name"
+                          />
+                        </div>
+                        <div>
+                          <Label>Image URL</Label>
+                          <Input
+                            value={blogFormData.image_url || ''}
+                            onChange={(e) => setBlogFormData({ ...blogFormData, image_url: e.target.value })}
+                            placeholder="Enter image URL"
+                          />
+                        </div>
+                        <div>
+                          <Label>Content</Label>
+                          <RichTextEditor
+                            value={blogFormData.content}
+                            onChange={(value) => setBlogFormData({ ...blogFormData, content: value })}
+                            placeholder="Enter blog content"
+                            minHeight="200px"
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <Label>Author</Label>
-                        <Input
-                          value={blogFormData.author}
-                          onChange={(e) => setBlogFormData({ ...blogFormData, author: e.target.value })}
-                          placeholder="Enter author name"
-                        />
-                      </div>
-                      <div>
-                        <Label>Image URL</Label>
-                        <Input
-                          value={blogFormData.image_url || ''}
-                          onChange={(e) => setBlogFormData({ ...blogFormData, image_url: e.target.value })}
-                          placeholder="Enter image URL"
-                        />
-                      </div>
-                      <div>
-                        <Label>Content</Label>
-                        <RichTextEditor
-                          value={blogFormData.content}
-                          onChange={(value) => setBlogFormData({ ...blogFormData, content: value })}
-                          placeholder="Enter blog content"
-                          minHeight="300px"
-                        />
-                      </div>
+                    </div>
+                    <div className="pt-4 border-t">
                       <Button onClick={handleBlogSubmit} disabled={createBlogMutation.isPending || updateBlogMutation.isPending}>
                         {(createBlogMutation.isPending || updateBlogMutation.isPending) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                         {editingBlog ? 'Update' : 'Create'}

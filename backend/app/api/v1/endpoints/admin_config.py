@@ -164,6 +164,7 @@ def admin_get_platform_settings(
     db: Session = Depends(get_db)
 ):
     """Admin: Get platform settings"""
+    default_sponsor = get_config(db, "default_sponsor_id")
     return {
         "min_payout_ngn": float(get_config(db, "min_payout_ngn") or 5000),
         "min_payout_usdt": float(get_config(db, "min_payout_usdt") or 10),
@@ -177,7 +178,8 @@ def admin_get_platform_settings(
         "monthly_withdrawal_limit": float(get_config(db, "monthly_withdrawal_limit") or 0),
         "max_referral_depth": int(get_config(db, "max_referral_depth") or 15),
         "access_token_expire_minutes": int(get_config(db, "access_token_expire_minutes") or 30),
-        "refresh_token_expire_days": int(get_config(db, "refresh_token_expire_days") or 7)
+        "refresh_token_expire_days": int(get_config(db, "refresh_token_expire_days") or 7),
+        "default_sponsor_id": int(default_sponsor) if default_sponsor else None
     }
 
 @router.put("/config/settings/platform")

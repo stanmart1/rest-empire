@@ -4,6 +4,7 @@ import { Loader2, Video, Play } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import VideoPlayerModal from '@/components/VideoPlayerModal';
+import { getImageUrl } from '@/utils/imageUtils';
 
 interface VideoItem {
   id: number;
@@ -60,7 +61,7 @@ const VideoGallery = () => {
                   {video.thumbnail_url ? (
                     <>
                       <img
-                        src={`${import.meta.env.VITE_API_BASE_URL}${video.thumbnail_url}`}
+                        src={getImageUrl(video.thumbnail_url)}
                         alt={video.title}
                         className="w-full h-full object-cover"
                       />

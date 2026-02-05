@@ -40,11 +40,7 @@ def get_file_url(file_path: str) -> str:
     # Remove the storage base path and return relative to /uploads mount point
     relative_path = str(Path(file_path).relative_to(UPLOAD_DIR))
     
-    # In production, return full URL with API base
-    if ENVIRONMENT == "production":
-        api_base = settings.API_BASE_URL or "https://api.restempire.com"
-        return f"{api_base}/uploads/{relative_path.replace(os.sep, '/')}"
-    
+    # Always return relative path - let frontend handle the base URL
     return f"/uploads/{relative_path.replace(os.sep, '/')}"
 
 def normalize_image_url(url: str) -> str:
